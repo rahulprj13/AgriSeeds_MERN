@@ -1,15 +1,30 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
+import {toast} from 'react-toastify'
+
 
 const Getapi = () => {
   const [formdata, setFormdata] = useState([])
 
+
+   //fetch data from api
   const userdata = async () => {
     const res = await axios.get("https://node5.onrender.com/user/user/")
     console.log("response..", res);
     console.log("response data..", res.data.data);
     setFormdata(res.data.data)
   }
+
+   //for delete data
+  const deletedata = async(id) =>{
+    const res = await axios.delete(`https://node5.onrender.com/user/user/${id}`)
+    console.log("deleted ", res);
+    if(res.status == 204){
+      toast.success("data deleted successfully...")
+      userdata()
+    }
+  }
+
   useEffect(() => {
     userdata()
   }, [])
@@ -18,7 +33,6 @@ const Getapi = () => {
   return (
     <div style={{textAlign:"center"}}>
       <h1>API Data </h1>
-      {/* <button onClick={userdata}>get data</button> */}
       <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
         <div className="w-full max-w-4xl bg-white shadow-2xl rounded-2xl overflow-hidden">
 
@@ -47,6 +61,10 @@ const Getapi = () => {
                     <td className="py-3 px-6 font-medium">{form._id}</td>
                     <td className="py-3 px-6">{form.name}</td>
                     <td className="py-3 px-6 text-indigo-600">{form.email}</td>
+                    <td className="py-3 px-6">
+                      <button onClick={()=>{deletedata(form._id)}} className='text-red-600 cursor-pointer'>DELETE</button>
+                    </td>
+
                   </tr>
                 ))}
               </tbody>
