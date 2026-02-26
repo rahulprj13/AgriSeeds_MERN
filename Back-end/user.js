@@ -1,12 +1,12 @@
-console.log("this is user file");
+// console.log("this is user file");
 
-const name="rahul"
+// const name="rahul"
 
-const data = (x) =>{
-    console.log("x is ", + x);
+// const data = (x) =>{
+//     console.log("x is ", + x);
     
-}
+// }
 
-module.exports={
-    name, data
-}
+// module.exports={
+//     name, data
+// }

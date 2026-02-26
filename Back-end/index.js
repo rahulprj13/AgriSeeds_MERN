@@ -1,59 +1,62 @@
-// const express = require("express")
-// const app = express()
+const express = require("express")
+const app = express()
 
-// app.get("/", (req, res) =>{
-//     res.send("hello montu...")
+// const user = {
+//     name:"rahul",
+//     age:23,
+//     city:"patan",
+// };
 
+// app.get("/user", (req,res) =>{
+//     // res.send("this is our first")  
+
+//     res.json({
+//         message:"user fetched successfullyl..",
+//         data:user,
+
+//     });
+// });
+
+// app.get("/user/:id", (req,res) =>{
+//     console.log(req.params);
+//     console.log(req.params.id);
+//     res.json({
+//         message:"data fetched"
+//     })
 // })
 
-// app.get("/getdata", (req, res) =>{
-//     console.log(req)
-//     res.send([
-//         {
-//         name:"rahul",
-//         age:"20"
-//         },{
-//         name:"montu",
-//         age:"20"
-//         },{
-//         name:"rahul",
-//         age:"20"
-//         },{
-//         name:"rahul",
-//         age:"20"
-//         },{
-//         name:"rahul",
-//         age:"20"
-//         },
-// ])
 
-// })
 
-// app.get("/", (req, res) =>{
-//     res.send("hello montu...")
+const users = [
+    {id:1, name:"rahul",age:23},
+    {id:2, name:"piyush",age:23},
+    {id:3, name:"rajat",age:23},
+    {id:4, name:"raj",age:23},
+]
 
-// })
-
-// app.listen(5000,()=>{
-//     console.log("server is running on port 5000...");
+app.get("/users/:id", (req, res)=>{
+    console.log(req.params);
     
-// })
+    // res.json({
+    //     message:"fetched successfully",
+    //     data:users
+    // });
+
+    const user = users.find(u => u.id === parseInt(req.params.id));
+    if(!user){
+        return res.status(404).json({
+            message:"user not found"
+        });
+    }
+        res.json({
+            message:"user fetched successfully",
+            data:user
+        });
+
+});
 
 
-console.log("index js file");
-
-// user file
-const user= require("./user")
-console.log("name is ",user.name);
-console.log(user.data(189));
-
-//employee file
-const emp = require("./employee")
-console.log(emp);
-
-const userdata = emp
-console.log("age is",userdata.emp.age);
-
-
-
-
+const PORT = 3000
+app.listen(PORT,()=>{
+    console.log(`server run on ${PORT} port`);
+})
