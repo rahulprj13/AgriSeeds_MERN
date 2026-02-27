@@ -1,7 +1,49 @@
 {
-    "emmet.preferences": {
+    "code-runner.runInTerminal": true,
+    "workbench.iconTheme": "material-icon-theme",
+    "git.openRepositoryInParentFolders": "never",
+    "editor.fontSize": 16,
+    "editor.mouseWheelZoom": true,
+    "editor.wordWrap": "on",
+    "[html]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+    "[javascriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "files.autoSave": "afterDelay",
+    "git.autofetch": true,
+    "git.confirmSync": false,
     "emmet.includeLanguages": {
         "javascript": "javascriptreact"
     },
+    "files.associations": {
+    "*.jsx": "javascriptreact"
+    },
+ 
+    "github.copilot.enable": {
+        "*": false,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false,
+        "javascriptreact": false
+    },
+    "json.schemas": [
+        {
+            "exclude":["node_modules"]
+        }
+    ],
+    "javascript.preferences.importModuleSpecifierEnding": "js",
+    "javascript.preferences.importModuleSpecifier": "relative",
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "typescript.preferences.importModuleSpecifierEnding": "js",
+    "reactSnippets.settings.prettierEnabled": true,
+
+    "js/ts.implicitProjectConfig.experimentalDecorators": true,
+
+    "javascript.suggest.completeFunctionCalls": true,
+    "javascript.suggest.autoImports": true
 }
