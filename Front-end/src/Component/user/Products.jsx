@@ -55,7 +55,7 @@ const Products = () => {
                             <button
                                 className="mt-4 bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 transition"
                                 onClick={() =>
-                                    navigate(`/user/category/${type}/${item}/${p.id}`, {
+                                    navigate(`/category/${type}/${item}/${p.id}`, {
                                         state: p
                                     })
                                 }

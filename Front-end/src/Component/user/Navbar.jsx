@@ -42,7 +42,7 @@ export const Navbar = () => {
 
                     {/* Logo */}
                     <Link
-                        to="/user/home"
+                        to="/home"
                         onClick={closeAll}
                         className="text-white text-2xl font-semibold whitespace-nowrap"
                     >
@@ -102,13 +102,6 @@ export const Navbar = () => {
                             About
                         </NavLink>
 
-                         <NavLink to="getapi" className={({ isActive }) =>
-                            isActive ? "text-green-500 font-semibold"
-                                : "text-gray-300 hover:text-white"
-                        }>
-                            Getapi
-                        </NavLink>
-
                         <NavLink to="contact" className={({ isActive }) =>
                             isActive ? "text-green-500 font-semibold"
                                 : "text-gray-300 hover:text-white"
@@ -149,7 +142,7 @@ export const Navbar = () => {
                         </div>
 
                         <NavLink
-                            to="/"
+                            to="/login"
                             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
                         >
                             Login

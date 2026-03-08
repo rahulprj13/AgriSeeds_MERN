@@ -25,11 +25,15 @@
     },
  
     "github.copilot.enable": {
-        "*": false,
+        "*": true,
         "plaintext": false,
         "markdown": false,
         "scminput": false,
-        "javascriptreact": false
+        "html": true,
+        "c": true,
+        "php": true,
+        "javascript": false,
+        "javascriptreact": true
     },
     "json.schemas": [
         {

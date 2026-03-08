@@ -59,7 +59,7 @@ const Category = () => {
                             </p>
 
                             <button
-                                onClick={() => navigate(`/user/category/${type}/${item}`)}
+                                onClick={() => navigate(`/category/${type}/${item}`)}
                                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition duration-300 hover:scale-105"
                             >
                                 View Product

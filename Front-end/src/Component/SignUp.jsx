@@ -1,3 +1,4 @@
+  import axios from "axios"
 import React, { useState } from "react";
 import img from "../assets/Images/background.jpg";
 import { Link, useNavigate } from "react-router-dom";
@@ -58,9 +59,32 @@ const SignUp = () => {
     },
   };
 
-  const onSubmit = (data) => {
-    alert("Registered Successfully...");
-  };
+  const onSubmit = async (data) => {
+
+  try{
+
+    const res = await axios.post(
+      "http://localhost:5000/api/auth/register",
+      {
+        name:data.name,
+        email:data.email,
+        password:data.password
+      }
+    )
+
+    alert(res.data.message)
+
+    navigate("/login")
+
+  }
+  catch(err){
+
+    alert(err.response.data.message)
+
+  }
+
+}
+
 
   return (
     <div
@@ -187,7 +211,7 @@ const SignUp = () => {
 
           <p className="text-center mt-4">
             Already have an account?{" "}
-            <Link to="/" className="text-yellow-400 font-bold">
+            <Link to="/login" className="text-yellow-400 font-bold">
               Login
             </Link>
           </p>

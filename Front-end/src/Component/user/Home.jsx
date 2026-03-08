@@ -38,7 +38,7 @@ const Home = () => {
             </p>
 
             <Link
-              to="/user/category/vegetable"
+              to="/category/vegetable"
               className="inline-block mt-8 bg-white text-green-700 font-semibold px-8 py-3 rounded-full shadow-lg hover:scale-105 transition duration-300"
             >
               Shop Now
@@ -82,7 +82,7 @@ const Home = () => {
               </h3>
 
               <NavLink
-                to={`/user/category/${cat.catName}`}
+                to={`/category/${cat.catName}`}
                 className="inline-block mt-6 text-green-600 font-semibold hover:underline"
               >
                 Explore →
@@ -146,7 +146,7 @@ const Home = () => {
         </p>
 
         <Link
-          to="/user/category/vegetable"
+          to="/category/vegetable"
           className="inline-block mt-8 bg-green-600 hover:bg-green-700 px-8 py-3 rounded-full text-lg shadow-lg transition"
         >
           Start Shopping
