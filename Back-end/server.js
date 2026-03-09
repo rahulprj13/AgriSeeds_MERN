@@ -1,16 +1,12 @@
 const express = require("express")
+const cors = require("cors")
 const app = express()
 
 app.use(express.json())
+app.use(cors())
 
 const connectDB = require("./config/db.js")
 connectDB()
-
-// const employee = require("./routes/EmployeeRoute.js")
-// app.use(employee)
-
-// const userRoutes = require("./routes/UserRoutes.js")
-// app.use(userRoutes)
 
 const authRouter = require("./routes/auth.js")
 app.use(authRouter)

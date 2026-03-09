@@ -1,30 +1,42 @@
 import React from 'react'
-import { useState } from 'react'
 import AppRouter from './router/AppRouter'
 import CategoryContextProvider from './Component/context/CategoryContext'
-import { ToastContainer, toast, Zoom } from 'react-toastify';
+import { ToastContainer, Zoom } from 'react-toastify';
+import axios from 'axios';
+import AuthContextProvider from './Component/context/AuthContext';
+import CartProvider from './Component/context/CartContext';
 
 function App() {
 
+  axios.defaults.baseURL = "http://localhost:5000"
+
   return (
     <>
-      <CategoryContextProvider>
-        <AppRouter />
-       <ToastContainer
-        position="top-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-        transition={Zoom}
-      />
-      
-      </CategoryContextProvider>
+      <AuthContextProvider>
+        <CartProvider>
+
+          <CategoryContextProvider>
+
+            <AppRouter />
+
+            <ToastContainer
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick={false}
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="dark"
+              transition={Zoom}
+            />
+
+          </CategoryContextProvider>
+        </CartProvider>
+
+      </AuthContextProvider>
     </>
   )
 }

@@ -2,7 +2,12 @@ const mongoose = require("mongoose")
 
 const UserSchema = new mongoose.Schema({
 
-  name:{
+  firstname:{
+    type:String,
+    required:true
+  },
+
+  lastname:{
     type:String,
     required:true
   },
@@ -16,6 +21,18 @@ const UserSchema = new mongoose.Schema({
   password:{
     type:String,
     required:true
+  },
+
+  role:{
+    type:String,
+    default:"user",
+    enum:["user","admin"]
+  },
+
+  status:{
+    type:String,
+    default:"active",
+    enum:["active", "inactive", "deleted", "blocked"]
   }
 
 })

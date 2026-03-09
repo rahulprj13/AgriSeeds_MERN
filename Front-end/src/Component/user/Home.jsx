@@ -95,7 +95,7 @@ const Home = () => {
 
 
       {/* 🚚 SERVICES SECTION */}
-      <div className="bg-white py-24">
+      <div className="bg-linear-to-r from-gray-900 to-gray-800 text-white py-24 text-center">
         <div className="max-w-7xl mx-auto px-6">
 
           <h2 className="text-center text-4xl font-extrabold mb-16">
@@ -136,7 +136,7 @@ const Home = () => {
 
 
       {/* 💰 DISCOUNT SECTION */}
-      <div className="bg-linear-to-r from-gray-900 to-gray-800 text-white py-24 text-center">
+      <div className="bg-linear-to-r from-gray-200 to-gray-200 py-24 text-center">
         <h2 className="text-4xl font-extrabold">
           Get 20% Off On Your First Order!
         </h2>
@@ -155,7 +155,7 @@ const Home = () => {
 
 
       {/* 🌟 CTA SECTION */}
-      <div className="py-24 text-center bg-gray-50">
+      {/* <div className="py-24 text-center bg-gray-50">
         <h2 className="text-4xl font-extrabold">
           Ready to Grow Something Amazing?
         </h2>
@@ -170,7 +170,7 @@ const Home = () => {
         >
           Create Account
         </Link>
-      </div>
+      </div> */}
 
     </div>
   );

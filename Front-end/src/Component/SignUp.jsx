@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faSeedling } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,18 +23,28 @@ const SignUp = () => {
 
   // ✅ SINGLE Validation Object
   const validationRules = {
-    name: {
-      required: "Full name is required*",
+    firstname: {
+      required: "First name is required*",
       pattern: {
         value: /^[A-Za-z\s]+$/,
         message: "Name can contain only letters*",
       },
       minLength: {
-        value: 5,
-        message: "Name must be at least 5 characters*",
+        value: 3,
+        message: "Name must be at least 3 characters*",
       },
     },
-
+    lastname: {
+      required: "Last name is required*",
+      pattern: {
+        value: /^[A-Za-z\s]+$/,
+        message: "Name can contain only letters*",
+      },
+      minLength: {
+        value: 3,
+        message: "Name must be at least 3 characters*",
+      },
+    },
     email: {
       required: "Email is required*",
       pattern: {
@@ -59,27 +70,20 @@ const SignUp = () => {
     },
   };
 
-  const onSubmit = async (data) => {
+  const submitHandler = async (data) => {
 
   try{
 
-    const res = await axios.post(
-      "http://localhost:5000/api/auth/signup",
-      {
-        name:data.name,
-        email:data.email,
-        password:data.password
-      }
-    )
-
-    alert(res.data.message)
-
-    navigate("/login")
-
+    const res = await axios.post("/signup", data)
+    if(res.status === 201)    
+    {
+      toast.success("user registered successfully...")
+      navigate("/login")
+    }
   }
   catch(err){
 
-    alert(err.response.data.message)
+    toast.error(err.response.data.message)
 
   }
 
@@ -131,19 +135,33 @@ const SignUp = () => {
            Create Account
         </h2>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(submitHandler)}>
 
-          {/* Name */}
+          {/* firstName */}
           <div className="mb-4">
-            <label className="block mb-1">Full Name</label>
+            <label className="block mb-1">First Name</label>
             <input
               type="text"
-              placeholder="Enter your name"
-              {...register("name", validationRules.name)}
+              placeholder="Enter your first name"
+              {...register("firstname", validationRules.firstname)}
               className="w-full p-2 rounded bg-transparent border border-gray-300 text-white outline-none"
             />
             <p className="text-black text-1xl mt-1">
-              {errors.name?.message}
+              {errors.firstname?.message}
+            </p>
+          </div>
+
+            {/* lastName */}
+          <div className="mb-4">
+            <label className="block mb-1">Last Name</label>
+            <input
+              type="text"
+              placeholder="Enter your last name"
+              {...register("lastname", validationRules.lastname)}
+              className="w-full p-2 rounded bg-transparent border border-gray-300 text-white outline-none"
+            />
+            <p className="text-black text-1xl mt-1">
+              {errors.lastname?.message}
             </p>
           </div>
 

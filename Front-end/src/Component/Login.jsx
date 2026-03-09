@@ -1,24 +1,25 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import img from "../assets/Images/background.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faSeedling } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import axios from "axios";
 import { toast } from "react-toastify";
-
+import { AuthContext } from "./context/AuthContext";
 
 const Login = () => {
+
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-
-
 
   const validationRules = {
     email: {
@@ -30,12 +31,6 @@ const Login = () => {
     },
     password: {
       required: "Password is required*",
-      message: "Password must be at least 8 characters, include an uppercase letter, a number, and a special character*",
-      // pattern: {
-      //   value: /^(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&]).{8,}$/,
-      //   message:
-      //     "Min 8 chars, 1 uppercase, 1 number, 1 special character*",
-      // },
     },
   };
 
@@ -43,24 +38,36 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
-  const onSubmit = async(data) => {
-    try{
-      const res = await axios.post("https://node5.onrender.com/user/login",data)
-      console.log("response...", res);
-      console.log("response data...", res.data);
+  const onSubmit = async (data) => {
 
-      if (res.status == 200) {
-        toast.success("Login successfully")
-        navigate("/user");
+    try {
+
+      setLoading(true);
+
+      await login(data);
+
+      toast.success("Login successfully");
+
+      navigate("/");
+
+    } catch (error) {
+
+      if (error.response && error.response.data.message) {
+
+        toast.error(error.response.data.message);
+
+      } else {
+
+        toast.error("Something went wrong");
+
       }
-      
-    }catch{
-      console.log(errors);
-      toast.error("Login failed. Please check your credentials.")
-      
+
+    } finally {
+
+      setLoading(false);
+
     }
-    // alert("Login Successfully 🚀");
-    // navigate("/user");
+
   };
 
   return (
@@ -78,6 +85,7 @@ const Login = () => {
           border border-[rgba(113,109,109,0.3)]
         "
       >
+
         {/* Close Button */}
         <button
           onClick={() => navigate("/")}
@@ -106,6 +114,7 @@ const Login = () => {
         </h2>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
+
           {/* Email */}
           <div className="mb-4">
             <label className="font-semibold block mb-1">
@@ -180,8 +189,12 @@ const Login = () => {
           </div>
 
           {/* Login Button */}
-          <button className="w-full bg-white text-black font-bold py-2 rounded-md mt-2 hover:bg-gray-200 transition">
-            Login
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-white text-black font-bold py-2 rounded-md mt-2 hover:bg-gray-200 transition"
+          >
+            {loading ? "Logging in..." : "Login"}
           </button>
 
           {/* Register */}
@@ -194,6 +207,7 @@ const Login = () => {
               Register
             </Link>
           </p>
+
         </form>
       </div>
     </div>
