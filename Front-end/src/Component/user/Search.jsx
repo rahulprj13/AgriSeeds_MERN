@@ -13,27 +13,50 @@ const Search = () => {
 
     let results = [];
 
-    Object.keys(categoryData).forEach((cat) => {
+    if (categoryData) {
 
-        if (cat.toLowerCase().includes(searchText)) {
-            results.push({
-                type: "category",
-                name: cat,
-                title: categoryData[cat].title
-            });
-        }
+        Object.keys(categoryData).forEach((cat) => {
 
-        categoryData[cat].items.forEach((item) => {
-            if (item.toLowerCase().includes(searchText)) {
+            const category = categoryData[cat];
+
+            // CATEGORY SEARCH
+            if (cat.toLowerCase().includes(searchText)) {
+
                 results.push({
-                    type: "item",
-                    name: item,
-                    category: cat
+                    type: "category",
+                    name: cat,
+                    title: category.title
                 });
+
             }
+
+            // ITEM SEARCH
+            if (category.items && Array.isArray(category.items)) {
+
+                category.items.forEach((item) => {
+
+                    const itemName =
+                        typeof item === "string"
+                            ? item
+                            : item.name || "";
+
+                    if (itemName.toLowerCase().includes(searchText)) {
+
+                        results.push({
+                            type: "item",
+                            name: itemName,
+                            category: cat
+                        });
+
+                    }
+
+                });
+
+            }
+
         });
 
-    });
+    }
 
     return (
 
@@ -41,7 +64,7 @@ const Search = () => {
 
             <div className="max-w-7xl mx-auto px-4">
 
-                {/* ✅ Title */}
+                {/* Title */}
                 <h1 className="text-4xl font-extrabold mb-12">
                     Search Results for{" "}
                     <span className="text-green-600 capitalize">
@@ -49,12 +72,11 @@ const Search = () => {
                     </span>
                 </h1>
 
-
                 {/* Empty State */}
                 {results.length === 0 && (
                     <div className="flex flex-col items-center justify-center mt-24 text-center">
 
-                        <div className="text-7xl mb-6">🔍</div>
+                        {/* <div className="text-7xl mb-6"></div> */}
 
                         <h2 className="text-3xl font-bold mb-2">
                             No Results Found
@@ -67,8 +89,7 @@ const Search = () => {
                     </div>
                 )}
 
-
-                {/* ✅ Results Grid */}
+                {/* Results */}
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
 
                     {results.map((res, index) => (
@@ -76,11 +97,17 @@ const Search = () => {
                         <div
                             key={index}
                             onClick={() => {
+
                                 if (res.type === "category") {
-                                    navigate(`category/${res.name}`);
+
+                                    navigate(`/category/${res.name}`);
+
                                 } else {
-                                    navigate(`products/${res.category}/${res.name}`);
+
+                                    navigate(`/category/${res.category}/${res.name}`);
+
                                 }
+
                             }}
                             className="
                                 group
@@ -96,7 +123,6 @@ const Search = () => {
                             "
                         >
 
-                            {/* Badge */}
                             <span className={`
                                 inline-block
                                 text-xs
@@ -114,8 +140,6 @@ const Search = () => {
                                     : "Product"}
                             </span>
 
-
-                            {/* Fake Image Box (Optional but looks premium) */}
                             <div className="
                                 h-32
                                 rounded-xl
@@ -133,13 +157,10 @@ const Search = () => {
                                 🌱
                             </div>
 
-
-                            {/* Name */}
                             <h2 className="text-xl font-bold capitalize mb-2 group-hover:text-green-600 transition">
                                 {res.name}
                             </h2>
 
-                            {/* Subtitle */}
                             <p className="text-gray-500 text-sm">
                                 {res.type === "category"
                                     ? res.title
@@ -153,7 +174,9 @@ const Search = () => {
                 </div>
 
             </div>
+
         </div>
+
     );
 };
 
