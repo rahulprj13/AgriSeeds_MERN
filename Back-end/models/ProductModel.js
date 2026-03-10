@@ -7,27 +7,38 @@ const ProductSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    description: {
-      type: String,
+
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "categories",
+      required: true,
     },
+
     price: {
       type: Number,
       required: true,
       min: 0,
     },
-    image: {
+
+    description: {
       type: String,
     },
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-      required: true,
+
+    discountPrice: {
+      type: Number,
+      min: 0,
     },
+
     stock: {
       type: Number,
       default: 0,
       min: 0,
     },
+
+    image: {
+      type: String,
+    },
+
     status: {
       type: String,
       enum: ["active", "inactive"],
@@ -40,4 +51,3 @@ const ProductSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("Product", ProductSchema);
-

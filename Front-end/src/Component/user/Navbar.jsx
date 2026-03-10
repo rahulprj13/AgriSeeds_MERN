@@ -139,7 +139,7 @@ export const Navbar = () => {
                                     onClick={() => setDropdown(!dropdown)}
                                     className="text-gray-300 hover:text-white"
                                 >
-                                    Categories ▼
+                                    Seeds ▼
                                 </button>
 
                                 {dropdown && (
@@ -249,7 +249,7 @@ export const Navbar = () => {
                                     onClick={() => setDropdown(!dropdown)}
                                     className="text-gray-300 hover:text-white"
                                 >
-                                    Categories ▼
+                        Seeds▼
                                 </button>
 
                                 {dropdown && (

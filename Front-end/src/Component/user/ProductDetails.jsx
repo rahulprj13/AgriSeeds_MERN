@@ -92,26 +92,54 @@
 // export default ProductDetails;
 
 
-import React, { useContext } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import { CartContext } from "../context/CartContext";
 
 const ProductDetails = () => {
+  const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const { addToCart } = useContext(CartContext);
 
-  // GET DATA
-  const product = location.state;
+  const [product, setProduct] = useState(location.state || null);
+  const [detail, setDetail] = useState(null);
+  const [loading, setLoading] = useState(!location.state);
 
-  // Safety check
+  useEffect(() => {
+    if (!id) return;
+
+    const load = async () => {
+      try {
+        const res = await axios.get(`/api/products/${id}`);
+        setProduct(res.data.product);
+        setDetail(res.data.detail);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // If we already have full product in state, still fetch to get detail
+    load();
+  }, [id]);
+
+  if (!product && loading) {
+    return (
+      <div className="text-center mt-12">
+        <h2 className="text-2xl font-semibold">Loading product...</h2>
+      </div>
+    );
+  }
+
   if (!product) {
     return (
       <div className="text-center mt-12">
         <h2 className="text-2xl font-semibold">Product Not Found 😢</h2>
-
         <button
           className="mt-4 bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 transition"
           onClick={() => navigate(-1)}
@@ -122,18 +150,13 @@ const ProductDetails = () => {
     );
   }
 
-  // Handle Add to Cart
   const handleAddToCart = () => {
     if (!user) {
-      // Redirect to login page if not logged in
       navigate("/login");
       return;
     }
 
-    // Add product to persistent cart via CartContext
     addToCart(product);
-
-    // Navigate to cart page
     navigate("/cart");
   };
 
@@ -147,7 +170,6 @@ const ProductDetails = () => {
       </button>
 
       <div className="grid md:grid-cols-2 gap-10 items-center">
-        {/* Image */}
         <div>
           <img
             src={product.image}
@@ -156,7 +178,6 @@ const ProductDetails = () => {
           />
         </div>
 
-        {/* Details */}
         <div>
           <h2 className="text-3xl font-bold">{product.name}</h2>
 
@@ -164,10 +185,48 @@ const ProductDetails = () => {
             ₹{product.price}
           </h3>
 
+          {detail?.brand && (
+            <p className="mt-2 text-gray-700">
+              <span className="font-semibold">Brand:</span> {detail.brand}
+            </p>
+          )}
+
           <p className="mt-4 text-gray-700">
-            Premium quality seeds with high germination rate. Perfect for
-            farmers and home gardeners.
+            {detail?.description ||
+              "Premium quality seeds with high germination rate. Perfect for farmers and home gardeners."}
           </p>
+
+          <div className="mt-4 grid grid-cols-2 gap-2 text-sm text-gray-700">
+            {detail?.weight && (
+              <p>
+                <span className="font-semibold">Weight:</span> {detail.weight}
+              </p>
+            )}
+            {detail?.germinationRate && (
+              <p>
+                <span className="font-semibold">Germination:</span>{" "}
+                {detail.germinationRate}
+              </p>
+            )}
+            {detail?.suitableSeason && (
+              <p>
+                <span className="font-semibold">Season:</span>{" "}
+                {detail.suitableSeason}
+              </p>
+            )}
+            {detail?.plantingDepth && (
+              <p>
+                <span className="font-semibold">Depth:</span>{" "}
+                {detail.plantingDepth}
+              </p>
+            )}
+            {detail?.spacing && (
+              <p>
+                <span className="font-semibold">Spacing:</span>{" "}
+                {detail.spacing}
+              </p>
+            )}
+          </div>
 
           <div className="mt-6 flex gap-4">
             <button

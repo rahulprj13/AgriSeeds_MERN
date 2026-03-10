@@ -12,7 +12,8 @@ const authRouter = require("./routes/AuthRoutes.js");
 const cartRouter = require("./routes/CartRoutes.js");
 const categoryRouter = require("./routes/CategoryRoutes.js");
 const adminCategoryRouter = require("./routes/AdminCategoryRoutes.js");
-const adminProductRouter = require("./routes/AdminProductRoutes.js");
+const adminProductRouter = require("./routes/adminProductRoutes.js");
+const productRouter = require("./routes/ProductRoutes.js");
 const adminDashboardRouter = require("./routes/AdminDashboardRoutes.js");
 
 app.use(authRouter);
@@ -20,6 +21,7 @@ app.use(categoryRouter);
 app.use("/api/cart", cartRouter);
 app.use(adminCategoryRouter);
 app.use(adminProductRouter);
+app.use(productRouter);
 app.use(adminDashboardRouter);
 
 const PORT = 5000;
