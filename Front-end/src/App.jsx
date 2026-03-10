@@ -4,7 +4,7 @@ import CategoryContextProvider from './Component/context/CategoryContext'
 import { ToastContainer, Zoom } from 'react-toastify';
 import axios from 'axios';
 import AuthContextProvider from './Component/context/AuthContext';
-import CartProvider from './Component/context/CartContext';
+import {CartProvider} from './Component/context/CartContext';
 
 function App() {
 

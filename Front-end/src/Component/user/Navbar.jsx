@@ -181,6 +181,8 @@ export const Navbar = () => {
                                 </div>
                             </NavLink>
 
+                            {/* Admin link removed from user navbar to keep admin area separate */}
+
 
                             {/* LOGIN / USER */}
                             {user ? (
@@ -313,6 +315,8 @@ export const Navbar = () => {
                                 </NavLink>
 
                             )}
+
+                            {/* Admin link removed in mobile as well */}
 
                         </div>
                     )}

@@ -6,10 +6,14 @@ export const AuthContext = createContext();
 const AuthContextProvider = ({ children }) => {
 
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+
+  const [token, setToken] = useState(
+    localStorage.getItem("token") || sessionStorage.getItem("token") || null
+  );
+
   const [loading, setLoading] = useState(true);
 
-  // FETCH USER FROM BACKEND
+  // FETCH USER
   const fetchUser = async () => {
 
     try {
@@ -28,7 +32,7 @@ const AuthContextProvider = ({ children }) => {
 
   };
 
-  // LOGIN FUNCTION
+  // LOGIN
   const login = async (data) => {
 
     try {
@@ -38,14 +42,28 @@ const AuthContextProvider = ({ children }) => {
       if (res.status === 200) {
 
         const token = res.data.token;
+        const role = res.data.user.role;
 
-        localStorage.setItem("token", token);
+        // ADMIN LOGIN
+        if (role === "admin") {
+
+          localStorage.setItem("token", token);
+          sessionStorage.removeItem("token");
+
+        } 
+        
+        // USER LOGIN
+        else {
+
+          sessionStorage.setItem("token", token);
+          localStorage.removeItem("token");
+
+        }
 
         setToken(token);
 
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-        // 👇 LOGIN KE BAAD USER FETCH
         await fetchUser();
 
         return res.data;
@@ -60,13 +78,13 @@ const AuthContextProvider = ({ children }) => {
 
   };
 
-  // LOGOUT FUNCTION
+  // LOGOUT
   const logout = () => {
 
     localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
 
     setToken(null);
-
     setUser(null);
 
     delete axios.defaults.headers.common["Authorization"];
@@ -76,21 +94,25 @@ const AuthContextProvider = ({ children }) => {
   // AUTO LOGIN
   useEffect(() => {
 
-    const storedToken = localStorage.getItem("token");
-
+    const storedToken =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
+  
     if (storedToken) {
-
+  
       setToken(storedToken);
-
+  
       axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
-
-      fetchUser();
-
+  
+      fetchUser().finally(() => {
+        setLoading(false);
+      });
+  
+    } else {
+      setLoading(false);
     }
-
-    setLoading(false);
-
+  
   }, []);
+
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout }}>
