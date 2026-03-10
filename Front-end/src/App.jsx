@@ -14,9 +14,7 @@ function App() {
     <>
       <AuthContextProvider>
         <CartProvider>
-
           <CategoryContextProvider>
-
             <AppRouter />
 
             <ToastContainer
@@ -32,10 +30,8 @@ function App() {
               theme="dark"
               transition={Zoom}
             />
-
           </CategoryContextProvider>
         </CartProvider>
-
       </AuthContextProvider>
     </>
   )

@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import { CategoryContext } from "../context/CategoryContext";
 
 const Footer = () => {
-  const { categoryData } = useContext(CategoryContext)
-  
+
+  const { categories } = useContext(CategoryContext);
+
   return (
     <footer className="bg-gray-900 text-gray-200 pt-10 pb-4 mt-12">
       <div className="max-w-7xl mx-auto px-4">
@@ -25,23 +26,27 @@ const Footer = () => {
           {/* Quick Links */}
           <div className="lg:col-span-2">
             <h6 className="font-semibold mb-2">Quick Links</h6>
+
             <ul className="space-y-2">
               <li>
-                <Link className="text-gray-200 hover:text-white no-underline" to="home">
+                <Link className="hover:text-white" to="/">
                   Home
                 </Link>
               </li>
+
               <li>
-                <Link className="text-gray-200 hover:text-white no-underline" to="about">
+                <Link className="hover:text-white" to="/about">
                   About
                 </Link>
               </li>
+
               <li>
-                <Link className="text-gray-200 hover:text-white no-underline" to="contact">
+                <Link className="hover:text-white" to="/contact">
                   Contact
                 </Link>
               </li>
             </ul>
+
           </div>
 
           {/* Categories */}
@@ -50,18 +55,19 @@ const Footer = () => {
 
             <ul className="space-y-2">
 
-              {Object.keys(categoryData).map((key) => (
-                <li key={key}>
+              {categories.map((cat) => (
+                <li key={cat._id}>
                   <Link
-                    className="text-gray-200 hover:text-white no-underline"
-                    to={`category/${key}`}
+                    className="hover:text-white"
+                    to={`/category/${cat.name.toLowerCase()}`}
                   >
-                    {categoryData[key].title}
+                    {cat.name}
                   </Link>
                 </li>
               ))}
 
             </ul>
+
           </div>
 
           {/* Contact */}
@@ -74,11 +80,10 @@ const Footer = () => {
 
         </div>
 
-        {/* Bottom Line */}
         <hr className="border-gray-700 my-6" />
 
         <div className="text-center">
-          <p className="mb-0">
+          <p>
             © {new Date().getFullYear()} SeedStore | All Rights Reserved
           </p>
         </div>

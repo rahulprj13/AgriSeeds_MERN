@@ -147,7 +147,7 @@ export const Navbar = () => {
 
                                         {categories.map((cat) => (
                                             <NavLink
-                                                key={cat.name}
+                                                key={cat._id || cat.name}
                                                 to={`category/${cat.name}`}
                                                 onClick={closeAll}
                                                 className={({ isActive }) =>
@@ -257,7 +257,7 @@ export const Navbar = () => {
 
                                         {categories.map((cat) => (
                                             <NavLink
-                                                key={cat.name}
+                                                key={cat._id || cat.name}
                                                 to={`category/${cat.name}`}
                                                 onClick={closeAll}
                                                 className={({ isActive }) =>
