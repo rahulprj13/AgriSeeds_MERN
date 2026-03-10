@@ -1,17 +1,26 @@
-const express = require("express")
-const cors = require("cors")
-const app = express()
+const express = require("express");
+const cors = require("cors");
+const app = express();
 
-app.use(express.json())
-app.use(cors())
+app.use(express.json());
+app.use(cors());
 
-const connectDB = require("./config/db.js")
-connectDB()
+const connectDB = require("./config/db.js");
+connectDB();
 
-const authRouter = require("./routes/auth.js")
-app.use(authRouter)
+const authRouter = require("./routes/AuthRoutes.js");
+const cartRouter = require("./routes/CartRoutes.js");
+const adminCategoryRouter = require("./routes/AdminCategoryRoutes.js");
+const adminProductRouter = require("./routes/AdminProductRoutes.js");
+const adminDashboardRouter = require("./routes/AdminDashboardRoutes.js");
 
-const PORT = 5000
-app.listen(PORT,()=>{
-    console.log(`server run on ${PORT} port`);
-})
+app.use(authRouter);
+app.use("/api/cart", cartRouter);
+app.use(adminCategoryRouter);
+app.use(adminProductRouter);
+app.use(adminDashboardRouter);
+
+const PORT = 5000;
+app.listen(PORT, () => {
+  console.log(`server run on ${PORT} port`);
+});
