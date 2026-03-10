@@ -2,43 +2,46 @@ const Product = require("../models/ProductModel");
 const Category = require("../models/CategoryModel");
 
 // CREATE PRODUCT
-exports.createProduct = async (req, res) => {
-  try {
 
-    const { name, description, price, image, categoryId, stock, status } = req.body;
-
-    const category = await Category.findById(categoryId);
-
-    if (!category) {
-      return res.status(400).json({
-        message: "Invalid category"
-      });
-    }
-
-    const product = await Product.create({
-      name,
-      description,
-      price,
-      image,
-      category: categoryId,
-      stock,
-      status
-    });
-
-    res.status(201).json({
-      message: "Product created successfully",
-      data: product
-    });
-
-  } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-      message: "Server error"
-    });
-  }
-};
+    exports.createProduct = async (req, res) => {
+        try {
+      
+          const { name, description, price, categoryId, stock, status } = req.body;
+      
+          const image = req.file ? req.file.filename : "";
+      
+          const category = await Category.findById(categoryId);
+      
+          if (!category) {
+            return res.status(400).json({
+              message: "Invalid category"
+            });
+          }
+      
+          const product = await Product.create({
+            name,
+            description,
+            price,
+            image,
+            category: categoryId,
+            stock,
+            status
+          });
+      
+          res.status(201).json({
+            message: "Product created successfully",
+            data: product
+          });
+      
+        } catch (error) {
+      
+          console.log(error);
+      
+          res.status(500).json({
+            message: "Server error"
+          });
+        }
+      };
 
 
 // GET ALL PRODUCTS (ADMIN)

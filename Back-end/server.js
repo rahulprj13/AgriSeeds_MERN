@@ -16,14 +16,16 @@ const adminProductRouter = require("./routes/adminProductRoutes.js");
 const productRouter = require("./routes/ProductRoutes.js");
 const adminDashboardRouter = require("./routes/AdminDashboardRoutes.js");
 
+
 app.use(authRouter);
 app.use(categoryRouter);
 app.use("/api/cart", cartRouter);
 app.use(adminCategoryRouter);
 app.use(adminProductRouter);
-app.use(productRouter);
+app.use( productRouter);
 app.use(adminDashboardRouter);
-
+app.use("/uploads", express.static("uploads"));
+  
 const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`server run on ${PORT} port`);

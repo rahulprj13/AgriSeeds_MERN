@@ -12,19 +12,22 @@ const {
 const authMiddleware = require("../middleware/authmiddleware");
 const adminMiddleware = require("../middleware/adminMiddleware");
 
+const upload = require("../middleware/upload");
+
 
 // CREATE PRODUCT
 router.post(
-  "/products",
+  "/api/admin/products",
   authMiddleware,
   adminMiddleware,
+  upload.single("image"),
   createProduct
 );
 
 
 // GET ALL PRODUCTS
 router.get(
-  "/products",
+  "/api/admin/products",
   authMiddleware,
   adminMiddleware,
   getProducts
@@ -33,7 +36,7 @@ router.get(
 
 // GET SINGLE PRODUCT
 router.get(
-  "/products/:id",
+  "/api/admin/products/:id",
   authMiddleware,
   adminMiddleware,
   getSingleProduct
@@ -42,16 +45,17 @@ router.get(
 
 // UPDATE PRODUCT
 router.put(
-  "/products/:id",
+  "/api/admin/products/:id",
   authMiddleware,
   adminMiddleware,
+  upload.single("image"),
   updateProduct
 );
 
 
 // DELETE PRODUCT
 router.delete(
-  "/products/:id",
+  "/api/admin/products/:id",
   authMiddleware,
   adminMiddleware,
   deleteProduct
