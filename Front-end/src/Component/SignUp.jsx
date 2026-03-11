@@ -25,49 +25,49 @@ const SignUp = () => {
 
   const validationRules = {
 
-    firstname:{
-      required:"First name is required*",
-      pattern:{
-        value:/^[A-Za-z\s]+$/,
-        message:"Name can contain only letters*"
+    firstname: {
+      required: "First name is required*",
+      pattern: {
+        value: /^[A-Za-z\s]+$/,
+        message: "Name can contain only letters*"
       },
-      minLength:{
-        value:3,
-        message:"Name must be at least 3 characters*"
+      minLength: {
+        value: 3,
+        message: "Name must be at least 3 characters*"
       }
     },
 
-    lastname:{
-      required:"Last name is required*",
-      pattern:{
-        value:/^[A-Za-z\s]+$/,
-        message:"Name can contain only letters*"
+    lastname: {
+      required: "Last name is required*",
+      pattern: {
+        value: /^[A-Za-z\s]+$/,
+        message: "Name can contain only letters*"
       },
-      minLength:{
-        value:3,
-        message:"Name must be at least 3 characters*"
+      minLength: {
+        value: 3,
+        message: "Name must be at least 3 characters*"
       }
     },
 
-    email:{
-      required:"Email is required*",
-      pattern:{
-        value:/^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        message:"Enter a valid email*"
+    email: {
+      required: "Email is required*",
+      pattern: {
+        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        message: "Enter a valid email*"
       }
     },
 
-    password:{
-      required:"Password is required*",
-      pattern:{
-        value:/^(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&]).{8,}$/,
-        message:"Min 8 chars, 1 uppercase, 1 number, 1 special character*"
+    password: {
+      required: "Password is required*",
+      pattern: {
+        value: /^(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&]).{8,}$/,
+        message: "Min 8 chars, 1 uppercase, 1 number, 1 special character*"
       }
     },
 
-    confirmPassword:{
-      required:"Confirm your password*",
-      validate:(value)=>
+    confirmPassword: {
+      required: "Confirm your password*",
+      validate: (value) =>
         value === passwordValue || "Passwords do not match*"
     }
 
@@ -79,19 +79,19 @@ const SignUp = () => {
 
     const email = getValues("email")
 
-    if(!email){
+    if (!email) {
       toast.error("Please enter email first")
       return
     }
 
-    try{
+    try {
 
-      await axios.post("/send-otp",{email})
+      await axios.post("/send-otp", { email })
 
       toast.success("OTP sent to your email")
 
     }
-    catch(err){
+    catch (err) {
 
       toast.error("Failed to send OTP")
 
@@ -103,13 +103,13 @@ const SignUp = () => {
 
   const submitHandler = async (data) => {
 
-    try{
+    try {
 
-      const {confirmPassword,...userData} = data
+      const { confirmPassword, ...userData } = data
 
-      const res = await axios.post("/signup",userData)
+      const res = await axios.post("/signup", userData)
 
-      if(res.status === 201){
+      if (res.status === 201) {
 
         toast.success("User registered successfully")
 
@@ -118,13 +118,13 @@ const SignUp = () => {
       }
 
     }
-    catch(err){
+    catch (err) {
 
       console.log(err)
 
-      if(err.response){
+      if (err.response) {
         toast.error(err.response.data.message)
-      }else{
+      } else {
         toast.error("Server error")
       }
 
@@ -134,172 +134,182 @@ const SignUp = () => {
 
   return (
 
-<div
-className="flex justify-center items-center min-h-screen"
-style={{
-backgroundImage:`url(${img})`,
-backgroundSize:"cover",
-backgroundPosition:"center",
-backgroundRepeat:"no-repeat"
-}}
->
+    <div
+      className="flex justify-center items-center min-h-screen"
+      style={{
+        backgroundImage: `url(${img})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat"
+      }}
+    >
 
-<div
-className="relative p-6 shadow-2xl border max-w-md w-full text-white backdrop-blur-lg"
-style={{
-borderRadius:"20px",
-background:"rgba(82,80,80,0.12)",
-border:"1px solid rgba(113,109,109,0.3)"
-}}
->
+      <div
+        className="relative p-6 shadow-2xl border max-w-md w-full text-white backdrop-blur-lg"
+        style={{
+          borderRadius: "20px",
+          background: "rgba(82,80,80,0.12)",
+          border: "1px solid rgba(113,109,109,0.3)"
+        }}
+      >
 
-<button
-onClick={()=>navigate("/")}
-className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/20 text-white hover:bg-white/40"
->
-<FontAwesomeIcon icon={faXmark}/>
-</button>
+        <button
+          onClick={() => navigate("/")}
+          className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/20 text-white hover:bg-white/40"
+        >
+          <FontAwesomeIcon icon={faXmark} />
+        </button>
 
-<h2 className="text-center font-bold text-3xl mb-6">
-<FontAwesomeIcon icon={faSeedling} className="text-green-400 mr-2"/>
-Create Account
-</h2>
+        <h2 className="text-center font-bold text-3xl mb-6">
+          <FontAwesomeIcon icon={faSeedling} className="text-green-400 mr-2" />
+          Create Account
+        </h2>
 
-<form onSubmit={handleSubmit(submitHandler)}>
+        <form onSubmit={handleSubmit(submitHandler)}>
 
-{/* FIRST NAME */}
+          {/* FIRST NAME */}
 
-<div className="mb-4">
-<label>First Name</label>
-<input
-type="text"
-placeholder="Enter your first name"
-{...register("firstname",validationRules.firstname)}
-className="w-full p-2 rounded bg-transparent border border-gray-300"
-/>
-<p className="text-red-400 text-sm">
-{errors.firstname?.message}
-</p>
-</div>
+          <div className="mb-4">
+            <label>First Name</label>
+            <input
+              type="text"
+              placeholder="Enter your first name"
+              {...register("firstname", validationRules.firstname)}
+              className="w-full p-2 rounded bg-transparent border border-gray-300"
+            />
+            <p className="text-red-400 text-sm">
+              {errors.firstname?.message}
+            </p>
+          </div>
 
-{/* LAST NAME */}
+          {/* LAST NAME */}
 
-<div className="mb-4">
-<label>Last Name</label>
-<input
-type="text"
-placeholder="Enter your last name"
-{...register("lastname",validationRules.lastname)}
-className="w-full p-2 rounded bg-transparent border border-gray-300"
-/>
-<p className="text-red-400 text-sm">
-{errors.lastname?.message}
-</p>
-</div>
+          <div className="mb-4">
+            <label>Last Name</label>
+            <input
+              type="text"
+              placeholder="Enter your last name"
+              {...register("lastname", validationRules.lastname)}
+              className="w-full p-2 rounded bg-transparent border border-gray-300"
+            />
+            <p className="text-red-400 text-sm">
+              {errors.lastname?.message}
+            </p>
+          </div>
 
-{/* EMAIL */}
+          {/* EMAIL */}
 
-<div className="mb-4">
-<label>Email</label>
-<input
-type="email"
-placeholder="Enter your email"
-{...register("email",validationRules.email)}
-className="w-full p-2 rounded bg-transparent border border-gray-300"
-/>
-<p className="text-red-400 text-sm">
-{errors.email?.message}
-</p>
-</div>
+          <div className="mb-4">
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              {...register("email", validationRules.email)}
+              className="w-full p-2 rounded bg-transparent border border-gray-300"
+            />
+            <p className="text-red-400 text-sm">
+              {errors.email?.message}
+            </p>
+          </div>
 
-{/* SEND OTP */}
+          {/* SEND OTP */}
 
-<button
-type="button"
-onClick={sendOtp}
-className="w-full bg-green-500 py-2 rounded mb-3 hover:bg-green-600"
->
-Send OTP
-</button>
+          <button
+            type="button"
+            onClick={sendOtp}
+            className="w-full bg-green-500 py-2 rounded mb-3 hover:bg-green-600"
+          >
+            Send OTP
+          </button>
 
-{/* OTP */}
+          {/* OTP */}
 
-<div className="mb-4">
-<input
-type="text"
-placeholder="Enter OTP"
-{...register("otp",{required:"OTP required"})}
-className="w-full p-2 rounded bg-transparent border border-gray-300"
-/>
-<p className="text-red-400 text-sm">
-{errors.otp?.message}
-</p>
-</div>
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Enter OTP"
+              maxLength={6}
+              {...register("otp", {
+                required: "OTP required*",
+                pattern: {
+                  value: /^[0-9]{6}$/,
+                  message: "OTP must be 6 digits*"
+                }
+              })}
+              onInput={(e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, "")
+              }}
+              className="w-full p-2 rounded bg-transparent border border-gray-300"
+            />
+            <p className="text-red-400 text-sm">
+              {errors.otp?.message}
+            </p>
+          </div>
 
-{/* PASSWORD */}
+          {/* PASSWORD */}
 
-<div className="mb-4">
+          <div className="mb-4">
 
-<label>Password</label>
+            <label>Password</label>
 
-<div className="flex">
+            <div className="flex">
 
-<input
-type={showPassword ? "text" : "password"}
-placeholder="Enter password"
-{...register("password",validationRules.password)}
-className="flex-1 p-2 rounded-l border border-gray-300"
-/>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter password"
+                {...register("password", validationRules.password)}
+                className="flex-1 p-2 rounded-l border border-gray-300"
+              />
 
-<button
-type="button"
-onClick={()=>setShowPassword(!showPassword)}
-className="px-4 bg-white text-black rounded-r"
->
-{showPassword ? "Hide":"Show"}
-</button>
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="px-4 bg-white text-black rounded-r"
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
 
-</div>
+            </div>
 
-<p className="text-red-400 text-sm">
-{errors.password?.message}
-</p>
+            <p className="text-red-400 text-sm">
+              {errors.password?.message}
+            </p>
 
-</div>
+          </div>
 
-{/* CONFIRM PASSWORD */}
+          {/* CONFIRM PASSWORD */}
 
-<div className="mb-4">
-<label>Confirm Password</label>
-<input
-type="password"
-placeholder="Confirm password"
-{...register("confirmPassword",validationRules.confirmPassword)}
-className="w-full p-2 rounded border border-gray-300"
-/>
+          <div className="mb-4">
+            <label>Confirm Password</label>
+            <input
+              type="password"
+              placeholder="Confirm password"
+              {...register("confirmPassword", validationRules.confirmPassword)}
+              className="w-full p-2 rounded border border-gray-300"
+            />
 
-<p className="text-red-400 text-sm">
-{errors.confirmPassword?.message}
-</p>
+            <p className="text-red-400 text-sm">
+              {errors.confirmPassword?.message}
+            </p>
 
-</div>
+          </div>
 
-<button className="w-full font-bold mt-2 py-2 rounded bg-white text-black hover:bg-gray-200">
-Register
-</button>
+          <button className="w-full font-bold mt-2 py-2 rounded bg-white text-black hover:bg-gray-200">
+            Register
+          </button>
 
-<p className="text-center mt-4">
-Already have an account?{" "}
-<Link to="/login" className="text-yellow-400 font-bold">
-Login
-</Link>
-</p>
+          <p className="text-center mt-4">
+            Already have an account?{" "}
+            <Link to="/login" className="text-yellow-400 font-bold">
+              Login
+            </Link>
+          </p>
 
-</form>
+        </form>
 
-</div>
+      </div>
 
-</div>
+    </div>
 
   )
 
