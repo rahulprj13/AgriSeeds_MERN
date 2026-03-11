@@ -19,6 +19,5 @@ const mailSend = async(to, subject, text) =>{
     console.log(mailResponse)
     return mailResponse
 
-
 }
 module.exports = mailSend
