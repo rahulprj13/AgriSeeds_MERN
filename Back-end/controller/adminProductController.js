@@ -3,45 +3,30 @@ const Category = require("../models/CategoryModel");
 
 // CREATE PRODUCT
 
-    exports.createProduct = async (req, res) => {
-        try {
-      
-          const { name, description, price, categoryId, stock, status } = req.body;
-      
-          const image = req.file ? req.file.filename : "";
-      
-          const category = await Category.findById(categoryId);
-      
-          if (!category) {
-            return res.status(400).json({
-              message: "Invalid category"
-            });
-          }
-      
-          const product = await Product.create({
-            name,
-            description,
-            price,
-            image,
-            category: categoryId,
-            stock,
-            status
-          });
-      
-          res.status(201).json({
-            message: "Product created successfully",
-            data: product
-          });
-      
-        } catch (error) {
-      
-          console.log(error);
-      
-          res.status(500).json({
-            message: "Server error"
-          });
-        }
-      };
+exports.createProduct = async (req, res) => {
+  try {
+
+    const product = new Product({
+      name: req.body.name,
+      description: req.body.description,
+      price: req.body.price,
+      category: req.body.categoryId,
+      stock: req.body.stock,
+      status: req.body.status,
+      image: req.file ? req.file.filename : ""
+    });
+
+    await product.save();
+
+    res.json(product);
+
+  } catch (error) {
+
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+
+  }
+};
 
 
 // GET ALL PRODUCTS (ADMIN)
@@ -93,37 +78,33 @@ exports.getSingleProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   try {
 
-    const { name, description, price, image, categoryId, stock, status } = req.body;
+    const product = await Product.findById(req.params.id);
 
-    const updateData = {
-      name,
-      description,
-      price,
-      image,
-      stock,
-      status
-    };
-
-    if (categoryId) {
-      updateData.category = categoryId;
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
     }
 
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true }
-    );
+    product.name = req.body.name;
+    product.description = req.body.description;
+    product.price = req.body.price;
+    product.category = req.body.categoryId;
+    product.stock = req.body.stock;
+    product.status = req.body.status;
 
-    res.json({
-      message: "Product updated",
-      data: product
-    });
+    // IMAGE UPDATE
+    if (req.file) {
+      product.image = req.file.filename;
+    }
+
+    await product.save();
+
+    res.json(product);
 
   } catch (error) {
 
-    res.status(500).json({
-      message: "Server error"
-    });
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+
   }
 };
 

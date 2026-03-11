@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const connectDB = require("./config/db.js");
+const connectDB = require("./utils/db.js");
 connectDB();
 
 const authRouter = require("./routes/AuthRoutes.js");

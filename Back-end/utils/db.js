@@ -1,7 +1,9 @@
 const mongoose = require("mongoose")
+const dotenv = require("dotenv")
+dotenv.config()
 const connectDB = async ()=>{
     try{
-        await mongoose.connect("mongodb://localhost:27017/Seeds_Selling")
+        await mongoose.connect(process.env.MONGO_URL)
         console.log("mongo db connected...");
         
     }catch(err){
