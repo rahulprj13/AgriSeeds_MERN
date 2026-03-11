@@ -1,119 +1,174 @@
+// const express = require("express");
+// const Category = require("../models/CategoryModel.js");
+// const authMiddleware = require("../middleware/authmiddleware.js");
+// const adminMiddleware = require("../middleware/adminMiddleware.js");
+
+// const router = express.Router();
+
+// // Create category
+// router.post(
+//   "/api/admin/categories",
+//   authMiddleware,
+//   adminMiddleware,
+//   async (req, res) => {
+//     try {
+//       const { name, description, status } = req.body;
+
+//       const existing = await Category.findOne({ name: name.trim() });
+//       if (existing) {
+//         return res.status(400).json({ message: "Category already exists" });
+//       }
+
+//       const category = await Category.create({
+//         name: name.trim(),
+//         description,
+//         status,
+//       });
+
+//       res.status(201).json(category);
+//     } catch (err) {
+//       res.status(500).json({ message: "Server error" });
+//     }
+//   }
+// );
+
+// // Get all categories
+// router.get(
+//   "/api/admin/categories",
+//   authMiddleware,
+//   adminMiddleware,
+//   async (req, res) => {
+//     try {
+//       const categories = await Category.find().sort({ createdAt: -1 });
+//       res.json(categories);
+//     } catch (err) {
+//       res.status(500).json({ message: "Server error" });
+//     }
+//   }
+// );
+
+// // Get single category
+// router.get(
+//   "/api/admin/categories/:id",
+//   authMiddleware,
+//   adminMiddleware,
+//   async (req, res) => {
+//     try {
+//       const category = await Category.findById(req.params.id);
+//       if (!category) {
+//         return res.status(404).json({ message: "Category not found" });
+//       }
+//       res.json(category);
+//     } catch (err) {
+//       res.status(500).json({ message: "Server error" });
+//     }
+//   }
+// );
+
+// // Update category
+// router.put(
+//   "/api/admin/categories/:id",
+//   authMiddleware,
+//   adminMiddleware,
+//   async (req, res) => {
+//     try {
+//       const { name, description, status } = req.body;
+
+//       const category = await Category.findByIdAndUpdate(
+//         req.params.id,
+//         {
+//           name: name && name.trim(),
+//           description,
+//           status,
+//         },
+//         { new: true }
+//       );
+
+//       if (!category) {
+//         return res.status(404).json({ message: "Category not found" });
+//       }
+
+//       res.json(category);
+//     } catch (err) {
+//       res.status(500).json({ message: "Server error" });
+//     }
+//   }
+// );
+
+// // Delete category
+// router.delete(
+//   "/api/admin/categories/:id",
+//   authMiddleware,
+//   adminMiddleware,
+//   async (req, res) => {
+//     try {
+//       const category = await Category.findByIdAndDelete(req.params.id);
+
+//       if (!category) {
+//         return res.status(404).json({ message: "Category not found" });
+//       }
+
+//       res.json({ message: "Category deleted" });
+//     } catch (err) {
+//       res.status(500).json({ message: "Server error" });
+//     }
+//   }
+// );
+
+// module.exports = router;
+
 const express = require("express");
-const Category = require("../models/CategoryModel.js");
+const router = express.Router();
+
 const authMiddleware = require("../middleware/authmiddleware.js");
 const adminMiddleware = require("../middleware/adminMiddleware.js");
 
-const router = express.Router();
+const {
+  createCategory,
+  getCategories,
+  getCategory,
+  updateCategory,
+  deleteCategory,
+} = require("../controllers/categoryController.js");
 
-// Create category
+// CREATE
 router.post(
   "/api/admin/categories",
   authMiddleware,
   adminMiddleware,
-  async (req, res) => {
-    try {
-      const { name, description, status } = req.body;
-
-      const existing = await Category.findOne({ name: name.trim() });
-      if (existing) {
-        return res.status(400).json({ message: "Category already exists" });
-      }
-
-      const category = await Category.create({
-        name: name.trim(),
-        description,
-        status,
-      });
-
-      res.status(201).json(category);
-    } catch (err) {
-      res.status(500).json({ message: "Server error" });
-    }
-  }
+  createCategory
 );
 
-// Get all categories
+// GET ALL
 router.get(
   "/api/admin/categories",
   authMiddleware,
   adminMiddleware,
-  async (req, res) => {
-    try {
-      const categories = await Category.find().sort({ createdAt: -1 });
-      res.json(categories);
-    } catch (err) {
-      res.status(500).json({ message: "Server error" });
-    }
-  }
+  getCategories
 );
 
-// Get single category
+// GET SINGLE
 router.get(
   "/api/admin/categories/:id",
   authMiddleware,
   adminMiddleware,
-  async (req, res) => {
-    try {
-      const category = await Category.findById(req.params.id);
-      if (!category) {
-        return res.status(404).json({ message: "Category not found" });
-      }
-      res.json(category);
-    } catch (err) {
-      res.status(500).json({ message: "Server error" });
-    }
-  }
+  getCategory
 );
 
-// Update category
+// UPDATE
 router.put(
   "/api/admin/categories/:id",
   authMiddleware,
   adminMiddleware,
-  async (req, res) => {
-    try {
-      const { name, description, status } = req.body;
-
-      const category = await Category.findByIdAndUpdate(
-        req.params.id,
-        {
-          name: name && name.trim(),
-          description,
-          status,
-        },
-        { new: true }
-      );
-
-      if (!category) {
-        return res.status(404).json({ message: "Category not found" });
-      }
-
-      res.json(category);
-    } catch (err) {
-      res.status(500).json({ message: "Server error" });
-    }
-  }
+  updateCategory
 );
 
-// Delete category
+// DELETE
 router.delete(
   "/api/admin/categories/:id",
   authMiddleware,
   adminMiddleware,
-  async (req, res) => {
-    try {
-      const category = await Category.findByIdAndDelete(req.params.id);
-
-      if (!category) {
-        return res.status(404).json({ message: "Category not found" });
-      }
-
-      res.json({ message: "Category deleted" });
-    } catch (err) {
-      res.status(500).json({ message: "Server error" });
-    }
-  }
+  deleteCategory
 );
 
 module.exports = router;
-
