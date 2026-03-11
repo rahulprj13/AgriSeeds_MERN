@@ -17,7 +17,7 @@ const SignUp = () => {
     register,
     handleSubmit,
     watch,
-    getValues, // ✅ important
+    getValues,
     formState: { errors },
   } = useForm();
 
@@ -73,7 +73,7 @@ const SignUp = () => {
 
   }
 
-  // ================= SEND OTP =================
+  // SEND OTP
 
   const sendOtp = async () => {
 
@@ -99,7 +99,7 @@ const SignUp = () => {
 
   }
 
-  // ================= REGISTER =================
+  // REGISTER
 
   const submitHandler = async (data) => {
 
@@ -132,103 +132,135 @@ const SignUp = () => {
 
   }
 
-  return (
+return (
 
-    <div
-      className="flex justify-center items-center min-h-screen"
-      style={{
-        backgroundImage: `url(${img})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat"
-      }}
-    >
+  <div
+    className="relative min-h-screen flex items-center justify-center px-4 py-10"
+    style={{
+      backgroundImage: `url(${img})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundAttachment: "fixed"
+    }}
+  >
+
+    {/* Blur Layer */}
+    <div className="absolute inset-0 backdrop-blur-sm bg-black/40"></div>
+
+    {/* Signup Card */}
+    <div className="relative z-10 w-full max-w-md">
 
       <div
-        className="relative p-6 shadow-2xl border max-w-md w-full text-white backdrop-blur-lg"
-        style={{
-          borderRadius: "20px",
-          background: "rgba(82,80,80,0.12)",
-          border: "1px solid rgba(113,109,109,0.3)"
-        }}
-      >
+  className="relative rounded-2xl shadow-2xl border border-white/20
+  bg-white/10 backdrop-blur-xl text-white
+  max-h-[90vh] overflow-y-auto p-8 scrollbar-hide"
+>
 
+        {/* CLOSE BUTTON */}
         <button
           onClick={() => navigate("/")}
-          className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/20 text-white hover:bg-white/40"
+          className="absolute top-4 right-4 text-white text-xl hover:text-red-400"
         >
           <FontAwesomeIcon icon={faXmark} />
         </button>
 
-        <h2 className="text-center font-bold text-3xl mb-6">
-          <FontAwesomeIcon icon={faSeedling} className="text-green-400 mr-2" />
+        {/* TITLE */}
+        <h2 className="text-center text-3xl font-bold mb-6">
+
+          <FontAwesomeIcon
+            icon={faSeedling}
+            className="text-green-400 mr-2"
+          />
+
           Create Account
+
         </h2>
 
-        <form onSubmit={handleSubmit(submitHandler)}>
+        {/* FORM */}
+
+        <form
+          onSubmit={handleSubmit(submitHandler)}
+          className="space-y-4"
+        >
 
           {/* FIRST NAME */}
 
-          <div className="mb-4">
-            <label>First Name</label>
+          <div>
+
             <input
               type="text"
-              placeholder="Enter your first name"
+              placeholder="First Name"
               {...register("firstname", validationRules.firstname)}
-              className="w-full p-2 rounded bg-transparent border border-gray-300"
+              className="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30
+              focus:outline-none focus:border-green-400 placeholder-gray-200"
             />
-            <p className="text-red-400 text-sm">
+
+            <p className="text-red-400 text-sm mt-1">
               {errors.firstname?.message}
             </p>
+
           </div>
+
 
           {/* LAST NAME */}
 
-          <div className="mb-4">
-            <label>Last Name</label>
+          <div>
+
             <input
               type="text"
-              placeholder="Enter your last name"
+              placeholder="Last Name"
               {...register("lastname", validationRules.lastname)}
-              className="w-full p-2 rounded bg-transparent border border-gray-300"
+              className="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30
+              focus:outline-none focus:border-green-400 placeholder-gray-200"
             />
-            <p className="text-red-400 text-sm">
+
+            <p className="text-red-400 text-sm mt-1">
               {errors.lastname?.message}
             </p>
+
           </div>
+
 
           {/* EMAIL */}
 
-          <div className="mb-4">
-            <label>Email</label>
+          <div>
+
             <input
               type="email"
-              placeholder="Enter your email"
+              placeholder="Email Address"
               {...register("email", validationRules.email)}
-              className="w-full p-2 rounded bg-transparent border border-gray-300"
+              className="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30
+              focus:outline-none focus:border-green-400 placeholder-gray-200"
             />
-            <p className="text-red-400 text-sm">
+
+            <p className="text-red-400 text-sm mt-1">
               {errors.email?.message}
             </p>
+
           </div>
+
 
           {/* SEND OTP */}
 
           <button
             type="button"
             onClick={sendOtp}
-            className="w-full bg-green-500 py-2 rounded mb-3 hover:bg-green-600"
+            className="w-full py-3 rounded-xl bg-green-500 hover:bg-green-600
+            font-semibold transition"
           >
             Send OTP
           </button>
 
+
           {/* OTP */}
 
-          <div className="mb-4">
+          <div>
+
             <input
               type="text"
               placeholder="Enter OTP"
               maxLength={6}
+
               {...register("otp", {
                 required: "OTP required*",
                 pattern: {
@@ -236,73 +268,94 @@ const SignUp = () => {
                   message: "OTP must be 6 digits*"
                 }
               })}
+
               onInput={(e) => {
                 e.target.value = e.target.value.replace(/[^0-9]/g, "")
               }}
-              className="w-full p-2 rounded bg-transparent border border-gray-300"
+
+              className="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30
+              focus:outline-none focus:border-green-400 placeholder-gray-200"
             />
-            <p className="text-red-400 text-sm">
+
+            <p className="text-red-400 text-sm mt-1">
               {errors.otp?.message}
             </p>
+
           </div>
+
 
           {/* PASSWORD */}
 
-          <div className="mb-4">
+          <div className="flex">
 
-            <label>Password</label>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
 
-            <div className="flex">
+              {...register("password", validationRules.password)}
 
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter password"
-                {...register("password", validationRules.password)}
-                className="flex-1 p-2 rounded-l border border-gray-300"
-              />
+              className="flex-1 px-4 py-3 rounded-l-xl bg-white/20 border border-white/30
+              focus:outline-none focus:border-green-400 placeholder-gray-200"
+            />
 
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="px-4 bg-white text-black rounded-r"
-              >
-                {showPassword ? "Hide" : "Show"}
-              </button>
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
 
-            </div>
-
-            <p className="text-red-400 text-sm">
-              {errors.password?.message}
-            </p>
+              className="px-4 bg-white text-black rounded-r-xl"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
 
           </div>
 
+          <p className="text-red-400 text-sm">
+            {errors.password?.message}
+          </p>
+
+
           {/* CONFIRM PASSWORD */}
 
-          <div className="mb-4">
-            <label>Confirm Password</label>
+          <div>
+
             <input
               type="password"
-              placeholder="Confirm password"
+              placeholder="Confirm Password"
+
               {...register("confirmPassword", validationRules.confirmPassword)}
-              className="w-full p-2 rounded border border-gray-300"
+
+              className="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30
+              focus:outline-none focus:border-green-400 placeholder-gray-200"
             />
 
-            <p className="text-red-400 text-sm">
+            <p className="text-red-400 text-sm mt-1">
               {errors.confirmPassword?.message}
             </p>
 
           </div>
 
-          <button className="w-full font-bold mt-2 py-2 rounded bg-white text-black hover:bg-gray-200">
+
+          {/* REGISTER */}
+
+          <button
+            className="w-full py-3 font-bold rounded-xl bg-white text-black
+            hover:bg-gray-200 transition"
+          >
             Register
           </button>
 
-          <p className="text-center mt-4">
+
+          <p className="text-center text-sm mt-2">
+
             Already have an account?{" "}
-            <Link to="/login" className="text-yellow-400 font-bold">
+
+            <Link
+              to="/login"
+              className="text-yellow-400 font-semibold"
+            >
               Login
             </Link>
+
           </p>
 
         </form>
@@ -311,7 +364,9 @@ const SignUp = () => {
 
     </div>
 
-  )
+  </div>
+
+)
 
 }
 
