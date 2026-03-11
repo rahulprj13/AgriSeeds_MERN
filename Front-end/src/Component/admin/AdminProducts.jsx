@@ -100,61 +100,7 @@ const AdminProducts = () => {
   };
 
   // Submit Form
-  // const handleSubmit = async (e) => {
-
-  //   e.preventDefault();
-
-  //   if (!form.name.trim() || !form.price || !form.categoryId) {
-  //     toast.error("Name, price and category are required");
-  //     return;
-  //   }
-
-  //   setLoading(true);
-
-  //   try {
-
-  //     const formData = new FormData();
-
-  //     formData.append("name", form.name);
-  //     formData.append("description", form.description);
-  //     formData.append("price", form.price);
-  //     formData.append("categoryId", form.categoryId);
-  //     formData.append("stock", form.stock);
-  //     formData.append("image", form.image);
-  //     formData.append("status", form.status);
-
-  //     if (editingId) {  
-
-  //       await axios.put("/api/admin/products", formData, {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           "Content-Type": "multipart/form-data",
-  //         },
-  //       });
-
-  //       toast.success("Product created");
-
-  //     }
-
-  //     resetForm();
-  //     loadProducts();
-
-  //   } catch (error) {
-
-  //     console.error(error);
-
-  //     const message =
-  //       error.response?.data?.message || "Failed to save product";
-
-  //     toast.error(message);
-
-  //   } finally {
-
-  //     setLoading(false);
-
-  //   }
-  // };
-
+  
   const handleSubmit = async (e) => {
 
     e.preventDefault();
@@ -443,6 +389,7 @@ const AdminProducts = () => {
                 <th className="px-3 py-2">Stock</th>
                 <th className="px-3 py-2">Status</th>
                 <th className="px-3 py-2">Actions</th>
+                
 
               </tr>
 
