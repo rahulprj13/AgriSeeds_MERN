@@ -1,6 +1,8 @@
 const User = require("../models/UserModel.js")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
+const mailSend = require("../utils/MailUtil.js")
+const Otp = require("../models/registerOtpModel.js")
 
 // LOGIN
 exports.loginUser = async (req,res)=>{
@@ -101,7 +103,7 @@ exports.registerUser = async (req,res)=>{
       password:hashedPassword
     })
 
-    // await mailSend(savedUser.email,"Welcome to our app","Thank you for registering with our app.")
+    await mailSend(user.email,"Welcome to our app","Thank you for registering with our app.")
 
 
     res.status(201).json({
@@ -120,3 +122,35 @@ exports.registerUser = async (req,res)=>{
   }
 
 }
+//email otp
+exports.sendOtp = async(req,res)=>{
+
+    try{
+    
+    const {email} = req.body
+    
+    const otp = Math.floor(100000 + Math.random()*900000)
+    
+    await Otp.create({
+    email,
+    otp
+    })
+    
+    await mailSend(
+    email,
+    "Your OTP Code",
+    `Your OTP is ${otp}`
+    )
+    
+    res.status(200).json({
+    message:"OTP sent successfully"
+    })
+    
+    }
+    catch(err){
+    res.status(500).json({
+    message:"Error sending OTP"
+    })
+    }
+    
+    }
