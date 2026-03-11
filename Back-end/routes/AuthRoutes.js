@@ -10,5 +10,4 @@ router.post("/login", loginUser)
 router.get("/profile", authMiddleware, getProfile)
 // router.get( authMiddleware)
 
-
 module.exports = router
