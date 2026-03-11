@@ -79,13 +79,12 @@
 
 // export default AppRouter
 
-
-
 import React, { useContext } from "react";
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
-import Login from "../Component/Login";
-import SignUp from "../Component/SignUp";
-import { Navbar } from "../Component/user/Navbar";
+
+import UserLayout from "../Component/layout/UserLayout";
+import AuthLayout from "../Component/layout/AuthLayout";
+
 import Home from "../Component/user/Home";
 import About from "../Component/user/About";
 import Contact from "../Component/user/Contact";
@@ -94,6 +93,9 @@ import Products from "../Component/user/Products";
 import ProductDetails from "../Component/user/ProductDetails";
 import Search from "../Component/user/Search";
 import Cart from "../Component/user/Cart";
+
+import Login from "../Component/auth/Login";
+import SignUp from "../Component/auth/SignUp";
 
 import AdminLayout from "../Component/admin/AdminLayout";
 import AdminDashboard from "../Component/admin/AdminDashboard";
@@ -116,28 +118,26 @@ const AdminPrivateRoute = ({ children }) => {
   }
 
   return children;
-
 };
 
 const router = createBrowserRouter([
 
-  // ✅ LOGIN & SIGNUP (NO NAVBAR)
-
-  {
-    path: "/login",
-    element: <Login />,
-  },
-
-  {
-    path: "/signup",
-    element: <SignUp />,
-  },
-
-  // ✅ USER ROUTES WITH NAVBAR
+  // AUTH PAGES
 
   {
     path: "/",
-    element: <Navbar />,
+    element: <AuthLayout />,
+    children: [
+      { path: "login", element: <Login /> },
+      { path: "signup", element: <SignUp /> },
+    ],
+  },
+
+  // USER PAGES
+
+  {
+    path: "/",
+    element: <UserLayout />,
     children: [
       { index: true, element: <Home /> },
       { path: "home", element: <Home /> },
@@ -151,14 +151,14 @@ const router = createBrowserRouter([
     ],
   },
 
-  // ✅ ADMIN LOGIN
+  // ADMIN LOGIN
 
   {
     path: "/admin/login",
     element: <AdminLogin />,
   },
 
-  // ✅ ADMIN PRIVATE ROUTES
+  // ADMIN PRIVATE ROUTES
 
   {
     path: "/admin",
