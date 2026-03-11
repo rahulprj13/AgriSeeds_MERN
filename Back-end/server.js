@@ -16,7 +16,6 @@ const adminProductRouter = require("./routes/adminProductRoutes.js");
 const productRouter = require("./routes/ProductRoutes.js");
 const adminDashboardRouter = require("./routes/AdminDashboardRoutes.js");
 
-
 app.use(authRouter);
 app.use(categoryRouter);
 app.use("/api/cart", cartRouter);
