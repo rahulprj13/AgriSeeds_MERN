@@ -1,0 +1,23 @@
+# Node modules
+node_modules/
+Front-end/node_modules/
+Back-end/node_modules/
+
+# Environment files
+.env
+Back-end/.env
+Front-end/.env
+
+# Upload folder
+Back-end/uploads/
+
+# Logs
+*.log
+logs
+
+# System files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
