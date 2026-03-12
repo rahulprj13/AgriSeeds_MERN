@@ -152,10 +152,10 @@ const SignUp = () => {
       <div className="relative z-10 w-full max-w-md">
 
         <div
-  className="relative rounded-2xl shadow-2xl border border-white/20
+          className="relative rounded-2xl shadow-2xl border border-white/20
   bg-white/10 backdrop-blur-xl text-white
   p-8"
->
+        >
 
           {/* CLOSE BUTTON */}
           <button
@@ -184,43 +184,43 @@ const SignUp = () => {
             className="space-y-4"
           >
 
-<div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
 
-  {/* FIRST NAME */}
-  <div>
+              {/* FIRST NAME */}
+              <div>
 
-    <input
-      type="text"
-      placeholder="First Name"
-      {...register("firstname", validationRules.firstname)}
-      className="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  {...register("firstname", validationRules.firstname)}
+                  className="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30
       focus:outline-none focus:border-green-400 placeholder-gray-200"
-    />
+                />
 
-    <p className="text-red-400 text-sm mt-1">
-      {errors.firstname?.message}
-    </p>
+                <p className="text-red-400 text-sm mt-1">
+                  {errors.firstname?.message}
+                </p>
 
-  </div>
+              </div>
 
-  {/* LAST NAME */}
-  <div>
+              {/* LAST NAME */}
+              <div>
 
-    <input
-      type="text"
-      placeholder="Last Name"
-      {...register("lastname", validationRules.lastname)}
-      className="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  {...register("lastname", validationRules.lastname)}
+                  className="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30
       focus:outline-none focus:border-green-400 placeholder-gray-200"
-    />
+                />
 
-    <p className="text-red-400 text-sm mt-1">
-      {errors.lastname?.message}
-    </p>
+                <p className="text-red-400 text-sm mt-1">
+                  {errors.lastname?.message}
+                </p>
 
-  </div>
+              </div>
 
-</div>
+            </div>
 
 
             {/* EMAIL */}
