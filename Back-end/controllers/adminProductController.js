@@ -13,7 +13,7 @@ exports.createProduct = async (req, res) => {
       discountPrice: req.body.discountPrice,
       weight: req.body.weight,
       unit: req.body.unit,
-      category: req.body.categoryId,
+      categoryId: req.body.categoryId,
       stock: req.body.stock,
       status: req.body.status,
       image: req.file ? req.file.filename : ""
@@ -37,7 +37,7 @@ exports.getProducts = async (req, res) => {
   try {
 
     const products = await Product.find()
-      .populate("category", "name")
+      .populate("categoryId", "name")
       .sort({ createdAt: -1 });
 
     res.json(products);
@@ -58,7 +58,7 @@ exports.getSingleProduct = async (req, res) => {
   try {
 
     const product = await Product.findById(req.params.id)
-      .populate("category", "name");
+      .populate("categoryId", "name");
 
     if (!product) {
       return res.status(404).json({
@@ -93,7 +93,7 @@ exports.updateProduct = async (req, res) => {
     product.discountPrice = req.body.discountPrice;
     product.weight = req.body.weight;
     product.unit = req.body.unit;
-    product.category = req.body.categoryId;
+    product.categoryId = req.body.categoryId;
     product.stock = req.body.stock;
     product.status = req.body.status;
 
