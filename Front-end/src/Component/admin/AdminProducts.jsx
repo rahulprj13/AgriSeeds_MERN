@@ -7,6 +7,9 @@ const emptyProduct = {
   name: "",
   description: "",
   price: "",
+  discountPrice: "",
+  weight: "",
+  unit: "",
   image: "",
   categoryId: "",
   stock: "",
@@ -54,6 +57,8 @@ const AdminProducts = () => {
     if (!form.name.trim()) tempErrors.name = "Product name is required";
     if (!form.price) tempErrors.price = "Price is required";
     if (!form.categoryId) tempErrors.categoryId = "Please select a category";
+    if (!form.unit) tempErrors.unit = "Unit is required";
+    if (!form.weight) tempErrors.weight = "Weight is required";
     if (!form.stock) tempErrors.stock = "Stock quantity is required";
     if (!form.description.trim()) tempErrors.description = "Description is required";
     
@@ -132,6 +137,9 @@ const AdminProducts = () => {
       name: p.name,
       description: p.description,
       price: p.price.toString(),
+      discountPrice: p.discountPrice ? p.discountPrice.toString() : "",
+      weight: p.weight ? p.weight.toString() : "",
+      unit: p.unit || "",
       image: p.image, 
       categoryId: p.category?._id || "",
       stock: p.stock.toString(),
@@ -200,7 +208,7 @@ const AdminProducts = () => {
                   <option value="">Choose Category</option>
                   {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
                 </select>
-                {errors.categoryId && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12}/> {errors.categoryId}</p>}
+                {errors.categoryId && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12}/> {errors.categoryId  }</p>}
               </div>
 
               {/* Price */}
@@ -208,6 +216,31 @@ const AdminProducts = () => {
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Price (₹)</label>
                 <input type="number" name="price" value={form.price} onChange={handleChange} className={`w-full bg-slate-50 border ${errors.price ? 'border-red-500' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm outline-none font-semibold`} />
                 {errors.price && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12}/> {errors.price}</p>}
+              </div>
+
+              {/* discountPrice */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Discount Price (₹)</label>
+                <input type="number" name="discountPrice" value={form.discountPrice} onChange={handleChange} className={`w-full bg-slate-50 border ${errors.discountPrice ? 'border-red-500' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm outline-none font-semibold`} />
+                {errors.discountPrice && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12}/> {errors.discountPrice}</p>}
+              </div>
+
+              {/* weight */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Weight (kg/g)</label>
+                <input type="number" name="weight" value={form.weight} onChange={handleChange} className={`w-full bg-slate-50 border ${errors.weight ? 'border-red-500' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm outline-none font-semibold`} />
+                {errors.weight && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12}/> {errors.weight}</p>}
+              </div>
+
+              {/* unit */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Unit</label>
+                <select name="unit" value={form.unit} onChange={handleChange} className={`w-full bg-slate-50 border ${errors.unit ? 'border-red-500' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500/20 outline-none font-semibold`}>
+                  <option value="">Choose unit</option>
+                  <option value="kg">Kilogram (kg)</option>
+                  <option value="gram">Gram (g)</option>
+                </select>
+                {errors.unit && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12}/> {errors.unit}</p>}
               </div>
 
               {/* Stock */}
@@ -276,6 +309,9 @@ const AdminProducts = () => {
                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Product Info</th>
                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Category</th>
                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Price</th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">DiscountPrice</th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Unit</th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Weight</th>
                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Stock</th>
                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
               </tr>
@@ -291,9 +327,16 @@ const AdminProducts = () => {
                     <p className={`text-[9px] font-black uppercase mt-1 ${p.status === 'active' ? 'text-green-500' : 'text-slate-400'}`}>{p.status}</p>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-md">{p.category?.name || "None"}</span>
+                    <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-md">{p.categoryId?.name || "None"}</span>
                   </td>
                   <td className="px-6 py-4 text-center font-black text-slate-800">₹{p.price}</td>
+                  <td className="px-6 py-4 text-center font-black text-slate-800">₹{p.discountPrice}</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="text-sm font-black text-slate-600">{p.unit}</span>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="text-sm font-black text-slate-600">{p.weight}</span>
+                  </td>
                   <td className="px-6 py-4 text-center">
                     <span className={`text-sm font-black ${p.stock < 10 ? 'text-red-500' : 'text-slate-600'}`}>{p.stock}</span>
                   </td>
