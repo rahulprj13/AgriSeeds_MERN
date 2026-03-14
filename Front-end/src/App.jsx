@@ -28,7 +28,7 @@ function App() {
               pauseOnFocusLoss
               draggable
               pauseOnHover
-              theme="dark"
+              theme="colored"
               transition={Zoom}
             />
           </CategoryContextProvider>
