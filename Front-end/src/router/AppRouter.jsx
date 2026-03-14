@@ -18,7 +18,7 @@ import SignUp from "../Component/auth/SignUp";
 
 import AdminLayout from "../Component/admin/AdminLayout";
 import AdminDashboard from "../Component/admin/AdminDashboard";
-// import AdminUsers from "../Component/admin/AdminUsers";
+import AdminUsers from "../Component/admin/AdminUsers";
 import AdminCategories from "../Component/admin/AdminCategories";
 import AdminProducts from "../Component/admin/AdminProducts";
 import AdminLogin from "../Component/admin/AdminLogin";
@@ -89,7 +89,7 @@ const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <AdminDashboard /> },
-      // { path: "users", element: <AdminUsers /> },
+      { path: "users", element: <AdminUsers /> },
       { path: "categories", element: <AdminCategories /> },
       { path: "products", element: <AdminProducts /> },
     ],
