@@ -49,6 +49,27 @@ exports.loginUser = async (req, res) => {
 
 }
 
+// 1. Block/Unblock User
+exports.updateUserStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body; // 'active' or 'blocked'
+    await User.findByIdAndUpdate(id, { status });
+    res.json({ message: "User status updated successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update status" });
+  }
+};
+
+// 2. Delete User
+exports.deleteUser = async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: "User deleted permanently" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+};
 
 // PROFILE API
 exports.getProfile = async (req, res) => {
