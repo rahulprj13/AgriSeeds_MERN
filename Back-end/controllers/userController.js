@@ -71,6 +71,18 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+// change user role
+exports.updateUserRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body; // 'admin' or 'user'
+    await User.findByIdAndUpdate(id, { role });
+    res.json({ message: "Role updated successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update role" });
+  }
+};
+
 // PROFILE API
 exports.getProfile = async (req, res) => {
 
