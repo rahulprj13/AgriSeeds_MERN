@@ -18,6 +18,8 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 0,
+      required:true
+
     },
 
     description: {
@@ -27,12 +29,26 @@ const ProductSchema = new mongoose.Schema(
     discountPrice: {
       type: Number,
       min: 0,
+      required:true
+
     },
 
     stock: {
       type: Number,
       default: 0,
       min: 0,
+    },
+
+    weight: {               
+      type: Number,
+      required: true
+    },
+
+    unit: {                
+      type: String,
+      enum: ["kg", "gram"],
+      default: "gram",
+      required: true
     },
 
     image: {
