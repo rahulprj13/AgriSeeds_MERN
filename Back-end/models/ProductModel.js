@@ -8,7 +8,7 @@ const ProductSchema = new mongoose.Schema(
       trim: true,
     },
 
-    category: {
+    categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "categories",
       required: true,
@@ -16,7 +16,6 @@ const ProductSchema = new mongoose.Schema(
 
     price: {
       type: Number,
-      required: true,
       min: 0,
       required:true
 
