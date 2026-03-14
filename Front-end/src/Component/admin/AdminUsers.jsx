@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Users } from "lucide-react";
 
 const AdminUserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -117,7 +118,7 @@ const AdminUserManagement = () => {
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-             USERS
+            <Users className="text-green-600" /> USERS
           </h2>
           <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">User Management System</p>
         </div>
