@@ -11,6 +11,7 @@ const AdminLayout = () => {
 
   const menuItems = [
     { path: "/admin", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
+    { path: "/admin/users", label: "Users", icon: <Sprout size={18} /> },
     { path: "/admin/categories", label: "Category", icon: <FolderTree size={18} /> },
     { path: "/admin/products", label: "Product", icon: <Package size={18} /> },
   ];
