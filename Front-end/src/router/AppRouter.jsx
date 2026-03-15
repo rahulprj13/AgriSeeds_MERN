@@ -1,5 +1,10 @@
-import React, { useContext } from "react";
+import React, { useContext, lazy, Suspense } from "react";
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
+
+// const user = lazy(() => import("../Component/user"));
+// const auth = lazy(() => import("../Component/auth"));
+// const admin = lazy(() => import("../Component/admin"));
+
 
 import UserLayout from "../Component/layout/UserLayout";
 import AuthLayout from "../Component/layout/AuthLayout";
@@ -98,7 +103,11 @@ const router = createBrowserRouter([
 ]);
 
 const AppRouter = () => {
-  return <RouterProvider router={router} />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RouterProvider router={router} />
+    </Suspense>
+  );
 };
 
 export default AppRouter;
