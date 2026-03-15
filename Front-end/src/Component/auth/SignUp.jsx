@@ -50,6 +50,22 @@ const SignUp = () => {
       }
     },
 
+   mobile: {
+  required: "Mobile number is required*",
+  pattern: {
+    value: /^[6-9][0-9]{9}$/,
+    message: "Enter a valid 10-digit mobile number*"
+  },
+  minLength: {
+    value: 10,
+    message: "Mobile number must be 10 digits*"
+  },
+  maxLength: {
+    value: 10,
+    message: "Mobile number cannot exceed 10 digits*"
+  }
+},
+
     email: {
       required: "Email is required*",
       pattern: {
@@ -207,7 +223,7 @@ const SignUp = () => {
               <div>
 
                 <input
-                  type="text"
+                  type="tel"
                   placeholder="Last Name"
                   {...register("lastname", validationRules.lastname)}
                   className="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30
@@ -222,6 +238,25 @@ const SignUp = () => {
 
             </div>
 
+            {/* Mobile */}
+            <div>
+
+              <input
+                type="text"
+                placeholder="Mobile Number"
+                {...register("mobile", validationRules.mobile)}
+                 onInput={(e) => {
+    e.target.value = e.target.value.replace(/[^0-9]/g, "");
+  }}
+                className="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30
+      focus:outline-none focus:border-green-400 placeholder-gray-200"
+              />
+
+              <p className="text-red-400 text-sm mt-1">
+                {errors.mobile?.message}
+              </p>
+
+            </div>
 
             {/* EMAIL */}
 

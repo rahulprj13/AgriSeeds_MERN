@@ -23,6 +23,12 @@ const UserSchema = new mongoose.Schema({
     required:true
   },
 
+  mobile:{
+    type:String,
+    required:true,
+    unique:true
+  },
+
   role:{
     type:String,
     default:"user",

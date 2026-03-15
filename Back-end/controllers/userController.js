@@ -117,7 +117,7 @@ exports.registerUser = async (req, res) => {
 
   try {
 
-    const { firstname, lastname, email, password, otp } = req.body
+    const { firstname, lastname,mobile, email, password, otp } = req.body
 
     const userExists = await User.findOne({ email })
 
@@ -147,6 +147,7 @@ exports.registerUser = async (req, res) => {
     const user = await User.create({
       firstname,
       lastname,
+      mobile,
       email,
       password: hashedPassword
     })
@@ -163,6 +164,7 @@ exports.registerUser = async (req, res) => {
         id: user._id,
         firstname: user.firstname,
         lastname: user.lastname,
+        mobile: user.mobile,
         email: user.email
       }
     })
