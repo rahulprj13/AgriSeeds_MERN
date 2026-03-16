@@ -36,7 +36,7 @@ const AdminProducts = () => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
       const [catRes, prodRes] = await Promise.all([
-        axios.get("/api/admin/categories", { headers }),
+        axios.get("/api/categories", { headers }),
         axios.get("/api/admin/products", { headers })
       ]);
       setCategories(catRes.data);
