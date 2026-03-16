@@ -126,7 +126,7 @@ const Cart = () => {
         <p className="text-gray-500">Your cart is empty.</p>
 
         <button
-          onClick={() => navigate("/products")}
+          onClick={() => navigate(`/category/vegetables`)}
           className="mt-6 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
         >
           Continue Shopping
