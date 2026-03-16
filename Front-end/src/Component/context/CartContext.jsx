@@ -1,186 +1,90 @@
-
-// import React, { createContext, useState, useEffect, useContext } from "react";
-// import { AuthContext } from "./AuthContext";
-
-// export const CartContext = createContext();
-
-// const CartProvider = ({ children }) => {
-//   const { user } = useContext(AuthContext);
-//   const [cart, setCart] = useState([]);
-
-//   // Load cart from localStorage when user changes
-//   useEffect(() => {
-//     if (user) {
-//       const storedCart = localStorage.getItem(`cart_${user.id}`);
-//       if (storedCart) setCart(JSON.parse(storedCart));
-//       else setCart([]);
-//     } else {
-//       setCart([]);
-//     }
-//   }, [user]);
-
-//   // Update cart both in state and localStorage
-//   const updateCart = (newCart) => {
-//     setCart(newCart);
-//     if (user) localStorage.setItem(`cart_${user.id}`, JSON.stringify(newCart));
-//   };
-
-//   // Add product to cart
-// const addToCart = (product) => {
-//   setCart((prevCart) => [
-//     ...prevCart,
-//     { ...product, quantity: 1, cartId: Date.now() }
-//   ]);
-// };
-
-//   // Remove product from cart
-//   const removeFromCart = (cartId) => {
-//   setCart((prevCart) => prevCart.filter((item) => item.cartId !== cartId));
-// };
-
-//   // Increment/decrement quantity
-// const incrementQuantity = (cartId) => {
-//   setCart((prevCart) =>
-//     prevCart.map((item) =>
-//       item.cartId === cartId
-//         ? { ...item, quantity: item.quantity < 10 ? item.quantity + 1 : 10 }
-//         : item
-//     )
-//   );
-// };
-
-//   const decrementQuantity = (cartId) => {
-//   setCart((prevCart) =>
-//     prevCart.map((item) =>
-//       item.cartId === cartId
-//         ? { ...item, quantity: item.quantity > 1 ? item.quantity - 1 : 1 }
-//         : item
-//     )
-//   );
-// };
-
-//   // Calculate total price
-//   const totalPrice = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
-
-//   return (
-//     <CartContext.Provider
-//       value={{
-//         cart,
-//         addToCart,
-//         removeFromCart,
-//         incrementQuantity,
-//         decrementQuantity,
-//         totalPrice,
-//       }}
-//     >
-//       {children}
-//     </CartContext.Provider>
-//   );
-// };
-
-// export default CartProvider;
-
-
-
-import React from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { createContext, useState, useEffect } from "react";
+import { AuthContext } from "./AuthContext";
 
 export const CartContext = createContext();
+const API_URL = "http://localhost:5000/api/cart";
 
 export const CartProvider = ({ children }) => {
-
   const [cart, setCart] = useState([]);
+  const { user } = useContext(AuthContext);
 
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  const fetchCart = async () => {
-
-    const res = await axios.get(
-      `/cart/${user._id}`
-    );
-
-    setCart(res.data.data);
-
-  };
-
-
+  // Fetch Cart from DB when user logs in
   useEffect(() => {
-
     if (user) {
       fetchCart();
+    } else {
+      setCart([]);
+    }
+  }, [user]);
+
+const fetchCart = async () => {
+    // Agar user logged in nahi hai ya id nahi hai, toh request mat bhejo
+    if (!user || !user._id) return; 
+
+    try {
+        const res = await axios.get(`${API_URL}/api/cart/${user._id}`);
+        setCart(res.data.data);
+    } catch (error) {
+        console.log("Cart fetch failed - Check if user is logged in");
+    }
+};
+
+const addToCart = async (product) => {
+    if (!user || !user._id) {
+        alert("Please login first!");
+        navigate("/login");
+        return;
     }
 
-  }, []);
+    try {
+        const res = await axios.post(`${API_URL}/api/cart/add`, {
+            userId: user._id, // Ensure this is correctly coming from AuthContext
+            product: product
+        });
+        
+        if(res.status === 200 || res.status === 201) {
+            fetchCart(); // List refresh karein
+        }
+    } catch (error) {
+        console.error("Add to cart failed:", error.response?.data || error.message);
+    }
+};
 
-
-
-  const addToCart = async (product) => {
-
-    await axios.post("/cart/add", {
-      userId: user._id,
-      product
-    });
-
-    fetchCart();
-
+  const incrementQuantity = async (itemId, currentQty) => {
+    try {
+      await axios.put(`${API_URL}/update/${itemId}`, { quantity: currentQty + 1 });
+      fetchCart();
+    } catch (error) {
+      console.error("Update Error", error);
+    }
   };
 
-
-  const incrementQuantity = async (item) => {
-
-    await axios.put(
-      `/cart/${item._id}`,
-      { quantity: item.quantity + 1 }
-    );
-
-    fetchCart();
-
+  const decrementQuantity = async (itemId, currentQty) => {
+    if (currentQty <= 1) return;
+    try {
+      await axios.put(`${API_URL}/update/${itemId}`, { quantity: currentQty - 1 });
+      fetchCart();
+    } catch (error) {
+      console.error("Update Error", error);
+    }
   };
 
-
-  const decrementQuantity = async (item) => {
-
-    if (item.quantity === 1) return;
-
-    await axios.put(
-      `/cart/${item._id}`,
-      { quantity: item.quantity - 1 }
-    );
-
-    fetchCart();
-
+  const removeFromCart = async (itemId) => {
+    try {
+      await axios.delete(`${API_URL}/remove/${itemId}`);
+      fetchCart();
+    } catch (error) {
+      console.error("Remove Error", error);
+    }
   };
 
-
-  const removeFromCart = async (id) => {
-
-    await axios.delete(
-      `/cart/${id}`
-    );
-
-    fetchCart();
-
-  };
-
-
-  const totalPrice = cart.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
-
+  const totalPrice = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (
-    <CartContext.Provider
-      value={{
-        cart,
-        addToCart,
-        incrementQuantity,
-        decrementQuantity,
-        removeFromCart,
-        totalPrice
-      }}
-    >
+    <CartContext.Provider value={{ 
+        cart, addToCart, incrementQuantity, decrementQuantity, removeFromCart, totalPrice 
+    }}>
       {children}
     </CartContext.Provider>
   );
