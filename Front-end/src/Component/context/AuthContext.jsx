@@ -5,11 +5,17 @@ export const AuthContext = createContext();
 
 const AuthContextProvider = ({ children }) => {
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const raw = sessionStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
 
-  const [token, setToken] = useState(
-    localStorage.getItem("token") || sessionStorage.getItem("token") || null
-  );
+  // IMPORTANT: use sessionStorage only (per-tab session)
+  const [token, setToken] = useState(() => sessionStorage.getItem("token") || null);
 
   const [loading, setLoading] = useState(true);
 
@@ -21,6 +27,7 @@ const AuthContextProvider = ({ children }) => {
       const res = await axios.get("/profile");
 
       setUser(res.data);
+      sessionStorage.setItem("user", JSON.stringify(res.data));
 
     } catch (error) {
 
@@ -42,23 +49,10 @@ const AuthContextProvider = ({ children }) => {
       if (res.status === 200) {
 
         const token = res.data.token;
-        const role = res.data.user.role;
-
-        // ADMIN LOGIN
-        if (role === "admin") {
-
-          localStorage.setItem("token", token);
-          sessionStorage.removeItem("token");
-
-        } 
-        
-        // USER LOGIN
-        else {
-
-          sessionStorage.setItem("token", token);
-          localStorage.removeItem("token");
-
-        }
+        // Tab-scoped auth (admin/user both stored per-tab)
+        sessionStorage.setItem("token", token);
+        // Clear any legacy cross-tab tokens
+        localStorage.removeItem("token");
 
         setToken(token);
 
@@ -83,6 +77,7 @@ const AuthContextProvider = ({ children }) => {
 
     localStorage.removeItem("token");
     sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
 
     setToken(null);
     setUser(null);
@@ -94,8 +89,7 @@ const AuthContextProvider = ({ children }) => {
   // AUTO LOGIN
   useEffect(() => {
 
-    const storedToken =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
+    const storedToken = sessionStorage.getItem("token");
   
     if (storedToken) {
   
