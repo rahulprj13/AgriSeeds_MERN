@@ -40,24 +40,43 @@ const Category = () => {
     if (!currentCategory) return <NotFound />;
 
     return (
-        <div className="min-h-screen bg-[#f8fafc]">
+        <div className="max-w-7xl mx-auto bg-[#f8fafc]">
             {/* --- HERO SECTION --- */}
             <div className="relative bg-white border-b border-slate-200 overflow-hidden">
-                <div className="absolute inset-0 opacity-5 pointer-events-none">
-                    <div className="absolute top-0 left-0 w-64 h-64 bg-green-500 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-                    <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-500 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
+                <div className="absolute inset-0 opacity-10 pointer-events-none">
+                    <div className="absolute -top-10 -left-10 w-40 h-40 bg-green-400 rounded-full blur-3xl animate-pulse" />
+                    <div className="absolute -bottom-10 -right-10 w-60 h-60 bg-blue-400 rounded-full blur-3xl opacity-50" />
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 py-16 md:py-24 relative z-10 text-center">
-                    <span className="inline-block px-4 py-1.5 mb-4 text-xs font-black tracking-[0.2em] text-green-600 bg-green-50 rounded-full uppercase">
-                        Our Collection
-                    </span>
-                    <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight">
-                        Fresh <span className="text-green-600">{currentCategory.name}</span>
-                    </h1>
-                    <p className="text-slate-500 max-w-2xl mx-auto text-lg font-medium leading-relaxed">
-                        {currentCategory.description || `Premium quality ${currentCategory.name} sourced directly for your needs.`}
-                    </p>
+                <div className="max-w-7xl mx-auto px-6 py-10 md:py-12 relative z-10">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+
+                        {/* Left Side: Text Content */}
+                        <div className="text-left max-w-xl">
+                            <div className="flex items-center gap-2 mb-3">
+                                <span className="w-8 h-0.5 bg-green-500"></span>
+                                <span className="text-[10px] font-black tracking-[0.3em] text-green-600 uppercase">
+                                    Premium Selection
+                                </span>
+                            </div>
+                            <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">
+                                Fresh <span className="text-green-600 relative">
+                                    {currentCategory.name}
+                                    <svg className="absolute -bottom-2 left-0 w-full h-2 text-green-200/60 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
+                                        <path d="M0 5 Q 25 0 50 5 T 100 5" stroke="currentColor" strokeWidth="4" fill="transparent" />
+                                    </svg>
+                                </span>
+                            </h1>
+                        </div>
+
+                        {/* Right Side: Description with Glass effect */}
+                        <div className="md:max-w-xs">
+                            <p className="text-slate-500 text-sm md:text-base font-medium leading-relaxed border-l-4 border-green-100 pl-4 py-1">
+                                {currentCategory.description || `High-quality ${currentCategory.name} handpicked and delivered fresh to your doorstep.`}
+                            </p>
+                        </div>
+
+                    </div>
                 </div>
             </div>
 
@@ -66,7 +85,7 @@ const Category = () => {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20">
                         <div className="w-12 h-12 border-4 border-green-600/20 border-t-green-600 rounded-full animate-spin mb-4" />
-                        <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Loading Freshness...</p>
+                        <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Loading...</p>
                     </div>
                 ) : products.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
