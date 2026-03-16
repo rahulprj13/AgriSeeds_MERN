@@ -10,7 +10,7 @@ const emptyProduct = {
   discountPrice: "",
   weight: "",
   unit: "",
-  image: "",
+  imagePath: "",
   categoryId: "",
   stock: "",
   status: "active",
@@ -49,7 +49,7 @@ const AdminProducts = () => {
   useEffect(() => { loadData(); }, []);
 
   // --- VALIDATION & SANITIZATION ---
-  
+
   const sanitizeHTML = (str) => str.replace(/<[^>]*>?/gm, '');
 
   const validate = () => {
@@ -61,7 +61,7 @@ const AdminProducts = () => {
     if (!form.weight) tempErrors.weight = "Weight is required";
     if (!form.stock) tempErrors.stock = "Stock quantity is required";
     if (!form.description.trim()) tempErrors.description = "Description is required";
-    
+
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
@@ -86,7 +86,7 @@ const AdminProducts = () => {
   };
 
   const handleFileChange = (e) => {
-    setForm(prev => ({ ...prev, image: e.target.files[0] }));
+    setForm(prev => ({ ...prev, imagePath: e.target.files[0] }));
   };
 
   const resetForm = () => {
@@ -108,9 +108,16 @@ const AdminProducts = () => {
     const cleanDesc = sanitizeHTML(form.description);
 
     Object.keys(form).forEach(key => {
-      if (key === "description") formData.append(key, cleanDesc);
-      else if (key === "image" && typeof form.image === 'string') return; // Don't append if it's just the URL string
-      else formData.append(key, form[key]);
+      if (key === "description") {
+        formData.append(key, cleanDesc);
+      } else if (key === "imagePath") {
+        if (form.imagePath instanceof File) {
+          formData.append("image", form.imagePath);
+        }
+        // If it's a string (existing URL), don't append
+      } else {
+        formData.append(key, form[key]);
+      }
     });
 
     try {
@@ -140,7 +147,7 @@ const AdminProducts = () => {
       discountPrice: p.discountPrice ? p.discountPrice.toString() : "",
       weight: p.weight ? p.weight.toString() : "",
       unit: p.unit || "",
-      image: p.image, 
+      imagePath: p.imagePath || "",
       categoryId: p.category?._id || "",
       stock: p.stock.toString(),
       status: p.status,
@@ -160,8 +167,18 @@ const AdminProducts = () => {
 
   // Search & Filter Logic
   const filteredProducts = products.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCat = filterCategory === "" || p.category?._id === filterCategory;
+    // 1. Search Logic (Name $ categoryname)
+    const searchLower = searchTerm.toLowerCase();
+    const categoryName = p.categoryId?.name || p.category?.name || "";
+
+    const matchesSearch =
+      p.name.toLowerCase().includes(searchLower) ||
+      categoryName.toLowerCase().includes(searchLower);
+
+    // 2. Dropdown Filter Logic
+    const productCatId = p.categoryId?._id || p.category?._id || p.categoryId;
+    const matchesCat = filterCategory === "" || productCatId === filterCategory;
+
     return matchesSearch && matchesCat;
   });
 
@@ -175,11 +192,10 @@ const AdminProducts = () => {
           </h2>
           <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Product Management System</p>
         </div>
-        <button 
+        <button
           onClick={() => setShowForm(!showForm)}
-          className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-lg ${
-            showForm ? "bg-slate-100 text-slate-600" : "bg-green-600 text-white hover:bg-green-700 shadow-green-200"
-          }`}
+          className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-lg ${showForm ? "bg-slate-100 text-slate-600" : "bg-green-600 text-white hover:bg-green-700 shadow-green-200"
+            }`}
         >
           {showForm ? <X size={18} /> : <Plus size={18} />}
           {showForm ? "Close Form" : "Add New Product"}
@@ -191,14 +207,14 @@ const AdminProducts = () => {
         <section className="bg-white rounded-2xl border border-slate-200 shadow-xl p-6 md:p-8 animate-in slide-in-from-top duration-300">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              
+
               {/* Name */}
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex justify-between">
                   Name <span>{form.name.length}/30</span>
                 </label>
                 <input name="name" value={form.name} onChange={handleChange} className={`w-full bg-slate-50 border ${errors.name ? 'border-red-500' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500/20 outline-none transition-all font-semibold`} placeholder="Ex: Organic Tomato 101" />
-                {errors.name && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12}/> {errors.name}</p>}
+                {errors.name && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12} /> {errors.name}</p>}
               </div>
 
               {/* Category */}
@@ -208,28 +224,28 @@ const AdminProducts = () => {
                   <option value="">Choose Category</option>
                   {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
                 </select>
-                {errors.categoryId && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12}/> {errors.categoryId  }</p>}
+                {errors.categoryId && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12} /> {errors.categoryId}</p>}
               </div>
 
               {/* Price */}
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Price (₹)</label>
                 <input type="number" name="price" value={form.price} onChange={handleChange} className={`w-full bg-slate-50 border ${errors.price ? 'border-red-500' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm outline-none font-semibold`} />
-                {errors.price && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12}/> {errors.price}</p>}
+                {errors.price && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12} /> {errors.price}</p>}
               </div>
 
               {/* discountPrice */}
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Discount Price (₹)</label>
                 <input type="number" name="discountPrice" value={form.discountPrice} onChange={handleChange} className={`w-full bg-slate-50 border ${errors.discountPrice ? 'border-red-500' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm outline-none font-semibold`} />
-                {errors.discountPrice && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12}/> {errors.discountPrice}</p>}
+                {errors.discountPrice && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12} /> {errors.discountPrice}</p>}
               </div>
 
               {/* weight */}
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Weight (kg/g)</label>
                 <input type="number" name="weight" value={form.weight} onChange={handleChange} className={`w-full bg-slate-50 border ${errors.weight ? 'border-red-500' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm outline-none font-semibold`} />
-                {errors.weight && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12}/> {errors.weight}</p>}
+                {errors.weight && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12} /> {errors.weight}</p>}
               </div>
 
               {/* unit */}
@@ -240,14 +256,14 @@ const AdminProducts = () => {
                   <option value="kg">Kilogram (kg)</option>
                   <option value="gram">Gram (g)</option>
                 </select>
-                {errors.unit && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12}/> {errors.unit}</p>}
+                {errors.unit && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12} /> {errors.unit}</p>}
               </div>
 
               {/* Stock */}
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Stock</label>
                 <input type="number" name="stock" value={form.stock} onChange={handleChange} className={`w-full bg-slate-50 border ${errors.stock ? 'border-red-500' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm outline-none font-semibold`} />
-                {errors.stock && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12}/> {errors.stock}</p>}
+                {errors.stock && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12} /> {errors.stock}</p>}
               </div>
 
               {/* Status */}
@@ -263,16 +279,22 @@ const AdminProducts = () => {
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Image Upload</label>
                 <input type="file" onChange={handleFileChange} className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-green-50 file:text-green-700 font-bold" />
+                {form.imagePath && !(form.imagePath instanceof File) && (
+                  <div className="mt-2">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Current Image:</p>
+                    <img src={`${API_URL}/uploads/${form.imagePath}`} className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm" alt="Current product image" onError={(e) => e.target.src = "https://placehold.co/100x100?text=No+Img"} />
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Description */}
             <div className="space-y-1">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex justify-between">
-                Description (No HTML) <span>{form.description.length}/200</span>
+                Description <span>{form.description.length}/200</span>
               </label>
               <textarea name="description" value={form.description} onChange={handleChange} rows={3} className={`w-full bg-slate-50 border ${errors.description ? 'border-red-500' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm outline-none font-medium`} placeholder="Enter product details..." />
-              {errors.description && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12}/> {errors.description}</p>}
+              {errors.description && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12} /> {errors.description}</p>}
             </div>
 
             <div className="flex justify-end gap-3 border-t pt-6">
@@ -317,37 +339,51 @@ const AdminProducts = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filteredProducts.map((p) => (
-                <tr key={p._id} className="hover:bg-slate-50/80 transition-all group">
-                  <td className="px-6 py-4">
-                    <img src={`${API_URL}/uploads/${p.image}`} className="w-12 h-12 rounded-xl object-cover border border-slate-200 shadow-sm" alt="" onError={(e) => e.target.src="https://placehold.co/100x100?text=No+Img"} />
-                  </td>
-                  <td className="px-6 py-4">
-                    <p className="text-sm font-black text-slate-800">{p.name}</p>
-                    <p className={`text-[9px] font-black uppercase mt-1 ${p.status === 'active' ? 'text-green-500' : 'text-slate-400'}`}>{p.status}</p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-md">{p.categoryId?.name || "None"}</span>
-                  </td>
-                  <td className="px-6 py-4 text-center font-black text-slate-800">₹{p.price}</td>
-                  <td className="px-6 py-4 text-center font-black text-slate-800">₹{p.discountPrice}</td>
-                  <td className="px-6 py-4 text-center">
-                    <span className="text-sm font-black text-slate-600">{p.unit}</span>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span className="text-sm font-black text-slate-600">{p.weight}</span>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span className={`text-sm font-black ${p.stock < 10 ? 'text-red-500' : 'text-slate-600'}`}>{p.stock}</span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-2">
-                      <button onClick={() => handleEdit(p)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"><Pencil size={18} /></button>
-                      <button onClick={() => handleDelete(p._id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={18} /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {filteredProducts.map((p) => {
+                // Defensive: handle undefined/null imagePath
+                let imgSrc = "https://placehold.co/100x100?text=No+Img";
+                if (p.imagePath) {
+                  if (typeof p.imagePath === 'string' && p.imagePath.startsWith('http')) {
+                    imgSrc = p.imagePath;
+                  } else if (typeof p.imagePath === 'string' && p.imagePath.startsWith('/')) {
+                    imgSrc = `${API_URL}${p.imagePath}`;
+                  } else if (typeof p.imagePath === 'string') {
+                    imgSrc = `${API_URL}/uploads/${p.imagePath}`;
+                  }
+                }
+                return (
+                  <tr key={p._id} className="hover:bg-slate-50/80 transition-all group">
+                    <td className="px-6 py-4">
+                      <img src={imgSrc} className="w-12 h-12 rounded-xl object-cover border border-slate-200 shadow-sm" alt="" onError={(e) => e.target.src = "https://placehold.co/100x100?text=No+Img"} />
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="text-sm font-black text-slate-800">{p.name}</p>
+                      <p className={`text-[9px] font-black uppercase mt-1 ${p.status === 'active' ? 'text-green-500' : 'text-slate-400'}`}>{p.status}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-md">{p.categoryId?.name || "None"}</span>
+                    </td>
+                    <td className="px-6 py-4 text-center font-black text-slate-800">₹{p.price}</td>
+                    <td className="px-6 py-4 text-center font-black text-slate-800">₹{p.discountPrice}</td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-sm font-black text-slate-600">{p.unit}</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-sm font-black text-slate-600">{p.weight}</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className={`text-sm font-black ${p.stock < 10 ? 'text-red-500' : 'text-slate-600'}`}>{p.stock}</span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button onClick={() => handleEdit(p)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"><Pencil size={18} /></button>
+                        <button onClick={() => handleDelete(p._id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={18} /></button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+
             </tbody>
           </table>
           {filteredProducts.length === 0 && (
@@ -357,6 +393,7 @@ const AdminProducts = () => {
       </div>
     </div>
   );
+
 };
 
 export default AdminProducts;
