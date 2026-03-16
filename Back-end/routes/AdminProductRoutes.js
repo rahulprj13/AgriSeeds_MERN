@@ -12,7 +12,7 @@ const {
 const authMiddleware = require("../middleware/authmiddleware");
 const adminMiddleware = require("../middleware/adminMiddleware");
 
-const upload = require("../middleware/upload");
+const upload = require("../middleware/uploadMiddleware");
 
 
 // CREATE PRODUCT
@@ -22,6 +22,7 @@ router.post(
   adminMiddleware,
   upload.single("image"),
   createProduct
+
 );
 
 

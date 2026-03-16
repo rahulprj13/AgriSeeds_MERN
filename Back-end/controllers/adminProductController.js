@@ -1,10 +1,13 @@
 const Product = require("../models/ProductModel");
 const Category = require("../models/CategoryModel");
+const uploadToCloudinary = require("../utils/cloudinaryUtils");
 
 // CREATE PRODUCT
 
 exports.createProduct = async (req, res) => {
   try {
+
+    const conrdinaryResponse = await uploadToCloudinary(req.file.path)
 
     const product = new Product({
       name: req.body.name,
@@ -16,9 +19,11 @@ exports.createProduct = async (req, res) => {
       categoryId: req.body.categoryId,
       stock: req.body.stock,
       status: req.body.status,
-      image: req.file ? req.file.filename : ""
+      imagePath: conrdinaryResponse.secure_url
+      // image: req.file ? req.file.filename : ""
     });
 
+    
     await product.save();
 
     res.json(product);
@@ -99,7 +104,8 @@ exports.updateProduct = async (req, res) => {
 
     // IMAGE UPDATE
     if (req.file) {
-      product.image = req.file.filename;
+      const cloudinaryResponse = await uploadToCloudinary(req.file.path);
+      product.imagePath = cloudinaryResponse.secure_url;
     }
 
     await product.save();
