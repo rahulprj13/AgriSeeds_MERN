@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Plus, Search, Pencil, Trash2, X, Package, AlertCircle, Filter, IndianRupee, Layers } from "lucide-react";
+import { AuthContext } from "../context/AuthContext";
 
 const emptyProduct = {
   name: "",
@@ -19,6 +20,7 @@ const emptyProduct = {
 const API_URL = "http://localhost:5000";
 
 const AdminProducts = () => {
+  const { token } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState(emptyProduct);
@@ -28,8 +30,6 @@ const AdminProducts = () => {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
-
-  const token = localStorage.getItem("token");
 
   // Load Data
   const loadData = async () => {
@@ -46,7 +46,7 @@ const AdminProducts = () => {
     }
   };
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { loadData(); }, [token]);
 
   // --- VALIDATION & SANITIZATION ---
 
