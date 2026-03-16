@@ -36,7 +36,7 @@ const AdminLogin = () => {
       const res = await login(data);
 
       // Only allow users with admin role here
-      if (res?.user?.email !== "admin@gmail.com") {
+      if (res?.user?.role !== "admin") {
         toast.error("Only admin users can log in here.");
         return;
       }
