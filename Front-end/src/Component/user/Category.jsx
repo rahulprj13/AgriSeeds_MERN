@@ -171,7 +171,7 @@ const ProductCard = ({ product, navigate }) => {
                     </div>
 
                     <button
-                        onClick={() => navigate(`item/${product._id}`, { state: product })}
+                        onClick={() => navigate(`${product.name}/${product._id}`, { state: product })}
                         className="bg-slate-900 text-white p-4 rounded-2xl hover:bg-green-600 transition-all duration-300 group/btn shadow-xl shadow-slate-200 hover:shadow-green-200 active:scale-95"
                     >
                         <ArrowRight size={20} className="group-hover/btn:translate-x-1 transition-transform" />
