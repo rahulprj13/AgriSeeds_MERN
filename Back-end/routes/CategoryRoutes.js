@@ -52,4 +52,8 @@ router.delete(
   deleteCategory
 );
 
+// PUBLIC ROUTES
+router.get("/api/categories", getCategories);
+router.get("/api/categories/:id", getCategory);
+
 module.exports = router;
