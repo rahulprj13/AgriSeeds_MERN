@@ -48,7 +48,7 @@ const Login = () => {
       const res = await login(data);
 
       toast.success("Login successfully");
-
+      // console.log("Login Response:", res.user.role);
       // ADMIN LOGIN
       if (res?.user?.role === "admin") {
 
