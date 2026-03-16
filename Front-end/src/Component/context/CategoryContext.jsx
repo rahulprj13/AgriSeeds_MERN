@@ -15,7 +15,7 @@ const CategoryContextProvider = ({ children }) => {
 
     try {
 
-      const res = await axios.get("/api/categories");
+      const res = await axios.get("/api/admin/categories");
 
       setCategories(res.data || []);
 
