@@ -1,26 +1,55 @@
-// const express = require("express");
-// const Category = require("../models/CategoryModel.js");
-
-// const router = express.Router();
-
-// // Public: Get all categories (for user UI dropdowns, filters, etc.)
-// router.get("/api/categories", async (req, res) => {
-//   try {
-//     const categories = await Category.find().sort({ name: 1 });
-//     res.json(categories);
-//   } catch (err) {
-//     res.status(500).json({ message: "Server error" });
-//   }
-// });
-
-// module.exports = router;
-
 const express = require("express");
 const router = express.Router();
 
-const { getPublicCategories } = require("../controllers/categoryController.js");
+const authMiddleware = require("../middleware/authmiddleware.js");
+const adminMiddleware = require("../middleware/adminMiddleware.js");
 
-// PUBLIC CATEGORY LIST
-router.get("/api/categories", getPublicCategories);
+const {
+  createCategory,
+  getCategories,
+  getCategory,
+  updateCategory,
+  deleteCategory,
+} = require("../controllers/categoryController.js");
+
+// CREATE
+router.post(
+  "/api/admin/categories",
+  authMiddleware,
+  adminMiddleware,
+  createCategory
+);
+
+// GET ALL
+router.get(
+  "/api/admin/categories",
+  authMiddleware,
+  adminMiddleware,
+  getCategories
+);
+
+// GET SINGLE
+router.get(
+  "/api/admin/categories/:id",
+  authMiddleware,
+  adminMiddleware,
+  getCategory
+);
+
+// UPDATE
+router.put(
+  "/api/admin/categories/:id",
+  authMiddleware,
+  adminMiddleware,
+  updateCategory
+);
+
+// DELETE
+router.delete(
+  "/api/admin/categories/:id",
+  authMiddleware,
+  adminMiddleware,
+  deleteCategory
+);
 
 module.exports = router;
