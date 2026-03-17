@@ -13,7 +13,7 @@ exports.createProduct = async (req, res) => {
       name: req.body.name,
       description: req.body.description,
       price: req.body.price,
-      discountPrice: req.body.discountPrice,
+      currentPrice: req.body.currentPrice,
       weight: req.body.weight,
       unit: req.body.unit,
       categoryId: req.body.categoryId,
@@ -95,7 +95,7 @@ exports.updateProduct = async (req, res) => {
     product.name = req.body.name;
     product.description = req.body.description;
     product.price = req.body.price;
-    product.discountPrice = req.body.discountPrice;
+    product.currentPrice = req.body.currentPrice;
     product.weight = req.body.weight;
     product.unit = req.body.unit;
     product.categoryId = req.body.categoryId;

@@ -25,7 +25,7 @@ const ProductSchema = new mongoose.Schema(
       type: String,
     },
 
-    discountPrice: {
+    currentPrice: {
       type: Number,
       min: 0,
       required:true
