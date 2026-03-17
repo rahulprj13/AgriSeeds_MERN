@@ -21,7 +21,7 @@ exports.addToCart = async (req, res) => {
             userId: userId,
             productId: product._id,
             name: product.name,
-            price: product.price,
+            currentPrice: product.currentPrice,
             imagePath: product.imagePath,
             quantity: 1
         });

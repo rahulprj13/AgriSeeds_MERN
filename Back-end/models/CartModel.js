@@ -21,7 +21,7 @@ const cartSchema = new mongoose.Schema({
     default: 1
   },
 
-  price: {
+  currentPrice: {
     type: Number,
     required: true
 
