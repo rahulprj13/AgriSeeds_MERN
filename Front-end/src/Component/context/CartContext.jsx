@@ -3,11 +3,12 @@ import axios from "axios";
 import { AuthContext } from "./AuthContext";
 
 export const CartContext = createContext();
-const API_URL = "http://localhost:5000/api/cart";
+const API_URL = "http://localhost:5000";
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const { user } = useContext(AuthContext);
+  const userId = user?._id || user?.id || null;
 
   // Fetch Cart from DB when user logs in
   useEffect(() => {
@@ -18,28 +19,29 @@ export const CartProvider = ({ children }) => {
     }
   }, [user]);
 
-const fetchCart = async () => {
+  const fetchCart = async () => {
     // Agar user logged in nahi hai ya id nahi hai, toh request mat bhejo
-    if (!user || !user._id) return; 
+    if (!userId) return;
 
     try {
-        const res = await axios.get(`${API_URL}/api/cart/${user._id}`);
+        const res = await axios.get(`${API_URL}/api/cart/${userId}`);
         setCart(res.data.data);
     } catch (error) {
         console.log("Cart fetch failed - Check if user is logged in");
     }
-};
+  };
 
-const addToCart = async (product) => {
-    if (!user || !user._id) {
-        alert("Please login first!");
-        navigate("/login");
-        return;
+  const addToCart = async (product) => {
+    // UI should redirect; context just rejects when unauthenticated
+    if (!userId) {
+      const err = new Error("Please login first");
+      err.code = "NOT_AUTHENTICATED";
+      throw err;
     }
 
     try {
         const res = await axios.post(`${API_URL}/api/cart/add`, {
-            userId: user._id, // Ensure this is correctly coming from AuthContext
+            userId, // backend expects "userId"
             product: product
         });
         
@@ -48,12 +50,13 @@ const addToCart = async (product) => {
         }
     } catch (error) {
         console.error("Add to cart failed:", error.response?.data || error.message);
+        throw error;
     }
-};
+  };
 
   const incrementQuantity = async (itemId, currentQty) => {
     try {
-      await axios.put(`${API_URL}/update/${itemId}`, { quantity: currentQty + 1 });
+      await axios.put(`${API_URL}/api/cart/update/${itemId}`, { quantity: currentQty + 1 });
       fetchCart();
     } catch (error) {
       console.error("Update Error", error);
@@ -63,7 +66,7 @@ const addToCart = async (product) => {
   const decrementQuantity = async (itemId, currentQty) => {
     if (currentQty <= 1) return;
     try {
-      await axios.put(`${API_URL}/update/${itemId}`, { quantity: currentQty - 1 });
+      await axios.put(`${API_URL}/api/cart/update/${itemId}`, { quantity: currentQty - 1 });
       fetchCart();
     } catch (error) {
       console.error("Update Error", error);
@@ -72,7 +75,7 @@ const addToCart = async (product) => {
 
   const removeFromCart = async (itemId) => {
     try {
-      await axios.delete(`${API_URL}/remove/${itemId}`);
+      await axios.delete(`${API_URL}/api/cart/remove/${itemId}`);
       fetchCart();
     } catch (error) {
       console.error("Remove Error", error);
