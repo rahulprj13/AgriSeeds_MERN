@@ -1,105 +1,10 @@
-// import React, { useContext } from "react";
-// import { AuthContext } from "../context/AuthContext";
-// import { CartContext } from "../context/CartContext";
-// import { useNavigate } from "react-router-dom";
-
-// const Cart = () => {
-//   const { user } = useContext(AuthContext);
-//   const {
-//     cart,
-//     incrementQuantity,
-//     decrementQuantity,
-//     removeFromCart,
-//     totalPrice,
-//   } = useContext(CartContext);
-//   const navigate = useNavigate();
-
-//   if (!user) {
-//     navigate("/login");
-//     return null;
-//   }
-
-//   if (cart.length === 0) {
-//     return (
-//       <div className="min-h-screen p-8 bg-gray-50 text-center">
-//         <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
-//         <p>Your cart is empty.</p>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="min-h-screen p-8 bg-gray-50">
-//       <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
-
-//       <div className="space-y-6">
-//         {cart.map((item) => (
-//           <div
-//             key={item.cartId}
-//             className="bg-white p-4 rounded shadow flex items-center gap-4"
-//           >
-//             {/* Product Image */}
-//             <img
-//               src={item.image}
-//               alt={item.name}
-//               className="w-24 h-24 object-cover rounded"
-//             />
-
-//             {/* Name, price, quantity */}
-//             <div className="flex-1">
-//               <h2 className="text-lg font-semibold">{item.name}</h2>
-//               <p className="text-green-600 font-semibold">₹{item.price} each</p>
-
-//               {/* Quantity controls */}
-//               <div className="flex items-center mt-2 gap-2">
-//                 <button
-//                   onClick={() => decrementQuantity(item.cartId)}
-//                   className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300"
-//                 >
-//                   -
-//                 </button>
-//                 <span className="px-3">{item.quantity}</span>
-//                 <button
-//                   onClick={() => incrementQuantity(item.cartId)}
-//                   className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300"
-//                 >
-//                   +
-//                 </button>
-//               </div>
-//             </div>
-
-//             {/* Total price & remove */}
-//             <div className="flex flex-col items-end gap-2">
-//               <p className="font-semibold">₹{item.price * item.quantity}</p>
-//               <button
-//                 onClick={() => removeFromCart(item.cartId)}
-//                 className="text-red-500 hover:underline text-sm"
-//               >
-//                 Remove
-//               </button>
-//             </div>
-//           </div>
-//         ))}
-
-//         {/* Cart Total */}
-//         <div className="text-right mt-6">
-//           <h2 className="text-xl font-bold">
-//             Total: <span className="text-green-600">₹{totalPrice}</span>
-//           </h2>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Cart;
-
 
 import React, { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { CartContext } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from "lucide-react";
+import { toast } from "react-toastify";
 
 const API_URL = "http://localhost:5000";
 
@@ -117,6 +22,7 @@ const Cart = () => {
 
   // Redirect if not logged in
   if (!user) {
+    toast.info("Please login first");
     navigate("/login");
     return null;
   }
@@ -166,21 +72,22 @@ const Cart = () => {
               return (
                 <div
                   key={item._id}
-                  className="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col sm:flex-row gap-6 items-center group"
+                  className="bg-white p-5 rounded-4xl border border-slate-100 shadow-sm flex flex-col sm:flex-row gap-6 items-center group"
                 >
                   {/* Product Image */}
-                  <div className="relative w-32 h-32 bg-slate-50 rounded-2xl overflow-hidden flex-shrink-0">
+                  <div className="relative w-32 h-32 bg-slate-50 rounded-2xl overflow-hidden shrink-0">
                     <img
                       src={itemImage}
                       alt={item.name}
                       className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-500"
+                      onClick={()=> navigate(`${item.name}/${item._id}`, { state: item })}
                     />
                   </div>
 
                   {/* Info */}
                   <div className="flex-1 text-center sm:text-left">
                     <h2 className="text-xl font-black text-slate-800 hover:text-green-600 cursor-pointer transition-colors"
-                        onClick={() => navigate(`/product-details/${item._id}`)}>
+                        onClick={() => navigate(`${item.name}/${item._id}`, { state: item })}>
                       {item.name}
                     </h2>
                     <p className="text-slate-400 text-sm font-bold uppercase tracking-widest mt-1">
@@ -189,14 +96,14 @@ const Cart = () => {
                     
                     <div className="flex items-center justify-center sm:justify-start mt-4 bg-slate-50 w-fit rounded-xl p-1 border border-slate-100">
                       <button
-                        onClick={() => decrementQuantity(item._id)}
+                        onClick={() => decrementQuantity(item._id, item.quantity)}
                         className="p-2 hover:bg-white hover:text-red-500 rounded-lg transition-all"
                       >
                         <Minus size={16} strokeWidth={3} />
                       </button>
                       <span className="w-10 text-center font-black text-slate-800">{item.quantity}</span>
                       <button
-                        onClick={() => incrementQuantity(item._id)}
+                        onClick={() => incrementQuantity(item._id, item.quantity)}
                         className="p-2 hover:bg-white hover:text-green-600 rounded-lg transition-all"
                       >
                         <Plus size={16} strokeWidth={3} />
@@ -207,8 +114,8 @@ const Cart = () => {
                   {/* Price & Actions */}
                   <div className="flex flex-row sm:flex-col justify-between items-center sm:items-end gap-4 w-full sm:w-auto border-t sm:border-t-0 pt-4 sm:pt-0">
                     <div className="text-right">
-                        <p className="text-2xl font-black text-slate-900">₹{item.price * item.quantity}</p>
-                        <p className="text-xs font-bold text-slate-400">₹{item.price} / unit</p>
+                        <p className="text-2xl font-black text-slate-900">₹{item.currentPrice * item.quantity}</p>
+                        <p className="text-xs font-bold text-slate-400">₹{item.currentPrice} / unit</p>
                     </div>
                     <button
                       onClick={() => removeFromCart(item._id)}
