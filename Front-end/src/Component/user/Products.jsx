@@ -1,11 +1,10 @@
-
-
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { CategoryContext } from "../context/CategoryContext";
-// Icons ke liye (lucide-react install hona chahiye)
-import { ShoppingBag, ArrowRight, IndianRupee, Info } from "lucide-react";
+// 1. ProductCard ko import karein (path check kar lena apne hisab se)
+import ProductCard from "./ProductCard";
+import { ShoppingBag } from "lucide-react";
 
 const API_URL = "http://localhost:5000";
 
@@ -52,8 +51,6 @@ const Products = () => {
 
                 <div className="max-w-7xl mx-auto px-6 py-10 md:py-12 relative z-10">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-
-                        {/* Left Side: Text Content */}
                         <div className="text-left max-w-xl">
                             <div className="flex items-center gap-2 mb-3">
                                 <span className="w-8 h-0.5 bg-green-500"></span>
@@ -70,14 +67,11 @@ const Products = () => {
                                 </span>
                             </h1>
                         </div>
-
-                        {/* Right Side: Description with Glass effect */}
                         <div className="md:max-w-xs">
                             <p className="text-slate-500 text-sm md:text-base font-medium leading-relaxed border-l-4 border-green-100 pl-4 py-1">
                                 {currentCategory.description || `High-quality ${currentCategory.name} handpicked and delivered fresh to your doorstep.`}
                             </p>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -92,7 +86,7 @@ const Products = () => {
                 ) : products.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {products.map((product) => (
-                            <ProductCard key={product._id} product={product} navigate={navigate} />
+                            <ProductCard key={product._id} product={product} />
                         ))}
                     </div>
                 ) : (
@@ -103,86 +97,7 @@ const Products = () => {
     );
 };
 
-// --- SUB-COMPONENTS FOR CLEAN CODE ---
-
-const ProductCard = ({ product, navigate }) => {
-    const sellerPrice = Number(product.currentPrice) || 0;
-    const Price = Number(product.price) || 0;
-
-    const discountPercent = (sellerPrice > 0 && sellerPrice !== Price)
-        ? Math.round((Math.abs(sellerPrice - Price) / Math.max(sellerPrice, Price)) * 100)
-        : 0;
-
-    return (
-        <div className="group bg-white rounded-4xl border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-green-900/5 transition-all duration-500 overflow-hidden flex flex-col relative">
-
-            {/* Image Section */}
-            <div className="relative h-64 overflow-hidden bg-slate-100">
-                <img
-                    src={
-                        product.imagePath
-                            ? (product.imagePath.startsWith('http')
-                                ? product.imagePath
-                                : `${API_URL}/uploads/${product.imagePath}`)
-                            : "https://placehold.co/400x400?text=No+Image"
-                    }
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                    onError={(e) => {
-                        e.target.src = "https://placehold.co/400x400?text=Image+Not+Found";
-                    }}
-                />
-
-                {/* Badges */}
-                <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
-                    {/* Yahan Condition change ki hai taaki badge display ho sake */}
-                    {discountPercent > 0 && (
-                        <span className="bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg uppercase tracking-tighter inline-block">
-                            {discountPercent}% OFF
-                        </span>
-                    )}
-                    <span className="bg-white/90 backdrop-blur-md text-slate-800 text-[10px] font-black px-3 py-1 rounded-full shadow-sm uppercase inline-block">
-                        {product.weight} {product.unit}
-                    </span>
-                </div>
-            </div>
-
-            {/* Details Section */}
-            <div className="p-6 flex flex-col grow">
-                <div className="mb-4">
-                    <h3 className="text-lg font-black text-slate-800 group-hover:text-green-600 transition-colors line-clamp-1">
-                        {product.name}
-                    </h3>
-                    <p className="text-slate-400 text-xs mt-1 font-medium line-clamp-2 leading-relaxed">
-                        {product.description}
-                    </p>
-                </div>
-
-                <div className="mt-auto flex items-end justify-between">
-                    <div className="flex flex-col">
-                       
-                        <span className="text-2xl font-black text-slate-900 flex items-center">
-                            <IndianRupee size={18} strokeWidth={3} /> {sellerPrice} 
-                            
-                             {product.price !== undefined && (
-                            <span className="text-slate-500 line-through text-xs font-bold decoration-red-400/50">
-                                ₹{Price}
-                            </span>
-                        )}
-                        </span>
-                    </div>
-
-                    <button
-                        onClick={() => navigate(`${product.name}/${product._id}`, { state: product })}
-                        className="bg-slate-900 text-white p-4 rounded-2xl hover:bg-green-600 transition-all duration-300 group/btn shadow-xl shadow-slate-200 hover:shadow-green-200 active:scale-95"
-                    >
-                        <ArrowRight size={20} className="group-hover/btn:translate-x-1 transition-transform" />
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
+// Sub-components 
 const EmptyState = ({ categoryName }) => (
     <div className="text-center py-20 px-6 bg-white rounded-[3rem] border-2 border-dashed border-slate-100">
         <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
