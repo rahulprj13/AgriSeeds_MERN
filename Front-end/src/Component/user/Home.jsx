@@ -72,7 +72,7 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-6 relative z-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
 
           {/* LEFT SIDE: Swiper Slider (Takes 7/12 columns) */}
-          <div className="lg:col-span-7 relative h-[450px] lg:h-[550px] rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl">
+          <div className="lg:col-span-7 relative h-112.5 lg:h-137.5 rounded-4xl overflow-hidden border border-white/10 shadow-2xl">
             <Swiper
               modules={[Autoplay, Pagination, EffectFade]}
               effect="fade"
@@ -88,9 +88,9 @@ const Home = () => {
                     <img
                       src={item.image}
                       alt={item.title}
-                      className="w-full h-full object-cover transition-transform duration-[4000ms] group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-4000 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-10">
+                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-10">
                       <span className="text-green-400 font-bold uppercase tracking-widest text-sm mb-2">{item.tag}</span>
                       <h2 className="text-white text-4xl font-black leading-tight max-w-md">{item.title}</h2>
                     </div>
@@ -103,7 +103,7 @@ const Home = () => {
           {/* RIGHT SIDE: 2 Static Images (Takes 5/12 columns) */}
           <div className="lg:col-span-5 flex flex-col gap-6">
             {/* Top Static Banner */}
-            <div className="relative h-[215px] lg:h-[263px] rounded-[2rem] overflow-hidden group shadow-xl">
+            <div className="relative h-53.75 lg:h-65.75 rounded-4xl overflow-hidden group shadow-xl">
               <img src="https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?q=80&w=2000" alt="Pesticides" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
               <div className="absolute inset-0 bg-black/40 flex items-center justify-end p-8">
                 <div className="text-right">
@@ -114,7 +114,7 @@ const Home = () => {
             </div>
 
             {/* Bottom Static Banner */}
-            <div className="relative h-[215px] lg:h-[263px] rounded-[2rem] overflow-hidden group shadow-xl">
+            <div className="relative h-53.75 lg:h-65.75 rounded-4xl overflow-hidden group shadow-xl">
               <img src="https://images.unsplash.com/photo-1628352081506-83c43123ed6d?q=80&w=2000" alt="Fertilizers" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
               <div className="absolute inset-0 bg-black/40 flex items-center justify-end p-8">
                 <div className="text-right">
