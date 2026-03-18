@@ -48,6 +48,13 @@ const Login = () => {
       const res = await login(data);
 
       toast.success("Login successfully");
+
+      // Store token and role in localStorage
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("role", res.user.role);
+
+      // console.log(res.data.token);
+      
       // ADMIN LOGIN
       if (res?.user?.role === "admin") {
         navigate("/admin");
