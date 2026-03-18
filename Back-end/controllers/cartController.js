@@ -34,14 +34,48 @@ exports.addToCart = async (req, res) => {
     }
 };
 
+// exports.getCart = async (req, res) => {
+//     try {
+//         const { userId } = req.params;
+//         if (!userId || userId === "undefined") {
+//             return res.status(400).json({ message: "Invalid User ID" });
+//         }
+//         const cart = await Cart.find({ userId });
+//         res.status(200).json({ data: cart });
+//     } catch (error) {
+//         console.error("GET_CART_ERROR:", error);
+//         res.status(500).json({ message: "Error fetching cart" });
+//     }
+// };
+
+
 exports.getCart = async (req, res) => {
     try {
         const { userId } = req.params;
+
         if (!userId || userId === "undefined") {
             return res.status(400).json({ message: "Invalid User ID" });
         }
-        const cart = await Cart.find({ userId });
-        res.status(200).json({ data: cart });
+
+        // 1. .populate('productId') use karke Product table se latest data mangwayein
+        // 'productId' wahi naam hona chahiye jo aapke Cart Schema mein define hai
+        const cartItems = await Cart.find({ userId }).populate('productId');
+
+        // 2. Data format ko clean karein taaki Frontend ko latest stock mile
+        const updatedCart = cartItems.map(item => {
+            // Agar product delete ho chuka hai toh null handle karein
+            if (!item.productId) return item; 
+
+            return {
+                ...item._doc,
+                // Cart table ka purana data overwrite karein Product table ke latest data se
+                stock: item.productId.stock,
+                status: item.productId.status,
+                currentPrice: item.productId.currentPrice || item.currentPrice
+            };
+        });
+
+        res.status(200).json({ data: updatedCart });
     } catch (error) {
         console.error("GET_CART_ERROR:", error);
         res.status(500).json({ message: "Error fetching cart" });
