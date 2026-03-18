@@ -127,7 +127,7 @@ const ProductDetails = () => {
                   src={productImage}
                   alt={product.name}
                   // z-0 ensures it stays below the content during any responsive shifts
-                  className="relative z-0 w-full max-w-[450px] object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.15)] group-hover:scale-105 transition-transform duration-700"
+                  className="relative z-0 w-full max-w-112.5 object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.15)] group-hover:scale-105 transition-transform duration-700"
                 />
               </div>
             </div>
@@ -150,7 +150,7 @@ const ProductDetails = () => {
               </h1>
 
               {/* Pricing Module */}
-              <div className="bg-slate-50 p-6 rounded-[2rem] inline-flex items-center gap-6 mb-8 border border-slate-100 w-fit">
+              <div className="bg-slate-50 p-6 rounded-4xl inline-flex items-center gap-6 mb-8 border border-slate-100 w-fit">
                 <div className="flex flex-col">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Current Price</span>
                   <div className="flex items-center gap-3">
@@ -165,7 +165,7 @@ const ProductDetails = () => {
                 
                 {discountPercent > 0 && (
                   <>
-                    <div className="h-10 w-[1px] bg-slate-200 mx-2 hidden sm:block"></div>
+                    <div className="h-10 w-px bg-slate-200 mx-2 hidden sm:block"></div>
                     <div className="flex flex-col">
                       <span className="text-[10px] font-black text-red-400 uppercase tracking-widest mb-1">Discount</span>
                       <span className="text-xl font-black text-red-500">{discountPercent}%</span>
@@ -193,11 +193,11 @@ const ProductDetails = () => {
               <div className="flex flex-col sm:flex-row gap-4 mb-10">
                 <button
                   onClick={() => handleAddToCart(product)}
-                  className="flex-[1.5] bg-slate-900 text-white h-20 rounded-[1.5rem] font-black text-lg flex items-center justify-center gap-3 hover:bg-green-600 transition-all shadow-xl shadow-slate-200 active:scale-95"
+                  className="flex-[1.5] bg-slate-900 text-white h-20 rounded-3xl font-black text-lg flex items-center justify-center gap-3 hover:bg-green-600 transition-all shadow-xl shadow-slate-200 active:scale-95"
                 >
                   <ShoppingCart size={24} /> Add to Cart
                 </button>
-                <button className="flex-1 bg-green-50 text-green-700 h-20 rounded-[1.5rem] font-black text-lg flex items-center justify-center gap-3 hover:bg-green-100 transition-all active:scale-95">
+                <button className="flex-1 bg-green-50 text-green-700 h-20 rounded-3xl font-black text-lg flex items-center justify-center gap-3 hover:bg-green-100 transition-all active:scale-95">
                   <Zap size={24} fill="currentColor" /> Buy Now
                 </button>
               </div>
