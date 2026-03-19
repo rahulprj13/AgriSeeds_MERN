@@ -49,6 +49,7 @@ const AuthContextProvider = ({ children }) => {
       if (res.status === 200) {
 
         const token = res.data.token;
+        const loggedInUser = res.data.user || null;
         // Tab-scoped auth (admin/user both stored per-tab)
         sessionStorage.setItem("token", token);
         // Clear any legacy cross-tab tokens
@@ -58,7 +59,12 @@ const AuthContextProvider = ({ children }) => {
 
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-        await fetchUser();
+        // Set user immediately from login response.
+        // This prevents cart actions from failing if `/profile` has issues.
+        if (loggedInUser) {
+          setUser(loggedInUser);
+          sessionStorage.setItem("user", JSON.stringify(loggedInUser));
+        }
 
         return res.data;
 
