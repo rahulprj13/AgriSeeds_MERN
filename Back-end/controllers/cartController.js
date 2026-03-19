@@ -3,13 +3,23 @@ const Cart = require("../models/CartModel");
 exports.addToCart = async (req, res) => {
     try {
         const { userId, product } = req.body;
+        
 
         // Validation: Check agar data aa raha hai
         if (!userId || !product) {
             return res.status(400).json({ message: "UserId or Product missing" });
         }
 
-        let cartItem = await Cart.findOne({ userId, productId: product._id });
+        const productId = product._id || product.id;
+        const categoryId = product.categoryId?._id || product.categoryId;
+        const currentPrice = product.currentPrice ?? product.price;
+
+        // Cart schema requires productId/categoryId/currentPrice
+        if (!productId || !categoryId || currentPrice == null) {
+            return res.status(400).json({ message: "Product data missing (productId/categoryId/currentPrice)" });
+        }
+
+        let cartItem = await Cart.findOne({ userId, productId, categoryId });
 
         if (cartItem) {
             cartItem.quantity += 1;
@@ -19,10 +29,14 @@ exports.addToCart = async (req, res) => {
 
         const newItem = new Cart({
             userId: userId,
-            productId: product._id,
+            productId,
+            categoryId,
             name: product.name,
-            currentPrice: product.currentPrice,
+            currentPrice,
+            price: product.price ?? currentPrice,
             imagePath: product.imagePath,
+            weight: product.weight,
+            unit: product.unit,
             quantity: 1
         });
 
@@ -53,13 +67,16 @@ exports.getCart = async (req, res) => {
     try {
         const { userId } = req.params;
 
-        if (!userId || userId === "undefined") {
+        if (!userId || userId === "undefined" ) {
             return res.status(400).json({ message: "Invalid User ID" });
         }
 
         // 1. .populate('productId') use karke Product table se latest data mangwayein
         // 'productId' wahi naam hona chahiye jo aapke Cart Schema mein define hai
-        const cartItems = await Cart.find({ userId }).populate('productId');
+        const cartItems = await Cart.find({ userId }).populate({
+            path: "productId",
+            populate: { path: "categoryId", select: "name" }
+        });
 
         // 2. Data format ko clean karein taaki Frontend ko latest stock mile
         const updatedCart = cartItems.map(item => {

@@ -4,11 +4,12 @@ import { CartContext } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, AlertCircle, ShieldCheck } from "lucide-react";
 import { toast } from "react-toastify";
+import { CategoryContext } from "../context/CategoryContext";
 
 const API_URL = "http://localhost:5000";
 
 const Cart = () => {
-  const { user } = useContext(AuthContext);
+  const { category } = useContext(CategoryContext);
   const {
     cart,
     incrementQuantity,
@@ -19,14 +20,17 @@ const Cart = () => {
 
   const navigate = useNavigate();
 
+    
+    // const categoryName = product.categoryId?.name?.toLowerCase() || "seeds";
+    // const productName = product.name?.toLowerCase().replace(/\s+/g, '-');
 
   // 1. Redirect if not logged in (Using useEffect to avoid double toast)
-  useEffect(() => {
-    if (!user) {
-      toast.info("Please login to view your cart", { toastId: "auth-check" });
-      navigate("/login");
-    }
-  }, [user, navigate]);
+  // useEffect(() => {
+  //   if (!user) {
+  //     toast.info("Please login to view your cart", { toastId: "auth-check" });
+  //     navigate("/login");
+  //   }
+  // }, [user, navigate]);
 
 
   
@@ -39,7 +43,7 @@ const Cart = () => {
   const hasInvalidItems = cart.some(item => checkAvailability(item));
 
   // Loading state if user is being redirected
-  if (!user) return null;
+  // if (!user) return null;
 
   // 3. Empty Cart UI
   if (cart.length === 0) {
@@ -79,9 +83,17 @@ const Cart = () => {
           
           {/* --- LEFT: CART ITEMS LIST --- */}
           <div className="lg:col-span-2 space-y-4">
+
             {cart.map((item) => {
+              
               const currentStock = Number(item.stock);
               const isUnavailable = (item.status && item.status !== "active") || currentStock <= 0;
+              const productId = item.productId?._id || item.productId;
+              const categorySlug = (item.productId?.categoryId?.name || "seeds")
+                .toLowerCase();
+              const productNameSlug = (item.productId?.name || item.name || "")
+                .toLowerCase()
+                .replace(/\s+/g, "-");
               
               const itemImage = item.imagePath
                 ? (item.imagePath.startsWith('http') ? item.imagePath : `${API_URL}/uploads/${item.imagePath}`)
@@ -100,14 +112,21 @@ const Cart = () => {
                       src={itemImage} 
                       alt={item.name} 
                       className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-500" 
-                       onClick={()=> navigate(`${item.name}/${item._id}`, { state: item })}
+                      onClick={() => {
+                        if (!productId) return;
+                        navigate(`/category/${categorySlug}/${productNameSlug}/${productId}`);
+                      }}
                     />
                   </div>
 
                   {/* Product Info */}
                   <div className="flex-1 text-center sm:text-left">
                     <h2 className={`text-xl font-black transition-colors ${isUnavailable ? "text-slate-400" : "text-slate-800 hover:text-green-600 cursor-pointer"}`}
-                        onClick={() => !isUnavailable && navigate(`/category/${item.category}/${item.name}/${item._id}`, { state: item })}>
+                        onClick={() => {
+                          if (isUnavailable) return;
+                          if (!productId) return;
+                          navigate(`/category/${categorySlug}/${productNameSlug}/${productId}`);
+                        }}>
                       {item.name}
                       
                     </h2>

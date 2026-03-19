@@ -9,6 +9,7 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const { user } = useContext(AuthContext);
   const userId = user?._id || user?.id || null;
+  
 
   // Fetch Cart from DB when user logs in
   useEffect(() => {
@@ -31,7 +32,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const addToCart = async (product) => {
+  const addToCart = async (product, category) => {
     // UI should redirect; context just rejects when unauthenticated
     if (!userId) {
       const err = new Error("Please login first");
@@ -42,7 +43,8 @@ export const CartProvider = ({ children }) => {
     try {
         const res = await axios.post(`${API_URL}/api/cart/add`, {
             userId, // backend expects "userId"
-            product: product
+            product: product,
+              category: category
         });
         
         if(res.status === 200 || res.status === 201) {

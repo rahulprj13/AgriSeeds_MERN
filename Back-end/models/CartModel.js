@@ -13,10 +13,15 @@ const cartSchema = new mongoose.Schema({
     required: true
   },
 
-  name: String,
-  imagePath: String,
 
-  quantity: {
+    
+  categoryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "categories",
+    required: true
+  },
+
+   quantity: {
     type: Number,
     default: 1
   },
@@ -26,6 +31,14 @@ const cartSchema = new mongoose.Schema({
     required: true
 
   }
+  ,
+
+  // Optional fields used by the frontend cart UI
+  name: { type: String },
+  price: { type: Number },
+  imagePath: { type: String },
+  weight: { type: Number },
+  unit: { type: String }
 }, 
 { timestamps: true });
 
