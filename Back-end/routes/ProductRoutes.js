@@ -42,7 +42,7 @@ router.get(
   getSingleProduct
 );
 
-
+  
 // UPDATE PRODUCT
 router.put(
   "/api/admin/products/:id",

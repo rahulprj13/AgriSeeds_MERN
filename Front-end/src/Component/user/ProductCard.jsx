@@ -39,6 +39,7 @@ const ProductCard = ({ product }) => {
                 <img
                     src={imageSrc}
                     alt={product.name}
+                    onClick={() => !isOutOfStock && navigate(`/category/${categoryName}/${productName}/${product._id}`, { state: product })}
                     className={`w-full h-full object-cover transition duration-500 ${!isOutOfStock && "group-hover:scale-110"}`}
                 />
                 

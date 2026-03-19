@@ -361,7 +361,7 @@
                       </td>
                       <td className="px-6 py-4">
                         <p className="text-sm font-black text-slate-800">{p.name}</p>
-                        <p className={`text-[9px] font-black uppercase mt-1 ${p.status === 'active' ? 'text-green-500' : 'text-slate-400'}`}>{p.status}</p>
+                        <p className={`text-[9px] font-black uppercase mt-1 ${p.status === 'active' ? 'text-green-500' : 'text-red-400'}`}>{p.status}</p>
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-md">{p.categoryId?.name || "None"}</span>
@@ -379,8 +379,8 @@
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
-                          <button onClick={() => handleEdit(p)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"><Pencil size={18} /></button>
-                          <button onClick={() => handleDelete(p._id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={18} /></button>
+                          <button onClick={() => handleEdit(p)} className="p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"><Pencil size={18} /></button>
+                          <button onClick={() => handleDelete(p._id)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={18} /></button>
                         </div>
                       </td>
                     </tr>

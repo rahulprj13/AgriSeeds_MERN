@@ -10,10 +10,12 @@ export const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [dropdown, setDropdown] = useState(false)
     const [search, setSearch] = useState("")
+    const [products, setProducts] = useState([]);
+
     const [profileOpen, setProfileOpen] = useState(false)
     const [hoverProfile, setHoverProfile] = useState(false)
     const [mobileProfileOpen, setMobileProfileOpen] = useState(false)
-    
+
     const profileRef = useRef(null)
     const seedsRef = useRef(null) // NEW: reference for seeds dropdown
 
@@ -31,12 +33,34 @@ export const Navbar = () => {
         navigate("/login")
     }
 
-    const handleSearch = () => {
-        const trimmed = search.trim()
-        if (!trimmed) return
-        navigate(`/search?q=${encodeURIComponent(trimmed)}`)
-        setSearch("")
-    }
+    // const handleSearch = () => {
+    //     const trimmed = search.trim()
+    //     if (!trimmed) return
+    //     navigate(`/search?q=${encodeURIComponent(trimmed)}`)
+    //     setSearch("")
+    // }
+
+    // FIX 1: Correct the variable names to match your state ('search')
+    const filteredProducts = products.filter(p => {
+        const searchLower = search.toLowerCase(); // Changed from searchTerm to search
+        const categoryName = p.categoryId?.name || p.category?.name || "";
+
+        const matchesSearch =
+            p.name.toLowerCase().includes(searchLower) ||
+            categoryName.toLowerCase().includes(searchLower);
+
+        // If you don't have a 'filterCategory' state, default this to true or remove it
+        return matchesSearch;
+    });
+
+    // FIX 2: Create a reusable search function
+    const handleSearchAction = () => {
+        const trimmed = search.trim();
+        if (trimmed) {
+            navigate(`/search?q=${encodeURIComponent(trimmed)}`);
+            // Optional: closeAll(); 
+        }
+    };
 
     const closeAll = () => {
         setIsOpen(false)
@@ -95,15 +119,21 @@ export const Navbar = () => {
                                 placeholder="Search seeds, products..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                                // Use the function here
+                                onKeyDown={(e) => e.key === "Enter" && handleSearchAction()}
                                 className="flex-1 px-4 py-2 bg-transparent text-white placeholder-gray-400 focus:outline-none text-sm"
                             />
+
                             {search && (
-                                <button onClick={() => setSearch("")} className="text-gray-400 hover:text-white px-2">
+                                <button onClick={() => setSearch("")} className="text-gray-300 hover:text-white px-2">
                                     ✕
                                 </button>
                             )}
-                            <button onClick={handleSearch} className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-r-full transition">
+
+                            <button
+                                onClick={handleSearchAction}
+                                className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-r-full transition"
+                            >
                                 <FontAwesomeIcon icon={faSearch} className="text-white" />
                             </button>
                         </div>
