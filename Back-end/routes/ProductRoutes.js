@@ -29,6 +29,7 @@ router.post(
 // GET ALL PRODUCTS
 router.get(
   "/api/admin/products",
+  
   getProducts
 );
 
@@ -36,8 +37,8 @@ router.get(
 // GET SINGLE PRODUCT
 router.get(
   "/api/admin/products/:id",
-  authMiddleware,
-  adminMiddleware,
+  // authMiddleware,
+  // adminMiddleware,
   getSingleProduct
 );
 
