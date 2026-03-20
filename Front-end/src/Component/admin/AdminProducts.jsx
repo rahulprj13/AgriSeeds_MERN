@@ -143,6 +143,10 @@
 
     const handleEdit = (p) => {
       setEditingId(p._id);
+
+      // Logic to extract the ID correctly
+      const catId = p.categoryId?._id || p.category?._id || p.categoryId || "";
+
       setForm({
         name: p.name,
         description: p.description,
@@ -151,7 +155,7 @@
         weight: p.weight ? p.weight.toString() : "",
         unit: p.unit || "",
         imagePath: p.imagePath || "",
-        categoryId: p.category?._id || "",
+         categoryId: catId,
         stock: p.stock.toString(),
         status: p.status,
       });
@@ -224,7 +228,7 @@
                 <div className="space-y-1">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Category</label>
                   <select name="categoryId" value={form.categoryId} onChange={handleChange} className={`w-full bg-slate-50 border ${errors.categoryId ? 'border-red-500' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500/20 outline-none font-semibold`}>
-                    <option value="">Choose Category</option>
+                    <option value="">---Choose Category---</option>
                     {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
                   </select>
                   {errors.categoryId && <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1"><AlertCircle size={12} /> {errors.categoryId}</p>}
@@ -255,7 +259,7 @@
                 <div className="space-y-1">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Unit</label>
                   <select name="unit" value={form.unit} onChange={handleChange} className={`w-full bg-slate-50 border ${errors.unit ? 'border-red-500' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500/20 outline-none font-semibold`}>
-                    <option value="">Choose unit</option>
+                    <option value="">---Choose Unit---</option>
                     <option value="kg">Kilogram (kg)</option>
                     <option value="gram">Gram (g)</option>
                   </select>
