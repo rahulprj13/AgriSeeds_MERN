@@ -197,7 +197,23 @@ const ProductDetails = () => {
                 >
                   <ShoppingCart size={24} /> Add to Cart
                 </button>
-                <button className="flex-1 bg-green-50 text-green-700 h-20 rounded-3xl font-black text-lg flex items-center justify-center gap-3 hover:bg-green-100 transition-all active:scale-95">
+                <button
+                  onClick={() => {
+                    if (!user) {
+                      toast.info("Please login first");
+                      navigate("/login", { replace: true, state: { from: location.pathname } });
+                      return;
+                    }
+
+                    navigate("/checkout", { 
+                      state: { 
+                        buyNowProduct: product,
+                        isBuyNow: true 
+                      } 
+                    });
+                  }}
+                  className="flex-1 bg-green-50 text-green-700 h-20 rounded-3xl font-black text-lg flex items-center justify-center gap-3 hover:bg-green-100 transition-all active:scale-95"
+                  >
                   <Zap size={24} fill="currentColor" /> Buy Now
                 </button>
               </div>

@@ -16,6 +16,9 @@ import Products from "../Component/user/Products";
 import ProductDetails from "../Component/user/ProductDetails";
 import Search from "../Component/user/Search";
 import Cart from "../Component/user/Cart";
+import Checkout from "../Component/user/Checkout";
+import Orders from "../Component/user/Orders";
+import OrderDetails from "../Component/user/OrderDetails";
 
 import Login from "../Component/auth/Login";
 import SignUp from "../Component/auth/SignUp";
@@ -71,6 +74,9 @@ const router = createBrowserRouter([
       { path: "category/:type/:item", element: <Products /> },
       { path: "category/:type/:item/:id", element: <ProductDetails /> },
       { path: "cart", element: <Cart /> },
+      { path: "checkout", element: <Checkout /> },
+      { path: "orders", element: <Orders /> },
+      { path: "orders/:id", element: <OrderDetails /> },
       { path: "search", element: <Search /> },
     ],
   },

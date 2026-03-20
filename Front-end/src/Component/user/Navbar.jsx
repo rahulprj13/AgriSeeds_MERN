@@ -193,6 +193,7 @@ export const Navbar = () => {
                                 {profileOpen && (
                                     <div className="absolute right-0 top-12 w-40 bg-white rounded-lg shadow-lg text-black py-2">
                                         <NavLink to="/profile" onClick={closeAll} className="block px-4 py-2 hover:bg-gray-100">Profile</NavLink>
+                                        <NavLink to="/orders" onClick={closeAll} className="block px-4 py-2 hover:bg-gray-100">My Orders</NavLink>
                                         <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">Logout</button>
                                     </div>
                                 )}
@@ -238,6 +239,7 @@ export const Navbar = () => {
                                 {mobileProfileOpen && (
                                     <div className="flex flex-col gap-2 mt-3 pl-12">
                                         <NavLink to="/profile" onClick={closeAll} className="text-gray-300">Profile</NavLink>
+                                        <NavLink to="/orders" onClick={closeAll} className="text-gray-300">My Orders</NavLink>
                                         <button onClick={handleLogout} className="text-red-500 text-left">Logout</button>
                                     </div>
                                 )}

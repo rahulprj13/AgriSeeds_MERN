@@ -13,12 +13,14 @@ const cartRouter = require("./routes/CartRoutes.js");
 const categoryRouter = require("./routes/CategoryRoutes.js");
 const productRouter = require("./routes/ProductRoutes.js");
 const adminDashboardRouter = require("./routes/AdminDashboardRoutes.js");
+const orderRouter = require("./routes/OrderRoutes.js");
 
 app.use(authRouter);
 app.use(categoryRouter);
 app.use("/api/cart", cartRouter);
 app.use( productRouter);
 app.use(adminDashboardRouter);
+app.use(orderRouter);
 app.use("/uploads", express.static("uploads"));
   
 const PORT = 5000;
