@@ -47,22 +47,45 @@ const Login = () => {
 
       const res = await login(data);
 
-      toast.success("Login successfully");
-
-      // Store token and role in localStorage
-      localStorage.setItem("token", res.token);
-      localStorage.setItem("role", res.user.role);
-
-      // console.log(res.data.token);
       
-      // ADMIN LOGIN
-      if (res?.user?.role === "admin") {
-        navigate("/admin");
+      // Check account status
+      if (res?.user?.status === "active") {
+        
+      // Store token and role in localStorage
+      
+        localStorage.setItem("token", res.token);
+        localStorage.setItem("role", res.user.role);
 
+        //Admin Login
+        if (res?.user?.role === "admin") {
+          toast.success("Login successfully");
+          navigate("/admin");
+        }
+
+        //User Login
+        else {
+          toast.success("Login successfully");
+          navigate("/");
+        }
       }
-      // USER LOGIN
+
+      // Inactive Account
+      else if (res?.user?.status === "inactive") {
+        
+      localStorage.setItem("token", "");
+      localStorage.setItem("role", "");
+        toast.error("Your account is inactive. Please contact support.");
+        
+        navigate("/login");
+      }
+
+      // Blocked Account
       else {
-        navigate("/");
+        localStorage.setItem("token", "");
+        localStorage.setItem("role", "");
+        toast.error("Your account is blocked. Please contact support.");
+        navigate("/login");
+
       }
 
     } catch (error) {

@@ -13,6 +13,15 @@ exports.loginUser = async (req, res) => {
 
     const user = await User.findOne({ email })
 
+    // Check if user is inactive
+    if(user.status === 'inactive'){
+      return res.status(403).json({ message: "Your account is inactive. Please contact support." })
+    }
+    // Check if user is blocked
+    if(user.status === 'blocked'){
+      return res.status(403).json({ message: "Your account is blocked. Please contact support." })
+    }
+
     if (!user) {
       return res.status(400).json({ message: "Invalid Email" })
     }
