@@ -31,6 +31,8 @@ import AdminProducts from "../Component/admin/AdminProducts";
 import AdminLogin from "../Component/admin/AdminLogin";
 
 import { AuthContext } from "../Component/context/AuthContext";
+import { ForgotPassword } from "../Component/auth/ForgotPassword";
+import { ResetPassword } from "../Component/auth/ResetPassword";
 
 const AdminPrivateRoute = ({ children }) => {
 
@@ -57,6 +59,8 @@ const router = createBrowserRouter([
     children: [
       { path: "login", element: <Login /> },
       { path: "signup", element: <SignUp /> },
+      {path:"/forgotpassword",element:<ForgotPassword/>},
+      {path:"/resetpassword/:token",element:<ResetPassword/>},
     ],
   },
 
@@ -80,6 +84,7 @@ const router = createBrowserRouter([
       { path: "search", element: <Search /> },
     ],
   },
+
 
   // ADMIN LOGIN
 
