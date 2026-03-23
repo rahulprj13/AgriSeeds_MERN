@@ -6,6 +6,91 @@ const mailSend = require("../utils/MailUtil.js")
 const Otp = require("../models/registerOtpModel.js")
 const secret = "secret"
 
+// admincrate user
+exports.adminCreateUser = async (req, res) => {
+  try {
+    const { firstname, lastname, mobile, email, password, role, status } = req.body;
+
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      firstname,
+      lastname,
+      mobile,
+      email,
+      password: hashedPassword,
+      role,
+      status,
+    });
+
+    res.status(201).json({ user });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+//admin updateuser
+exports.adminUpdateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { firstname, lastname, mobile, email, password, role, status } = req.body;
+
+    const existingUser = await User.findById(id);
+
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // check duplicate email except current user
+    if (email) {
+      const emailExists = await User.findOne({
+        email,
+        _id: { $ne: id },
+      });
+
+      if (emailExists) {
+        return res.status(400).json({
+          message: "Email already exists",
+        });
+      }
+    }
+
+    const updateData = {
+      firstname,
+      lastname,
+      mobile,
+      email,
+      role,
+      status,
+    };
+
+    if (password && password.trim() !== "") {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    const user = await User.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    }).select("-password");
+
+    return res.status(200).json({
+      message: "User updated successfully",
+      user,
+    });
+  } catch (err) {
+    console.log("adminUpdateUser error:", err);
+    return res.status(500).json({
+      message: "Server error",
+      error: err.message,
+    });
+  }
+};
+
 // LOGIN
 exports.loginUser = async (req, res) => {
 
@@ -60,7 +145,7 @@ exports.loginUser = async (req, res) => {
 
 }
 
-// 1. Block/Unblock User
+//  Block/Unblock User
 exports.updateUserStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -72,7 +157,7 @@ exports.updateUserStatus = async (req, res) => {
   }
 };
 
-// 2. Delete User
+//  Delete User
 exports.deleteUser = async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id);
@@ -291,5 +376,3 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error })
   }
 }
-
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWJlYTI0NjIxYTlkMGQ3YjJjNzYzYjgiLCJmaXJzdG5hbWUiOiJyYWoiLCJsYXN0bmFtZSI6IndvcmsiLCJlbWFpbCI6Im10MzUyNzUwQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiJDJiJDEwJDZoVmNWTTFmMk84cHZPVUFuYWJmZi5zMVRublEwTHZza1NzVVpuTkRtdmpqeGJTZ0lmT1RHIiwibW9iaWxlIjoiNzc3Nzc3Nzc3NyIsInJvbGUiOiJ1c2VyIiwic3RhdHVzIjoiYWN0aXZlIiwiX192IjowLCJpYXQiOjE3NzQyNDIzMjksImV4cCI6MTc3NDI0MjYyOX0.cFf7jNrwaudvo8p7UEzaUO_mCGEpqjdKizxTaMegknY

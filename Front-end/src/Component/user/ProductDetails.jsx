@@ -101,9 +101,7 @@ const ProductDetails = () => {
         <div className="bg-white rounded-[3rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
           <div className="grid lg:grid-cols-2">
             
-            {/* --- LEFT: VISUALS SECTION --- 
-                Humein isse background layer banana hai isliye z-0 use kiya hai.
-            */}
+            
             <div className="p-6 md:p-12 bg-slate-50/50 flex items-center justify-center relative border-r border-slate-50 overflow-hidden">
               
               {/* Promotional Badges */}
@@ -126,15 +124,12 @@ const ProductDetails = () => {
                 <img
                   src={productImage}
                   alt={product.name}
-                  // z-0 ensures it stays below the content during any responsive shifts
                   className="relative z-0 w-full max-w-112.5 object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.15)] group-hover:scale-105 transition-transform duration-700"
                 />
               </div>
             </div>
 
-            {/* --- RIGHT: DETAILS SECTION --- 
-                z-10 ensures this content stays on top of the image layer.
-            */}
+            
             <div className="p-8 md:p-16 flex flex-col relative z-10 bg-white lg:bg-transparent">
               
               {/* Product Trust Signals */}

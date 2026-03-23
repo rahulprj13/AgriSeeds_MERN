@@ -82,9 +82,9 @@ const ProductCard = ({ product }) => {
                 <h3 className={`text-lg font-black transition-colors line-clamp-1 ${isOutOfStock ? "text-slate-500" : "text-slate-800 group-hover:text-green-600"}`}>
                     {product.name}
                 </h3>
-                <p className="text-slate-400 text-xs mt-1 font-medium line-clamp-2 leading-relaxed">
+                {/* <p className="text-slate-400 text-xs mt-1 font-medium line-clamp-2 leading-relaxed">
                     {product.description}
-                </p>
+                </p> */}
 
                 <div className="mt-auto flex items-end justify-between pt-4">
                     <div className="flex flex-col">

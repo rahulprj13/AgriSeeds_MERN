@@ -97,13 +97,29 @@ exports.createOrderFromCart = async (req, res) => {
 };
 
 // List orders for current user
+// List orders for current user - UPDATED
 exports.getOrdersForUser = async (req, res) => {
   try {
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
+    // 1. Saare orders fetch karein
     const orders = await Order.find({ userId }).sort({ createdAt: -1 });
-    return res.status(200).json({ data: orders });
+
+    // 2. Har order ke liye uske items populate karein
+    const ordersWithItems = await Promise.all(
+      orders.map(async (order) => {
+        const items = await OrderItem.find({ orderId: order._id })
+          .populate("productId", "name imagePath image"); // Products model se details nikaalna
+        
+        return {
+          ...order._doc,
+          items: items // Ab frontend ko 'items' array milega jisme product image hogi
+        };
+      })
+    );
+
+    return res.status(200).json({ data: ordersWithItems });
   } catch (error) {
     console.error("GET_ORDERS_ERROR:", error);
     return res.status(500).json({ message: "Error fetching orders" });
