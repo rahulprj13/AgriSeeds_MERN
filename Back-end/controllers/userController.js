@@ -125,49 +125,60 @@ exports.getProfile = async (req, res) => {
 
 // REGISTER
 exports.registerUser = async (req, res) => {
-
   try {
+    const { firstname, lastname, mobile, email, password, otp } = req.body;
 
-    const { firstname, lastname, mobile, email, password, otp } = req.body
-
-    const userExists = await User.findOne({ email })
+    const userExists = await User.findOne({ email });
 
     if (userExists) {
       return res.status(400).json({
-        message: "User already exists"
-      })
+        message: "User already exists",
+      });
     }
 
-    // VERIFY OTP
-    const otpRecord = await Otp.findOne({ email }).sort({ createdAt: -1 })
+    // latest OTP record
+    const otpRecord = await Otp.findOne({ email }).sort({ createdAt: -1 });
 
     if (!otpRecord) {
       return res.status(400).json({
-        message: "OTP not found"
-      })
+        message: "OTP not found",
+      });
     }
 
+    // OTP match check
     if (otpRecord.otp != otp) {
       return res.status(400).json({
-        message: "Invalid OTP"
-      })
+        message: "Invalid OTP",
+      });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
+    // OTP expiry check
+    if (otpRecord.expiresAt < new Date()) {
+      await Otp.deleteMany({ email });
+
+      return res.status(400).json({
+        message: "OTP expired",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
       firstname,
       lastname,
       mobile,
       email,
-      password: hashedPassword
-    })
+      password: hashedPassword,
+    });
+
+    //  OTP delete after registration
+    await Otp.deleteMany({ email });
 
     await mailSend(
       user.email,
       "Welcome to our app",
       "Thank you for registering with our app."
-    )
+    );
 
     res.status(201).json({
       message: "User registered successfully",
@@ -176,48 +187,45 @@ exports.registerUser = async (req, res) => {
         firstname: user.firstname,
         lastname: user.lastname,
         mobile: user.mobile,
-        email: user.email
-      }
-    })
-
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
-  catch (err) {
-    res.status(500).json({ message: "Server error" })
-  }
+};
 
-}
 //email otp
 exports.sendOtp = async (req, res) => {
-
   try {
+    const { email } = req.body;
 
-    const { email } = req.body
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    const otp = Math.floor(100000 + Math.random() * 900000)
+    // old OTP remove
+    await Otp.deleteMany({ email });
 
     await Otp.create({
       email,
-      otp
-    })
+      otp,
+      expiresAt: new Date(Date.now() + 60 * 1000), // 60 seconds
+    });
 
     await mailSend(
       email,
       "Your OTP Code",
-      `Your OTP is ${otp}`
-    )
+      `Your OTP is ${otp}. This OTP will expire in 60 seconds.`
+    );
 
     res.status(200).json({
-      message: "OTP sent successfully"
-    })
-
-  }
-  catch (err) {
+      message: "OTP sent successfully",
+    });
+  } catch (err) {
     res.status(500).json({
-      message: "Error sending OTP"
-    })
+      message: "Error sending OTP",
+    });
   }
-
-}
+};
 
 // forgot password
 exports.forgotPassword = async (req, res) => {
