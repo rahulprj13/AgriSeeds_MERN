@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken")
 const crypto = require("crypto")
 const mailSend = require("../utils/MailUtil.js")
 const Otp = require("../models/registerOtpModel.js")
+const uploadToCloudinary = require("../utils/cloudinaryUtils.js")
 const secret = "secret"
 
 // admincrate user
@@ -125,6 +126,12 @@ exports.loginUser = async (req, res) => {
       { expiresIn: "1d" }
     )
 
+    const profileImage = user.profileImage
+      ? user.profileImage.startsWith("http")
+        ? user.profileImage
+        : `http://localhost:5000/uploads/${user.profileImage}`
+      : null;
+
     res.status(200).json({
       message: "Login successful",
       token,
@@ -134,7 +141,8 @@ exports.loginUser = async (req, res) => {
         lastname: user.lastname,
         email: user.email,
         role: user.role,
-        status: user.status
+        status: user.status,
+        profileImage,
       }
     })
 
@@ -192,13 +200,20 @@ exports.getProfile = async (req, res) => {
       })
     }
 
+    const profileImage = user.profileImage
+      ? user.profileImage.startsWith("http")
+        ? user.profileImage
+        : `http://localhost:5000/uploads/${user.profileImage}`
+      : null;
+
     res.status(200).json({
       id: user._id,
       firstname: user.firstname,
       lastname: user.lastname,
       email: user.email,
       role: user.role,
-      status: user.status
+      status: user.status,
+      profileImage,
     })
 
   }
@@ -376,3 +391,104 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error })
   }
 }
+
+// UPDATE USER PROFILE (for users)
+exports.updateUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { firstname, lastname, mobile } = req.body;
+
+    const existingUser = await User.findById(userId);
+
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // check duplicate mobile except current user
+    if (mobile) {
+      const mobileExists = await User.findOne({
+        mobile,
+        _id: { $ne: userId },
+      });
+
+      if (mobileExists) {
+        return res.status(400).json({
+          message: "Mobile number already exists",
+        });
+      }
+    }
+
+    const updateData = {};
+    if (firstname) updateData.firstname = firstname;
+    if (lastname) updateData.lastname = lastname;
+    if (mobile) updateData.mobile = mobile;
+
+    const user = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+      runValidators: true,
+    }).select("-password");
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user,
+    });
+  } catch (err) {
+    console.log("updateUserProfile error:", err);
+    return res.status(500).json({
+      message: "Server error",
+      error: err.message,
+    });
+  }
+};
+
+// UPLOAD/UPDATE USER PROFILE IMAGE
+exports.uploadProfileImage = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No image file provided" });
+    }
+
+    const cloudinaryResponse = await uploadToCloudinary(req.file.path);
+
+    if (!cloudinaryResponse || !cloudinaryResponse.secure_url) {
+      return res.status(500).json({ message: "Image upload failed" });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { profileImage: cloudinaryResponse.secure_url },
+      { new: true }
+    ).select("-password");
+
+    return res.status(200).json({
+      message: "Profile image uploaded successfully",
+      user,
+    });
+  } catch (err) {
+    console.log("uploadProfileImage error:", err);
+    return res.status(500).json({
+      message: "Server error",
+      error: err.message,
+    });
+  }
+};
+
+// GET FULL USER PROFILE
+exports.getFullProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json(user);
+  } catch (err) {
+    console.log("getFullProfile error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
