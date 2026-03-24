@@ -24,7 +24,7 @@ export const Navbar = () => {
     const { categories } = useContext(CategoryContext)
     const navigate = useNavigate()
 
-    const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0)
+    const totalItems = (cart && cart.length) ? cart.length : 0
 
     const handleLogout = () => {
         if (!window.confirm("Are you sure you want to logout?")) return

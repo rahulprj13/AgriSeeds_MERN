@@ -53,6 +53,18 @@ const Checkout = () => {
   const buyNowProduct = location.state?.buyNowProduct;
   const [buyNowQty, setBuyNowQty] = useState(1);
 
+  // In buy-now mode, max quantity should come from cart (so backend decrement won't fail)
+  const buyNowCartItem = isBuyNow && buyNowProduct
+    ? cart.find((ci) => {
+      const pid = ci.productId?._id || ci.productId;
+      return String(pid) === String(buyNowProduct._id);
+    })
+    : null;
+
+  // Buy Now order will decrement quantity only from the cart item,
+  // so frontend should not allow qty > cart item's qty.
+  const buyNowMaxQty = isBuyNow ? Number(buyNowCartItem?.quantity ?? 1) : null;
+
   // Items Memoization
   const items = useMemo(() => {
     if (isBuyNow && buyNowProduct) {
@@ -81,7 +93,7 @@ const Checkout = () => {
   // --- Updated Remove Logic with Message ---
   const handleRemoveItem = (itemId) => {
     const confirmRemoval = window.confirm("Are you sure you don't want to buy this product?");
-    
+
     if (confirmRemoval) {
       if (isBuyNow) {
         toast.info("Buy Now cancelled");
@@ -97,17 +109,28 @@ const Checkout = () => {
     try {
       setLoading(true);
       const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
-      const payload = { 
-        address: formData, 
-        items: isBuyNow ? items : undefined, 
-        isBuyNow: !!isBuyNow 
-      };
 
-      const res = await axios.post(`${API_URL}/api/orders`, payload, { headers });
-      toast.success("Order placed successfully");
+      if (isBuyNow) {
+        const res = await axios.post(
+          `${API_URL}/api/orders/buy-now`,
+          {
+            address: formData,
+            productId: buyNowProduct?._id,
+            quantity: buyNowQty,
+          },
+          { headers }
+        );
 
-      if (!isBuyNow && typeof reloadCart === "function") await reloadCart();
-      navigate(`/orders/${res.data.order._id}`);
+        toast.success("Order placed successfully");
+        if (typeof reloadCart === "function") await reloadCart();
+        navigate(`/orders/${res.data.order._id}`);
+      } else {
+        const payload = { address: formData };
+        const res = await axios.post(`${API_URL}/api/orders`, payload, { headers });
+        toast.success("Order placed successfully");
+        if (typeof reloadCart === "function") await reloadCart();
+        navigate(`/orders/${res.data.order._id}`);
+      }
     } catch (e) {
       toast.error(e?.response?.data?.message || "Order failed");
     } finally {
@@ -120,9 +143,9 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-slate-50 pb-16">
       <div className="max-w-7xl mx-auto px-4 pt-10">
-        
+
         {/* BACK BUTTON */}
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-slate-500 hover:text-slate-900 font-bold mb-4 transition-colors group"
         >
@@ -150,7 +173,11 @@ const Checkout = () => {
                   {items.map((item) => {
                     const currentStock = Number(item.stock ?? 10);
                     const isOutOfStock = currentStock <= 0 || (item.status && item.status !== "active");
-                    const canIncrement = !isOutOfStock && item.quantity < currentStock;
+                    const canIncrement = isBuyNow
+                      ? buyNowMaxQty != null
+                        ? item.quantity < buyNowMaxQty
+                        : item.quantity < currentStock
+                      : !isOutOfStock && item.quantity < currentStock;
 
                     const itemImage = item.imagePath
                       ? (item.imagePath.startsWith("http") ? item.imagePath : `${API_URL}/uploads/${item.imagePath}`)
@@ -197,7 +224,7 @@ const Checkout = () => {
                               type="button"
                               onClick={() => {
                                 if (isBuyNow) {
-                                  setBuyNowQty(prev => (prev < currentStock ? prev + 1 : prev));
+                                  setBuyNowQty(prev => (prev < (buyNowMaxQty ?? currentStock) ? prev + 1 : prev));
                                 } else {
                                   canIncrement && incrementQuantity(item._id, item.quantity);
                                 }

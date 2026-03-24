@@ -42,6 +42,15 @@ const Orders = () => {
       case "cancelled": return "bg-red-100 text-red-700 border-red-200";
       default: return "bg-amber-100 text-amber-700 border-amber-200";
     }
+ 
+  };
+  const paymentStatusStyle = (paymentStatus) => {
+    switch (paymentStatus?.toLowerCase()) {
+      case "failed": return "bg-red-100 text-red-700 border-red-200";
+      case "pending": return "bg-blue-100 text-blue-700 border-blue-200";
+      case "paid": return "bg-green-100 text-green-700 border-green-200";
+      default: return "bg-amber-100 text-amber-700 border-amber-200";
+    }
   };
 
   if (!isLoggedIn) return null;
@@ -112,7 +121,7 @@ const Orders = () => {
                       <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${getStatusStyle(order.orderStatus)}`}>
                         {order.orderStatus}
                       </span>
-                      <span className="text-xs font-bold text-slate-400">#{order._id.slice(-6).toUpperCase()}</span>
+                      <span className="text-xs font-bold text-slate-400">{order._id.toUpperCase()}</span>
                     </div>
 
                     <h3 className="text-lg font-black text-slate-800 mb-1 group-hover:text-indigo-600 transition-colors truncate max-w-[280px]">
@@ -128,7 +137,9 @@ const Orders = () => {
                   {/* Pricing & CTA */}
                   <div className="w-full sm:w-auto flex sm:flex-col items-center justify-between sm:justify-center gap-2 border-t sm:border-t-0 pt-4 sm:pt-0 border-slate-50">
                     <div className="sm:text-right">
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Amount Paid</p>
+                       <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${paymentStatusStyle(order.paymentStatus)}`}>
+                        {order.paymentStatus}
+                      </span>
                       <p className="text-2xl font-black text-slate-900">₹{order.totalAmount.toLocaleString()}</p>
                     </div>
                     <div className="h-10 w-10 bg-slate-50 rounded-full flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-inner">

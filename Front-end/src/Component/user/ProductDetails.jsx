@@ -23,7 +23,7 @@ const ProductDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-  const { addToCart } = useContext(CartContext);
+  const { addToCart, cart, incrementQuantity, decrementQuantity, removeFromCart } = useContext(CartContext);
 
   const [product, setProduct] = useState(location.state || null);
   const [loading, setLoading] = useState(!location.state);
@@ -82,6 +82,12 @@ const ProductDetails = () => {
       toast.error(e?.response?.data?.message || e?.message || "Add to cart failed");
     }
   };
+
+  // helper: find cart item for this product
+  const cartItem = cart.find((item) => {
+    const pid = item.productId?._id || item.productId;
+    return String(pid) === String(product._id);
+  });
 
   return (
     <div className="bg-[#fcfdfd] min-h-screen pb-20 font-sans selection:bg-green-100">
@@ -185,31 +191,63 @@ const ProductDetails = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 mb-10">
+              <div className="flex flex-col sm:flex-row gap-4 mb-10 items-center">
+                {cartItem ? (
+                  <div className="flex items-center gap-3 bg-slate-50 rounded-3xl p-3">
+                    <button
+                      onClick={() => decrementQuantity(cartItem._id, cartItem.quantity)}
+                      className="px-3 py-2 rounded-lg bg-white/80 hover:bg-white"
+                    >
+                      -
+                    </button>
+                    <div className="px-4 py-2 font-black text-lg">{cartItem.quantity}</div>
+                    <button
+                      onClick={() => incrementQuantity(cartItem._id, cartItem.quantity)}
+                      className="px-3 py-2 rounded-lg bg-white/80 hover:bg-white"
+                    >
+                      +
+                    </button>
+                    <button
+                      onClick={() => removeFromCart(cartItem._id)}
+                      className="ml-3 px-3 py-2 rounded-lg bg-rose-50 text-rose-600"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleAddToCart(product)}
+                    className="flex-[1.5] bg-slate-900 text-white h-16 rounded-3xl font-black text-lg flex items-center justify-center gap-3 hover:bg-green-600 transition-all shadow-xl shadow-slate-200 active:scale-95"
+                  >
+                    <ShoppingCart size={20} /> Add to Cart
+                  </button>
+                )}
+
                 <button
-                  onClick={() => handleAddToCart(product)}
-                  className="flex-[1.5] bg-slate-900 text-white h-20 rounded-3xl font-black text-lg flex items-center justify-center gap-3 hover:bg-green-600 transition-all shadow-xl shadow-slate-200 active:scale-95"
-                >
-                  <ShoppingCart size={24} /> Add to Cart
-                </button>
-                <button
-                  onClick={() => {
+                  onClick={async () => {
                     if (!user) {
                       toast.info("Please login first");
                       navigate("/login", { replace: true, state: { from: location.pathname } });
                       return;
                     }
 
-                    navigate("/checkout", { 
-                      state: { 
-                        buyNowProduct: product,
-                        isBuyNow: true 
-                      } 
-                    });
+                    try {
+                      // if not in cart, add it
+                      if (!cartItem) {
+                        await addToCart(product);
+                        toast.success("Added to cart");
+                      }
+                      // navigate to checkout (single-item view) where user can fill address
+                      navigate("/checkout", {
+                        state: { isBuyNow: true, buyNowProduct: product },
+                      });
+                    } catch (e) {
+                      toast.error(e?.response?.data?.message || e?.message || "Buy Now failed");
+                    }
                   }}
-                  className="flex-1 bg-green-50 text-green-700 h-20 rounded-3xl font-black text-lg flex items-center justify-center gap-3 hover:bg-green-100 transition-all active:scale-95"
-                  >
-                  <Zap size={24} fill="currentColor" /> Buy Now
+                  className="flex-1 bg-green-50 text-green-700 h-16 rounded-3xl font-black text-lg flex items-center justify-center gap-3 hover:bg-green-100 transition-all active:scale-95"
+                >
+                  <Zap size={20} fill="currentColor" /> Buy Now
                 </button>
               </div>
 

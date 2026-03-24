@@ -28,6 +28,8 @@ import AdminDashboard from "../Component/admin/AdminDashboard";
 import AdminUsers from "../Component/admin/AdminUsers";
 import AdminCategories from "../Component/admin/AdminCategories";
 import AdminProducts from "../Component/admin/AdminProducts";
+import AdminOrders from "../Component/admin/AdminOrders";
+import AdminOrderItem from "../Component/admin/AdminOrderItem";
 import AdminLogin from "../Component/admin/AdminLogin";
 
 import { AuthContext } from "../Component/context/AuthContext";
@@ -107,6 +109,8 @@ const router = createBrowserRouter([
       { path: "users", element: <AdminUsers /> },
       { path: "categories", element: <AdminCategories /> },
       { path: "products", element: <AdminProducts /> },
+      { path: "orders", element: <AdminOrders /> },
+      { path: "orders/:id", element: <AdminOrderItem /> },
     ],
   },
 
