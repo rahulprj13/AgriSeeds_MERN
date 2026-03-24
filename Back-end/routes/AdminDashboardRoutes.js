@@ -105,11 +105,43 @@ router.get(
 );
 
 // Admin: Get order details by ID
-// router.get(
-//   "/api/admin/orders/:id",
-//   authMiddleware,
-//   getOrderDetails
-// );
+router.get(
+  "/api/admin/orders/:id",
+  authMiddleware,
+  adminMiddleware,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({ message: "Order ID is required" });
+      }
+
+      const order = await Order.findById(id)
+        .populate("addressId")
+        .populate("userId", "firstname lastname email mobile");
+
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
+      const items = await OrderItem.find({ orderId: order._id })
+        .populate({
+          path: "productId",
+          select: "name imagePath image price categoryId",
+          populate: {
+            path: "categoryId",
+            select: "name"
+          }
+        });
+
+      res.json({ order, items });
+    } catch (err) {
+      console.error("GET_ADMIN_ORDER_DETAILS_ERROR:", err);
+      res.status(500).json({ message: "Error fetching order details" });
+    }
+  }
+);
 
 // Admin: Update order status/payment (by order ID)
 router.put(
@@ -131,13 +163,18 @@ router.put(
 
       const updatedOrder = await Order.findById(order._id)
         .populate("addressId")
-        .populate("userId", "firstname lastname email phone");
+        .populate("userId", "firstname lastname email mobile");
 
-      // include items in response
-      const items = await OrderItem.find({ orderId: order._id }).populate(
-        "productId",
-        "name imagePath image price"
-      );
+      // include items in response with proper category population
+      const items = await OrderItem.find({ orderId: order._id })
+        .populate({
+          path: "productId",
+          select: "name imagePath image price categoryId",
+          populate: {
+            path: "categoryId",
+            select: "name"
+          }
+        });
 
       res.json({ message: "Order updated", order: updatedOrder, items });
     } catch (err) {
