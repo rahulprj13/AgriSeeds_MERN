@@ -26,11 +26,11 @@ const AdminOrderItem = () => {
       setLoading(true);
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
-      // Use existing order details API (supports admin and user check in controller)
-      const res = await axios.get(`${API_URL}/api/orders/${id}`, config);
-      console.log(res);
+      // Use admin-specific endpoint for order details
+      const res = await axios.get(`${API_URL}/api/admin/orders/${id}`, config);
+      console.log("Admin Order Details:", res.data);
       
-      setOrder(res.data?.order || res.data || null);
+      setOrder(res.data?.order || null);
       setItems(Array.isArray(res.data?.items) ? res.data.items : []);
       
     } catch (e) {
@@ -166,9 +166,9 @@ const AdminOrderItem = () => {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 mb-6">
           <h3 className="font-semibold text-slate-900 mb-4">Customer Information</h3>
           <div className="text-sm text-slate-600">
-            <p>Name: {order.userId?.name || 'N/A'}</p>
+            <p>Name: {order.userId?.firstname && order.userId?.lastname ? `${order.userId.firstname} ${order.userId.lastname}` : 'N/A'}</p>
             <p>Email: {order.userId?.email || 'N/A'}</p>
-            {order.userId?.phone && <p>Phone: {order.userId.phone}</p>}
+            {order.userId?.mobile && <p>Phone: {order.userId.mobile}</p>}
           </div>
         </div>
 
