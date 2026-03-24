@@ -105,11 +105,11 @@ router.get(
 );
 
 // Admin: Get order details by ID
-router.get(
-  "/api/admin/orders/:id",
-  authMiddleware,
-  getOrderDetails
-);
+// router.get(
+//   "/api/admin/orders/:id",
+//   authMiddleware,
+//   getOrderDetails
+// );
 
 // Admin: Update order status/payment (by order ID)
 router.put(

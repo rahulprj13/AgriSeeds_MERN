@@ -68,12 +68,6 @@ const OrderDetails = () => {
         const res = await axios.get(`${API_URL}/api/orders/${id}/details`, config);
         const orderData = res.data?.order || null;
 
-        if (orderData?.orderStatus?.toLowerCase() === "cancelled") {
-          toast.info("This order has been cancelled");
-          navigate("/orders", { replace: true });
-          return;
-        }
-
         setOrder(orderData);
         setItems(Array.isArray(res.data?.items) ? res.data.items : []);
 
@@ -117,8 +111,12 @@ const OrderDetails = () => {
     try {
       setLoading(true);
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : undefined;
-      await axios.put(`${API_URL}/api/orders/${id}/status`, { orderStatus: "cancelled" }, config);
-      toast.error("Order has been cancelled");
+      const res = await axios.put(`${API_URL}/api/orders/${id}/status`, { orderStatus: "cancelled" }, config);
+      
+      // Update local state with cancelled status
+      setOrder(res.data?.order || { ...order, orderStatus: "cancelled" });
+      
+      toast.success("Order has been cancelled");
       setTimeout(() => navigate("/orders", { replace: true }), 1500);
     } catch (e) {
       toast.error("Failed to cancel order");
@@ -143,7 +141,7 @@ const OrderDetails = () => {
               <p className="text-xs text-slate-400 font-bold mt-1 uppercase tracking-tighter">ID: {order._id}</p>
             </div>
           </div>
-          {order.orderStatus?.toLowerCase() !== "cancelled" && order.orderStatus?.toLowerCase() !== "delivered" && (
+          {order?.orderStatus?.toLowerCase() !== "cancelled" && order?.orderStatus?.toLowerCase() !== "delivered" && (
             <button onClick={handleCancelOrder} className="flex items-center gap-2 bg-white border-2 border-red-100 text-red-600 px-4 py-2 rounded-xl font-black text-sm hover:bg-red-50 transition-all">
               <XCircle size={18} /> Cancel Order
             </button>
@@ -222,6 +220,13 @@ const OrderDetails = () => {
               </div>
 
               <form onSubmit={handleSubmit(onUpdateAddress)} className="space-y-4">
+                {/* Show message if order is cancelled */}
+                {order?.orderStatus?.toLowerCase() === "cancelled" && (
+                  <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-4">
+                    <p className="text-red-700 font-bold text-sm">This order has been cancelled and cannot be edited.</p>
+                  </div>
+                )}
+                
                 {/* Full Name */}
                 <div className="space-y-1">
                   <label className="text-xs font-black text-slate-400 uppercase ml-1">Full Name</label>
@@ -282,15 +287,16 @@ const OrderDetails = () => {
                 <div className="flex gap-3 pt-4">
                   <button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-black hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    disabled={isSubmitting || order?.orderStatus?.toLowerCase() === "cancelled"}
+                    className="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-black hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Save size={20} /> Update
                   </button>
                   <button
                     type="button"
                     onClick={() => reset()}
-                    className="p-4 bg-slate-100 text-slate-600 rounded-2xl hover:bg-slate-200 transition-all"
+                    disabled={order?.orderStatus?.toLowerCase() === "cancelled"}
+                    className="p-4 bg-slate-100 text-slate-600 rounded-2xl hover:bg-slate-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Reset to original"
                   >
                     <RefreshCcw size={20} />

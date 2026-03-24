@@ -28,6 +28,8 @@ const AdminOrderItem = () => {
 
       // Use existing order details API (supports admin and user check in controller)
       const res = await axios.get(`${API_URL}/api/orders/${id}`, config);
+      console.log(res);
+      
       setOrder(res.data?.order || res.data || null);
       setItems(Array.isArray(res.data?.items) ? res.data.items : []);
       
