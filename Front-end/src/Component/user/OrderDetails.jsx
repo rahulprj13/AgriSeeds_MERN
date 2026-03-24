@@ -196,7 +196,7 @@ const OrderDetails = () => {
                         )}
                       </Link>
                       <div>
-                        <Link to={`/category/${it.categoryId?.name}/${it.productId?.name}/${it.productId?._id}`} className="text-lg font-black text-slate-900 hover:text-blue-600 transition-colors">{it.productId?.name || "Product Name"}</Link>
+                        <Link to={`/category/${it.productId.categoryId?.name}/${it.productId?.name}/${it.productId?._id}`} className="text-lg font-black text-slate-900 hover:text-blue-600 transition-colors">{it.productId?.name || "Product Name"}</Link>
                         <p className="text-slate-500 font-bold mt-1">Qty: <span className="text-slate-900">{it.quantity}</span><span className="mx-3 text-slate-200">|</span>Price: <span className="text-slate-900">₹{it.price}</span></p>
                       </div>
                     </div>
