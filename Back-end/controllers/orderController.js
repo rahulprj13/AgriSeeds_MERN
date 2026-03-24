@@ -110,14 +110,19 @@ exports.getOrdersForUser = async (req, res) => {
     console.log("DEBUG query:", query);
     const orders = await Order.find(query)
       .sort({ createdAt: -1 })
-      .populate("userId", "name email phone");
+      .populate("userId", "firstname lastname email mobile");
 
     const ordersWithItems = await Promise.all(
       orders.map(async (order) => {
-        const items = await OrderItem.find({ orderId: order._id }).populate(
-          "productId",
-          "name imagePath image"
-        );
+        const items = await OrderItem.find({ orderId: order._id })
+          .populate({
+            path: "productId",
+            select: "name imagePath image price categoryId",
+            populate: {
+              path: "categoryId",
+              select: "name"
+            }
+          });
 
         return {
           ...order._doc,
@@ -145,14 +150,19 @@ exports.getOrderDetails = async (req, res) => {
     const query = isAdmin ? { _id: id } : { _id: id, userId };
     const order = await Order.findOne(query)
       .populate("addressId")
-      .populate("userId", "name email phone");
+      .populate("userId", "firstname lastname email mobile");
 
     if (!order) return res.status(404).json({ message: "Order not found" });
 
-    const items = await OrderItem.find({ orderId: order._id }).populate(
-      "productId",
-      "name imagePath currentPrice price weight unit categoryId"
-    );
+    const items = await OrderItem.find({ orderId: order._id })
+      .populate({
+        path: "productId",
+        select: "name imagePath currentPrice price weight unit categoryId",
+        populate: {
+          path: "categoryId",
+          select: "name"
+        }
+      });
 
     return res.status(200).json({ order, items });
   } catch (error) {
@@ -181,7 +191,7 @@ exports.updateOrderStatus = async (req, res) => {
 
     const updatedOrder = await Order.findById(order._id)
       .populate("addressId")
-      .populate("userId", "name email phone");
+      .populate("userId", "firstname lastname email mobile");
 
     return res.status(200).json({ message: "Order updated", order: updatedOrder });
   } catch (error) {
