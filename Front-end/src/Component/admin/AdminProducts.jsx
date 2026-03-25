@@ -764,7 +764,7 @@ const AdminProducts = () => {
                   <button
                     key={page}
                     onClick={() => goToPage(page)}
-                    className={`h-10 min-w-[40px] rounded-xl px-3 text-sm font-bold transition ${
+                    className={`h-10 min-w-10 rounded-xl px-3 text-sm font-bold transition ${
                       currentPage === page
                         ? "bg-green-600 text-white shadow-sm"
                         : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
