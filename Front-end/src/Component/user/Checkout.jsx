@@ -56,9 +56,9 @@ const Checkout = () => {
   // In buy-now mode, max quantity should come from cart (so backend decrement won't fail)
   const buyNowCartItem = isBuyNow && buyNowProduct
     ? cart.find((ci) => {
-        const pid = ci.productId?._id || ci.productId;
-        return String(pid) === String(buyNowProduct._id);
-      })
+      const pid = ci.productId?._id || ci.productId;
+      return String(pid) === String(buyNowProduct._id);
+    })
     : null;
 
   // Buy Now order will decrement quantity only from the cart item,
@@ -93,7 +93,7 @@ const Checkout = () => {
   // --- Updated Remove Logic with Message ---
   const handleRemoveItem = (itemId) => {
     const confirmRemoval = window.confirm("Are you sure you don't want to buy this product?");
-    
+
     if (confirmRemoval) {
       if (isBuyNow) {
         toast.info("Buy Now cancelled");
@@ -143,9 +143,9 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-slate-50 pb-16">
       <div className="max-w-7xl mx-auto px-4 pt-10">
-        
+
         {/* BACK BUTTON */}
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-slate-500 hover:text-slate-900 font-bold mb-4 transition-colors group"
         >
@@ -189,11 +189,27 @@ const Checkout = () => {
                         className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-slate-100 rounded-2xl p-4"
                       >
                         <div className="flex items-center gap-4 w-full sm:w-auto">
-                          <div className="w-20 h-20 rounded-xl bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center shrink-0">
-                            <img src={itemImage} alt={item.name} className="w-full h-full object-contain p-2" />
+                          {/* Image with Link */}
+                          <div
+                             onClick={() => navigate(`/category/${item.productId?.categoryId.name}/${item.productId.name}/${item.productId?._id}`)}
+                            className="w-20 h-20 rounded-xl bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer hover:border-indigo-500 transition-all group"
+                          >
+                            <img
+                              src={itemImage}
+                              alt={item.name}
+                              className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-300"
+                            />
                           </div>
+
                           <div>
-                            <p className="font-black text-slate-900">{item.name}</p>
+                            {/* Name with Link */}
+                            <p
+                              onClick={() => navigate(`/category/${item.productId?.categoryId.name}/${item.productId.name}/${item.productId?._id}`)}
+                              className="font-black text-slate-900 cursor-pointer hover:text-green-600 transition-colors"
+                            >
+                              {item.name}
+                            </p>
+
                             <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">
                               {item.weight} {item.unit}
                             </p>
