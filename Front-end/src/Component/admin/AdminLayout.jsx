@@ -36,11 +36,13 @@ const AdminLayout = () => {
         ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
       `}>
         <div className="p-6 border-b border-slate-800">
-          <div className="flex items-center space-x-3 mb-8">
+          <div className="flex items-center space-x-3 mb-8 cursor-pointer" onClick={() => navigate("/admin")}>
             <div className="w-10 h-10 bg-linear-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/20 text-white">
               <Sprout size={22} strokeWidth={2.5} />
             </div>
-            <h1 className="text-xl font-black tracking-tighter italic uppercase">Seed<span className="text-green-500">Store</span></h1>
+            <h1 className="text-xl font-black tracking-tighter italic uppercase" 
+             
+            >Seed<span className="text-green-500">Store</span></h1>
           </div>
 
           {user && (
