@@ -208,6 +208,61 @@ const OrderDetails = () => {
           </div>
         </div>
 
+        {/* Delivery Status Days */}
+        {(() => {
+          const calcEstimatedDelivery = (createdDate) => {
+            const d = new Date(createdDate);
+            d.setDate(d.getDate() + 5);
+            return d;
+          };
+          const estimatedDelivery = order.expectedDelivery ? new Date(order.expectedDelivery) : calcEstimatedDelivery(order.createdAt);
+          return (
+            <div className="mb-8 bg-white border-2 border-slate-100 rounded-3xl p-6 shadow-sm">
+              <h3 className="text-lg font-black mb-6 flex items-center gap-2 border-b pb-4 text-slate-900"><Truck size={22} className="text-blue-600" /> Delivery Status & Timeline</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Order Placed</p>
+                    <p className="font-black text-slate-900">{new Date(order.createdAt).toLocaleDateString()}</p>
+                    <p className="text-xs text-slate-400">{new Date(order.createdAt).toLocaleTimeString()}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Expected Delivery</p>
+                    <p className="font-black text-indigo-600">{estimatedDelivery.toLocaleDateString()}</p>
+                    {!order.expectedDelivery && <p className="text-xs text-slate-400 italic">(estimated)</p>}
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {isDelivered ? (
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Delivered On</p>
+                      <p className="font-black text-green-600">{new Date(order.updatedAt).toLocaleDateString()}</p>
+                      <p className="text-xs text-slate-400">{new Date(order.updatedAt).toLocaleTimeString()}</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Status</p>
+                      <p className="font-black text-indigo-600 capitalize">{order.orderStatus || 'In Transit'}</p>
+                    </div>
+                  )}
+                  {order.courier && (
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Courier</p>
+                      <p className="font-black text-slate-900">{order.courier}</p>
+                    </div>
+                  )}
+                  {order.trackingNumber && (
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Tracking Number</p>
+                      <p className="font-black text-slate-900 break-all">{order.trackingNumber}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
 
