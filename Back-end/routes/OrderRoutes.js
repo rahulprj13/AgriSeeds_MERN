@@ -8,6 +8,7 @@ const {
   updateOrderAddress,
   deleteOrderItem,
   createBuyNowOrder,
+  cancelOrderByUser,
 } = require("../controllers/orderController");
 
 const router = express.Router();
@@ -24,12 +25,15 @@ router.get("/api/orders/:id", authMiddleware, getOrderDetails);
 // Update order address
 router.put("/api/orders/:id/address", authMiddleware, updateOrderAddress);
 
+// Cancel order for customer
+router.put("/api/orders/:id/cancelled", authMiddleware, cancelOrderByUser);
+
 // Delete a product (order item) from an order
-router.delete(
-  "/api/orders/:id/items/:itemId",
-  authMiddleware,
-  deleteOrderItem
-);
+// router.delete(
+//   "/api/orders/:id/items/:itemId",
+//   authMiddleware,
+//   deleteOrderItem
+// );
 
 // Create an order for a single product (Buy Now)
 router.post("/api/orders/buy-now", authMiddleware, createBuyNowOrder);

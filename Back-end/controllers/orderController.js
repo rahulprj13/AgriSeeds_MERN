@@ -110,8 +110,11 @@ exports.getOrdersForUser = async (req, res) => {
     // 2. Har order ke liye uske items populate karein
     const ordersWithItems = await Promise.all(
       orders.map(async (order) => {
-        const items = await OrderItem.find({ orderId: order._id })
-          .populate("productId", "name imagePath image"); // Products model se details nikaalna
+        const items = await OrderItem.find({ orderId: order._id }).populate({
+        path: "productId",
+        select: "name imagePath image categoryId",
+        populate: { path: "categoryId", select: "name" },
+      });
         
         return {
           ...order._doc,
@@ -138,10 +141,11 @@ exports.getOrderDetails = async (req, res) => {
     const order = await Order.findOne({ _id: id, userId });
     if (!order) return res.status(404).json({ message: "Order not found" });
 
-    const items = await OrderItem.find({ orderId: order._id }).populate(
-      "productId",
-      "name imagePath currentPrice price weight unit categoryId"
-    );
+    const items = await OrderItem.find({ orderId: order._id }).populate({
+      path: "productId",
+      select: "name imagePath currentPrice price weight unit categoryId",
+      populate: { path: "categoryId", select: "name" },
+    });
 
     const populatedOrder = await Order.findOne({ _id: order._id, userId }).populate(
       "addressId"
@@ -239,6 +243,43 @@ exports.deleteOrderItem = async (req, res) => {
   }
 };
 
+// Cancel order by user (mark cancelled, no item deletions)
+exports.cancelOrderByUser = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const { id } = req.params;
+
+    const order = await Order.findOne({ _id: id, userId });
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    if (["delivered", "cancelled"].includes(order.orderStatus)) {
+      return res.status(400).json({ message: "Order cannot be cancelled" });
+    }
+
+    order.orderStatus = "cancelled";
+    order.trackingHistory.push({
+      status: "cancelled",
+      location: "",
+      note: "Cancelled by customer",
+    });
+    await order.save();
+
+    const updatedOrder = await Order.findById(order._id)
+      .populate("addressId")
+      .populate("userId", "firstname lastname email mobile");
+
+    const items = await OrderItem.find({ orderId: order._id }).populate(
+      "productId",
+      "name imagePath currentPrice price weight unit categoryId"
+    );
+
+    return res.status(200).json({ message: "Order cancelled", order: updatedOrder, items });
+  } catch (error) {
+    console.error("CANCEL_ORDER_ERROR:", error);
+    return res.status(500).json({ message: "Error cancelling order" });
+  }
+};
+
 // Create an order for a single product (Buy Now)
 exports.createBuyNowOrder = async (req, res) => {
   try {
@@ -298,7 +339,7 @@ exports.createBuyNowOrder = async (req, res) => {
       userId,
       addressId: savedAddress._id,
       totalAmount: totalPrice,
-      orderStatus: "pending",
+      orderStatus: "processing",
       paymentStatus: "pending",
     });
 
