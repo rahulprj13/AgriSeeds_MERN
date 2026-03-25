@@ -1,7 +1,8 @@
 import React, { useContext, useState, useRef, useEffect } from 'react'
 import { NavLink, Link, useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCartShopping, faSearch, faUser, faBars, faXmark } from '@fortawesome/free-solid-svg-icons'
+import axios from "axios";
+import { faCartShopping, faSearch, faUser, faBars, faXmark, faHeart } from '@fortawesome/free-solid-svg-icons'
 import { CategoryContext } from '../context/CategoryContext'
 import { AuthContext } from '../context/AuthContext'
 import { CartContext } from '../context/CartContext'
@@ -20,11 +21,34 @@ export const Navbar = () => {
     const seedsRef = useRef(null) // NEW: reference for seeds dropdown
 
     const { cart } = useContext(CartContext)
-    const { user, logout } = useContext(AuthContext)
+    const { user, logout, token } = useContext(AuthContext)
     const { categories } = useContext(CategoryContext)
     const navigate = useNavigate()
 
     const totalItems = (cart && cart.length) ? cart.length : 0
+
+    const [wishlistCount, setWishlistCount] = useState(0);
+
+    useEffect(() => {
+        const loadWishlistCount = async () => {
+            try {
+                if (!user || !token) {
+                    setWishlistCount(0);
+                    return;
+                }
+
+                const res = await axios.get("/api/wishlist", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                const data = res.data?.data;
+                setWishlistCount(Array.isArray(data) ? data.length : 0);
+            } catch (e) {
+                setWishlistCount(0);
+            }
+        };
+
+        loadWishlistCount();
+    }, [user, token]);
 
     const handleLogout = () => {
         if (!window.confirm("Are you sure you want to logout?")) return
@@ -105,6 +129,14 @@ export const Navbar = () => {
                                     </span>
                                 )}
                             </NavLink>
+                            <NavLink to="/wishlist" className="relative text-gray-300 hover:text-white">
+                                <FontAwesomeIcon icon={faHeart} />
+                                {wishlistCount > 0 && (
+                                    <span className="absolute -top-2 -right-3 bg-red-500 text-white rounded-full text-[10px] px-1.5 py-0.5">
+                                        {wishlistCount}
+                                    </span>
+                                )}
+                            </NavLink>
                             <button onClick={() => setIsOpen(!isOpen)} className="text-white text-xl">
                                 <FontAwesomeIcon icon={isOpen ? faXmark : faBars} />
                             </button>
@@ -177,6 +209,16 @@ export const Navbar = () => {
                             )}
                         </NavLink>
 
+                        {/* WISHLIST */}
+                        <NavLink to="/wishlist" className="relative text-gray-300 hover:text-white">
+                            <FontAwesomeIcon icon={faHeart} />
+                            {wishlistCount > 0 && (
+                                <span className="absolute -top-2 -right-3 bg-red-500 text-white rounded-full text-xs px-1.5 py-0.5">
+                                    {wishlistCount}
+                                </span>
+                            )}
+                        </NavLink>
+
                         {/* PROFILE */}
                         {user ? (
                             <div className="relative flex items-center gap-2" ref={profileRef} onMouseEnter={() => setHoverProfile(true)} onMouseLeave={() => setHoverProfile(false)}>
@@ -194,6 +236,7 @@ export const Navbar = () => {
                                     <div className="absolute right-0 top-12 w-40 bg-white rounded-lg shadow-lg text-black py-2">
                                         <NavLink to="/profile" onClick={closeAll} className="block px-4 py-2 hover:bg-gray-100">Profile</NavLink>
                                         <NavLink to="/orders" onClick={closeAll} className="block px-4 py-2 hover:bg-gray-100">My Orders</NavLink>
+                                        <NavLink to="/wishlist" onClick={closeAll} className="block px-4 py-2 hover:bg-gray-100">Wishlist</NavLink>
                                         <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">Logout</button>
                                     </div>
                                 )}
@@ -240,6 +283,7 @@ export const Navbar = () => {
                                     <div className="flex flex-col gap-2 mt-3 pl-12">
                                         <NavLink to="/profile" onClick={closeAll} className="text-gray-300">Profile</NavLink>
                                         <NavLink to="/orders" onClick={closeAll} className="text-gray-300">My Orders</NavLink>
+                                        <NavLink to="/wishlist" onClick={closeAll} className="text-gray-300">Wishlist</NavLink>
                                         <button onClick={handleLogout} className="text-red-500 text-left">Logout</button>
                                     </div>
                                 )}

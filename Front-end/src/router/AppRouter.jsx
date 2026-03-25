@@ -19,6 +19,7 @@ import Cart from "../Component/user/Cart";
 import Checkout from "../Component/user/Checkout";
 import Orders from "../Component/user/Orders";
 import OrderDetails from "../Component/user/OrderDetails";
+import Wishlist from "../Component/user/Wishlist";
 
 import Login from "../Component/auth/Login";
 import SignUp from "../Component/auth/SignUp";
@@ -86,6 +87,7 @@ const router = createBrowserRouter([
       { path: "checkout", element: <Checkout /> },
       { path: "orders", element: <Orders /> },
       { path: "orders/:id", element: <OrderDetails /> },
+      { path: "wishlist", element: <Wishlist /> },
       { path: "search", element: <Search /> },
     ],
   },
