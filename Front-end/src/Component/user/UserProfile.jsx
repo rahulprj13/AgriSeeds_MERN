@@ -158,7 +158,7 @@ const UserProfile = () => {
         <div className="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
           
           {/* Header/Cover Area */}
-          <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-700"></div>
+          <div className="h-32 bg-linear-to-r from-blue-600 to-indigo-700"></div>
 
           <div className="px-8 pb-8">
             <div className="relative flex justify-between items-end -mt-16 mb-6">
