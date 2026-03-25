@@ -66,6 +66,15 @@ const Orders = () => {
     }
   };
 
+  const getPaymentStyle = (status) => {
+    switch (status?.toLowerCase()) {
+      case "paid": return "bg-green-100 text-green-700 border-green-200";
+      case "pending": return "bg-amber-100 text-amber-700 border-amber-200";
+      case "failed": return "bg-red-100 text-red-700 border-red-200";
+      default: return "bg-slate-100 text-slate-700 border-slate-200";
+    }
+  };
+
   if (!isLoggedIn) return null;
 
   return (
@@ -99,13 +108,13 @@ const Orders = () => {
                 <div
                   key={order._id}
                   onClick={() => navigate(`/orders/${order._id}`)}
-                  className="group bg-white border border-slate-200 rounded-[2rem] p-5 flex flex-col sm:flex-row items-center gap-6 hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-100/50 transition-all cursor-pointer"
+                  className="group bg-white border border-slate-200 rounded-4xl p-5 flex flex-col sm:flex-row items-center gap-6 hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-100/50 transition-all cursor-pointer"
                 >
                   {/* Product Image Wrapper */}
-                  <div className="relative h-24 w-24 flex-shrink-0">
+                  <div className="relative h-24 w-24 shrink-0">
                     <div className="h-full w-full bg-slate-100 rounded-2xl overflow-hidden border border-slate-100 group-hover:scale-105 transition-transform duration-300">
                       {product?.imagePath ? (
-                        
+
 
                         <img
                           src={
@@ -135,10 +144,10 @@ const Orders = () => {
                         {getStatusIcon(order.orderStatus)}
                         {order.orderStatus}
                       </span>
-                      <span className="text-xs font-bold text-slate-400">#{order._id.slice(-6).toUpperCase()}</span>
+                      <span className="text-xs font-bold text-slate-400">#{order._id}</span>
                     </div>
 
-                    <h3 className="text-lg font-black text-slate-800 mb-2 group-hover:text-indigo-600 transition-colors truncate max-w-[280px]">
+                    <h3 className="text-lg font-black text-slate-800 mb-2 group-hover:text-indigo-600 transition-colors truncate max-w-70">
                       {product?.name || "Multiple Items Order"}
                     </h3>
 
@@ -167,7 +176,7 @@ const Orders = () => {
                     {/* Progress Bar */}
                     <div className="mb-2 h-1-5 bg-slate-200 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 transition-all duration-500"
+                        className="h-full bg-linear-to-r from-indigo-500 to-indigo-600 transition-all duration-500"
                         style={{ width: `${getProgressPercentage(order.orderStatus)}%` }}
                       />
                     </div>
@@ -179,11 +188,14 @@ const Orders = () => {
                   </div>
 
                   {/* Pricing & CTA */}
-                  <div className="w-full sm:w-auto flex sm:flex-col items-center justify-between sm:justify-center gap-2 border-t sm:border-t-0 pt-4 sm:pt-0 border-slate-50">
-                    <div className="sm:text-right">
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Amount Paid</p>
+                  <div className="w-full sm:w-auto flex sm:flex-col items-center justify-between sm:justify-center gap-3 border-t sm:border-t-0 pt-4 sm:pt-0 border-slate-50">
+                    <div className="flex flex-col items-end gap-1">
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center justify-center border ${getPaymentStyle(order.paymentStatus)}`}>
+                        {order.paymentStatus}
+                      </span>
                       <p className="text-2xl font-black text-slate-900">₹{order.totalAmount.toLocaleString()}</p>
                     </div>
+
                     <div className="h-10 w-10 bg-slate-50 rounded-full flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-inner">
                       <ChevronRight className="w-5 h-5" />
                     </div>
