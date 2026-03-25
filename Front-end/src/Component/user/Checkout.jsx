@@ -126,7 +126,7 @@ const Checkout = () => {
         navigate(`/orders/${res.data.order._id}`);
       } else {
         const payload = { address: formData };
-        const res = await axios.post(`${API_URL}/api/orders`, payload, { headers });
+        const res = await axios.post(`${API_URL}/api/user/orders`, payload, { headers });
         toast.success("Order placed successfully");
         if (typeof reloadCart === "function") await reloadCart();
         navigate(`/orders/${res.data.order._id}`);

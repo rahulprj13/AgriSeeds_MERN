@@ -14,7 +14,7 @@ const {
 const router = express.Router();
 
 // Create order from user's cart
-router.post("/api/orders", authMiddleware, createOrderFromCart);
+router.post("/api/user/orders", authMiddleware, createOrderFromCart);
 
 // List orders for logged-in user
 router.get("/api/orders", authMiddleware, getOrdersForUser);
