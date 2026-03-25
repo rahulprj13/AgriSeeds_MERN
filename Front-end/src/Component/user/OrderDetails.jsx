@@ -155,8 +155,8 @@ const OrderDetails = () => {
             ← Back
           </button>
           <div className="text-right">
-            <p className="font-black text-2xl uppercase tracking-tight text-slate-900">Order #{order._id?.slice(-6).toUpperCase()}</p>
-            <p className="text-xs font-bold text-slate-400">{new Date(order.createdAt).toLocaleDateString()}</p>
+            <p className="font-black text-1xl uppercase tracking-tight text-slate-900">OrderId:{order._id}</p>
+            <p className="text-xs font-bold text-slate-400">OrderDate:{new Date(order.createdAt).toLocaleDateString()}</p>
           </div>
         </div>
 
@@ -170,7 +170,7 @@ const OrderDetails = () => {
                 className="absolute top-1/2 left-8 h-1.5 bg-indigo-600 -translate-y-1/2 z-0 transition-all duration-1000 ease-in-out rounded-full"
                 style={{ width: `calc(${progressPercentage}% - 16px)` }}
               >
-                <div className="absolute right-[-18px] top-[-32px] bg-indigo-600 text-white p-2 rounded-lg shadow-lg border-2 border-white">
+                <div className="absolute -right-4.5 -top-8 bg-indigo-600 text-white p-2 rounded-lg shadow-lg border-2 border-white">
                   <Truck size={18} />
                 </div>
               </div>
@@ -291,7 +291,7 @@ const OrderDetails = () => {
 
           {/* Sidebar Summary */}
           <div className="space-y-6">
-            <div className="bg-white border rounded-[2rem] p-8 shadow-sm">
+            <div className="bg-white border rounded-4xl p-8 shadow-sm">
               <h3 className="text-lg font-black mb-6 text-slate-900">Order Summary</h3>
               <div className="space-y-4">
                 <div className="flex justify-between font-bold text-slate-400"><span>Subtotal</span><span className="text-slate-900">₹{order.totalAmount?.toLocaleString()}</span></div>
@@ -303,7 +303,7 @@ const OrderDetails = () => {
               </div>
             </div>
             {!isCancelled && !isDelivered && (
-              <button onClick={handleCancelOrder} className="w-full py-5 rounded-[1.5rem] bg-red-50 text-red-600 font-black border-2 border-red-100 hover:bg-red-600 hover:text-white transition-all">
+              <button onClick={handleCancelOrder} className="w-full py-5 rounded-3xl bg-red-50 text-red-600 font-black border-2 border-red-100 hover:bg-red-600 hover:text-white transition-all">
                 Cancel Order
               </button>
             )}
