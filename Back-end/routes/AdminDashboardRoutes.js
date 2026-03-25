@@ -18,12 +18,14 @@ router.get(
   adminMiddleware,
   async (req, res) => {
     try {
-      const [totalUsers, totalProducts, totalCategories, totalCartItems] =
+      const [totalUsers, totalProducts, totalCategories, totalCartItems, totalOrders] =
         await Promise.all([
           User.countDocuments(),
           Product.countDocuments(),
           Category.countDocuments(),
           Cart.countDocuments(),
+          Order.countDocuments(),
+
         ]);
 
       res.json({
@@ -31,6 +33,7 @@ router.get(
         totalProducts,
         totalCategories,
         totalCartItems,
+        totalOrders
       });
     } catch (err) {
       res.status(500).json({ message: "Server error" });
