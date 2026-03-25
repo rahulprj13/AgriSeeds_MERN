@@ -33,6 +33,9 @@ import AdminLogin from "../Component/admin/AdminLogin";
 import { AuthContext } from "../Component/context/AuthContext";
 import { ForgotPassword } from "../Component/auth/ForgotPassword";
 import { ResetPassword } from "../Component/auth/ResetPassword";
+import AdminOrders from "../Component/admin/AdminOrders.jsx";
+import AdminOrderItem from "../Component/admin/AdminOrderItem.jsx";
+import UserProfile from "../Component/user/UserProfile.jsx";
 
 const AdminPrivateRoute = ({ children }) => {
 
@@ -74,6 +77,8 @@ const router = createBrowserRouter([
       { path: "home", element: <Home /> },
       { path: "about", element: <About /> },
       { path: "contact", element: <Contact /> },
+      { path: "profile", element: <UserProfile /> },
+
       { path: "category/:type", element: <Products /> },
       { path: "category/:type/:item", element: <Products /> },
       { path: "category/:type/:item/:id", element: <ProductDetails /> },
@@ -107,6 +112,8 @@ const router = createBrowserRouter([
       { path: "users", element: <AdminUsers /> },
       { path: "categories", element: <AdminCategories /> },
       { path: "products", element: <AdminProducts /> },
+      { path: "orders", element: <AdminOrders /> },
+      { path: "orders/:id", element: <AdminOrderItem /> },
     ],
   },
 
