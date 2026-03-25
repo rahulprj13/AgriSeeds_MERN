@@ -6,8 +6,6 @@ import { CategoryContext } from '../context/CategoryContext'
 import { AuthContext } from '../context/AuthContext'
 import { CartContext } from '../context/CartContext'
 
-const API_URL = "http://localhost:5000";
-
 export const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [dropdown, setDropdown] = useState(false)
@@ -84,20 +82,6 @@ export const Navbar = () => {
         document.addEventListener("mousedown", handleClickOutside)
         return () => document.removeEventListener("mousedown", handleClickOutside)
     }, [])
-
-//profileImage
-    const getProfileImageUrl = () => {
-    if (!user || !user.profileImage) return null;
-    
-    // Agar image full URL hai (Cloudinary/Google)
-    if (user.profileImage.startsWith("http")) {
-        return user.profileImage;
-    }
-    
-    // Agar local backend se aa rahi hai
-    return `http://localhost:5000/uploads/${user.profileImage}`;
-};
-
 
     return (
         <nav className="bg-gray-900/70 backdrop-blur-lg sticky top-0 z-50 shadow-md border-b border-white/10">
@@ -198,11 +182,7 @@ export const Navbar = () => {
                             <div className="relative flex items-center gap-2" ref={profileRef} onMouseEnter={() => setHoverProfile(true)} onMouseLeave={() => setHoverProfile(false)}>
                                 <button onClick={() => setProfileOpen(!profileOpen)}>
                                     {user.profileImage ? (
-                                        <img src={
-                                            user.profileImage.startsWith("http")
-                                                ? user.profileImage
-                                                : `${API_URL}/uploads/${user.profileImage}`
-                                        } alt="profile" className="w-9 h-9 rounded-full object-cover border border-gray-600" />
+                                        <img src={user.profileImage} alt="profile" className="w-9 h-9 rounded-full object-cover border border-gray-600" />
                                     ) : (
                                         <div className="w-9 h-9 rounded-full bg-gray-700 flex items-center justify-center border border-gray-600">
                                             <FontAwesomeIcon icon={faUser} className="text-white" />
@@ -252,11 +232,7 @@ export const Navbar = () => {
                             <div className="pt-4 border-t border-gray-700">
                                 <button onClick={() => setMobileProfileOpen(!mobileProfileOpen)} className="flex items-center gap-2 text-gray-300 px-2">
                                     <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
-                                        {user.profileImage ? <img src={
-                                            user.profileImage.startsWith("http")
-                                                ? user.profileImage
-                                                : `http://localhost:5000/uploads/${user.profileImage}`
-                                        } className="w-full h-full object-cover" /> : <FontAwesomeIcon icon={faUser} />}
+                                        {user.profileImage ? <img src={user.profileImage} className="w-full h-full object-cover" /> : <FontAwesomeIcon icon={faUser} />}
                                     </div>
                                     {user.firstname}
                                 </button>

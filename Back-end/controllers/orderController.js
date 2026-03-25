@@ -76,7 +76,6 @@ exports.createOrderFromCart = async (req, res) => {
         OrderItem.create({
           orderId: order._id,
           productId: item.productId,
-          categoryId:item.categorId,
           quantity: item.quantity,
           price: item.price,
           totalPrice: item.totalPrice,
@@ -98,35 +97,25 @@ exports.createOrderFromCart = async (req, res) => {
   }
 };
 
-// List orders for current user or admin
+// List orders for current user
+// List orders for current user - UPDATED
 exports.getOrdersForUser = async (req, res) => {
   try {
     const userId = req.user?.id;
-    const isAdmin = req.user?.role === "admin";
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    console.log("DEBUG getOrdersForUser:", { userId, userRole: req.user?.role, isAdmin });
-    const query = isAdmin ? {} : { userId };
-    console.log("DEBUG query:", query);
-    const orders = await Order.find(query)
-      .sort({ createdAt: -1 })
-      .populate("userId", "firstname lastname email mobile");
+    // 1. Saare orders fetch karein
+    const orders = await Order.find({ userId }).sort({ createdAt: -1 });
 
+    // 2. Har order ke liye uske items populate karein
     const ordersWithItems = await Promise.all(
       orders.map(async (order) => {
         const items = await OrderItem.find({ orderId: order._id })
-          .populate({
-            path: "productId",
-            select: "name imagePath image price categoryId",
-            populate: {
-              path: "categoryId",
-              select: "name"
-            }
-          });
-
+          .populate("productId", "name imagePath image"); // Products model se details nikaalna
+        
         return {
           ...order._doc,
-          items,
+          items: items // Ab frontend ko 'items' array milega jisme product image hogi
         };
       })
     );
@@ -138,65 +127,33 @@ exports.getOrdersForUser = async (req, res) => {
   }
 };
 
-// Get one order + its items (admin can access any order; users only their own)
+// Get one order + its items (only if it belongs to current user)
 exports.getOrderDetails = async (req, res) => {
   try {
     const userId = req.user?.id;
-    const isAdmin = req.user?.role === "admin";
     const { id } = req.params;
 
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    const query = isAdmin ? { _id: id } : { _id: id, userId };
-    const order = await Order.findOne(query)
-      .populate("addressId")
-      .populate("userId", "firstname lastname email mobile");
-
+    const order = await Order.findOne({ _id: id, userId });
     if (!order) return res.status(404).json({ message: "Order not found" });
 
-    const items = await OrderItem.find({ orderId: order._id })
-      .populate({
-        path: "productId",
-        select: "name imagePath currentPrice price weight unit categoryId",
-        populate: {
-          path: "categoryId",
-          select: "name"
-        }
-      });
+    const items = await OrderItem.find({ orderId: order._id }).populate(
+      "productId",
+      "name imagePath currentPrice price weight unit categoryId"
+    );
 
-    return res.status(200).json({ order, items });
+    const populatedOrder = await Order.findOne({ _id: order._id, userId }).populate(
+      "addressId"
+    );
+
+    return res.status(200).json({
+      order: populatedOrder || order,
+      items,
+    });
   } catch (error) {
     console.error("GET_ORDER_DETAILS_ERROR:", error);
     return res.status(500).json({ message: "Error fetching order" });
-  }
-};
-
-// Update order status/payment (for admin) or own order (user)
-exports.updateOrderStatus = async (req, res) => {
-  try {
-    const userId = req.user?.id;
-    const isAdmin = req.user?.role === "admin";
-    const { id } = req.params;
-    const { orderStatus, paymentStatus } = req.body;
-
-    if (!userId) return res.status(401).json({ message: "Unauthorized" });
-
-    const query = isAdmin ? { _id: id } : { _id: id, userId };
-    const order = await Order.findOne(query);
-    if (!order) return res.status(404).json({ message: "Order not found" });
-
-    if (orderStatus) order.orderStatus = orderStatus;
-    if (paymentStatus) order.paymentStatus = paymentStatus;
-    await order.save();
-
-    const updatedOrder = await Order.findById(order._id)
-      .populate("addressId")
-      .populate("userId", "firstname lastname email mobile");
-
-    return res.status(200).json({ message: "Order updated", order: updatedOrder });
-  } catch (error) {
-    console.error("UPDATE_ORDER_STATUS_ERROR:", error);
-    return res.status(500).json({ message: "Error updating order" });
   }
 };
 

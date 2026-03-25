@@ -19,7 +19,6 @@ import Cart from "../Component/user/Cart";
 import Checkout from "../Component/user/Checkout";
 import Orders from "../Component/user/Orders";
 import OrderDetails from "../Component/user/OrderDetails";
-import UserProfile from "../Component/user/UserProfile";
 
 import Login from "../Component/auth/Login";
 import SignUp from "../Component/auth/SignUp";
@@ -29,8 +28,6 @@ import AdminDashboard from "../Component/admin/AdminDashboard";
 import AdminUsers from "../Component/admin/AdminUsers";
 import AdminCategories from "../Component/admin/AdminCategories";
 import AdminProducts from "../Component/admin/AdminProducts";
-import AdminOrders from "../Component/admin/AdminOrders";
-import AdminOrderItem from "../Component/admin/AdminOrderItem";
 import AdminLogin from "../Component/admin/AdminLogin";
 
 import { AuthContext } from "../Component/context/AuthContext";
@@ -77,7 +74,6 @@ const router = createBrowserRouter([
       { path: "home", element: <Home /> },
       { path: "about", element: <About /> },
       { path: "contact", element: <Contact /> },
-      { path: "profile", element: <UserProfile /> },
       { path: "category/:type", element: <Products /> },
       { path: "category/:type/:item", element: <Products /> },
       { path: "category/:type/:item/:id", element: <ProductDetails /> },
@@ -111,8 +107,6 @@ const router = createBrowserRouter([
       { path: "users", element: <AdminUsers /> },
       { path: "categories", element: <AdminCategories /> },
       { path: "products", element: <AdminProducts /> },
-      { path: "orders", element: <AdminOrders /> },
-      { path: "orders/:id", element: <AdminOrderItem /> },
     ],
   },
 

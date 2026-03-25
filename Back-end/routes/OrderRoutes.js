@@ -5,7 +5,6 @@ const {
   createOrderFromCart,
   getOrdersForUser,
   getOrderDetails,
-  updateOrderStatus,
   updateOrderAddress,
   deleteOrderItem,
   createBuyNowOrder,
@@ -17,20 +16,10 @@ const router = express.Router();
 router.post("/api/orders", authMiddleware, createOrderFromCart);
 
 // List orders for logged-in user
-router.get("/api/orders/:id", authMiddleware, getOrdersForUser);
 router.get("/api/orders", authMiddleware, getOrdersForUser);
 
 // Get order details + items for logged-in user
-router.get("/api/orders/:id/details", authMiddleware, getOrderDetails);
-
-// Get order details + items for logged-in user/admin
-router.get("/api/admin/orders/:id", authMiddleware, getOrderDetails);
-
-// Update order status/payment (user can update their own orders)
-router.put("/api/orders/:id/status", authMiddleware, updateOrderStatus);
-
-// Update order status/payment (admin/or owner)
-router.put("/api/admin/orders/:id", authMiddleware, updateOrderStatus);
+router.get("/api/orders/:id", authMiddleware, getOrderDetails);
 
 // Update order address
 router.put("/api/orders/:id/address", authMiddleware, updateOrderAddress);
