@@ -224,16 +224,103 @@ exports.getProfile = async (req, res) => {
 }
 
 // REGISTER
+// exports.registerUser = async (req, res) => {
+//   try {
+//     const { firstname, lastname, mobile, email, password, otp } = req.body;
+
+//     const userExists = await User.findOne({ email });
+
+//     if (userExists) {
+//       return res.status(400).json({
+//         message: "User already exists",
+//       });
+//     }
+
+//     // latest OTP record
+//     const otpRecord = await Otp.findOne({ email }).sort({ createdAt: -1 });
+
+//     if (!otpRecord) {
+//       return res.status(400).json({
+//         message: "OTP not found",
+//       });
+//     }
+
+//     // OTP match check
+//     if (otpRecord.otp != otp) {
+//       return res.status(400).json({
+//         message: "Invalid OTP",
+//       });
+//     }
+
+//     // OTP expiry check
+//     if (otpRecord.expiresAt < new Date()) {
+//       await Otp.deleteMany({ email });
+
+//       return res.status(400).json({
+//         message: "OTP expired",
+//       });
+//     }
+
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     const user = await User.create({
+//       firstname,
+//       lastname,
+//       mobile,
+//       email,
+//       password: hashedPassword,
+//     });
+
+//     //  OTP delete after registration
+//     await Otp.deleteMany({ email });
+
+//     await mailSend(
+//       user.email,
+//       "Welcome to our app",
+//       "Thank you for registering with our app."
+//     );
+
+//     res.status(201).json({
+//       message: "User registered successfully",
+//       user: {
+//         id: user._id,
+//         firstname: user.firstname,
+//         lastname: user.lastname,
+//         mobile: user.mobile,
+//         email: user.email,
+//       },
+//     });
+//   } catch (err) {
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
 exports.registerUser = async (req, res) => {
   try {
     const { firstname, lastname, mobile, email, password, otp } = req.body;
 
-    const userExists = await User.findOne({ email });
-
-    if (userExists) {
+    if (!firstname || !lastname || !mobile || !email || !password || !otp) {
       return res.status(400).json({
-        message: "User already exists",
+        message: "All fields are required",
       });
+    }
+
+    // email OR mobile dono check karo
+    const existingUser = await User.findOne({
+      $or: [{ email }, { mobile }],
+    });
+
+    if (existingUser) {
+      if (existingUser.email === email) {
+        return res.status(400).json({
+          message: "User already exists with this email",
+        });
+      }
+
+      if (existingUser.mobile === mobile) {
+        return res.status(400).json({
+          message: "User already exists with this mobile number",
+        });
+      }
     }
 
     // latest OTP record
@@ -245,14 +332,14 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    // OTP match check
-    if (otpRecord.otp != otp) {
+    // OTP match
+    if (String(otpRecord.otp) !== String(otp)) {
       return res.status(400).json({
         message: "Invalid OTP",
       });
     }
 
-    // OTP expiry check
+    // OTP expiry
     if (otpRecord.expiresAt < new Date()) {
       await Otp.deleteMany({ email });
 
@@ -271,16 +358,21 @@ exports.registerUser = async (req, res) => {
       password: hashedPassword,
     });
 
-    //  OTP delete after registration
+    // OTP delete after successful registration
     await Otp.deleteMany({ email });
 
-    await mailSend(
-      user.email,
-      "Welcome to our app",
-      "Thank you for registering with our app."
-    );
+    // welcome mail fail ho to registration fail mat karo
+    try {
+      await mailSend(
+        user.email,
+        "Welcome to our app",
+        "Thank you for registering with our app."
+      );
+    } catch (mailErr) {
+      console.error("Welcome mail error:", mailErr);
+    }
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "User registered successfully",
       user: {
         id: user._id,
@@ -291,10 +383,28 @@ exports.registerUser = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error("registerUser error:", err);
+
+    // duplicate key error handle
+    if (err.code === 11000) {
+      if (err.keyPattern?.email) {
+        return res.status(400).json({
+          message: "Email already registered",
+        });
+      }
+
+      if (err.keyPattern?.mobile) {
+        return res.status(400).json({
+          message: "Mobile number already registered",
+        });
+      }
+    }
+
+    return res.status(500).json({
+      message: err.message || "Server error",
+    });
   }
 };
-
 //email otp
 exports.sendOtp = async (req, res) => {
   try {
