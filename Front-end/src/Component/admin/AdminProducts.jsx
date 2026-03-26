@@ -12,6 +12,8 @@ import {
   Filter,
 } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
+import { useRef } from "react";
+
 
 const emptyProduct = {
   name: "",
@@ -32,7 +34,7 @@ const AdminProducts = () => {
   const { token } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [form, setForm] = useState(emptyProduct);
+  const [form, setForm] = useState(emptyProduct, { description: "• " });
   const [errors, setErrors] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
@@ -43,6 +45,16 @@ const AdminProducts = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 20;
 
+  //add description with useRef
+  const descriptionRef = useRef(null);
+
+  const autoResizeTextarea = () => {
+    const textarea = descriptionRef.current;
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
   const loadData = async () => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
@@ -89,7 +101,7 @@ const AdminProducts = () => {
       if (!regex.test(value) || value.length > 30) return;
     }
 
-    if (name === "description" && value.length > 200) return;
+    if (name === "description" && value.length > 1000) return;
 
     if (
       (name === "price" ||
@@ -311,11 +323,10 @@ const AdminProducts = () => {
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-lg ${
-            showForm
-              ? "bg-slate-100 text-slate-600"
-              : "bg-green-600 text-white hover:bg-green-700 shadow-green-200"
-          }`}
+          className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-lg ${showForm
+            ? "bg-slate-100 text-slate-600"
+            : "bg-green-600 text-white hover:bg-green-700 shadow-green-200"
+            }`}
         >
           {showForm ? <X size={18} /> : <Plus size={18} />}
           {showForm ? "Close Form" : "Add New Product"}
@@ -334,9 +345,8 @@ const AdminProducts = () => {
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  className={`w-full bg-slate-50 border ${
-                    errors.name ? "border-red-500" : "border-slate-200"
-                  } rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500/20 outline-none transition-all font-semibold`}
+                  className={`w-full bg-slate-50 border ${errors.name ? "border-red-500" : "border-slate-200"
+                    } rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500/20 outline-none transition-all font-semibold`}
                   placeholder="Ex: Organic Tomato 101"
                 />
                 {errors.name && (
@@ -354,9 +364,8 @@ const AdminProducts = () => {
                   name="categoryId"
                   value={form.categoryId}
                   onChange={handleChange}
-                  className={`w-full bg-slate-50 border ${
-                    errors.categoryId ? "border-red-500" : "border-slate-200"
-                  } rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500/20 outline-none font-semibold`}
+                  className={`w-full bg-slate-50 border ${errors.categoryId ? "border-red-500" : "border-slate-200"
+                    } rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500/20 outline-none font-semibold`}
                 >
                   <option value="">---Choose Category---</option>
                   {categories.map((c) => (
@@ -381,9 +390,8 @@ const AdminProducts = () => {
                   name="price"
                   value={form.price}
                   onChange={handleChange}
-                  className={`w-full bg-slate-50 border ${
-                    errors.price ? "border-red-500" : "border-slate-200"
-                  } rounded-xl px-4 py-3 text-sm outline-none font-semibold`}
+                  className={`w-full bg-slate-50 border ${errors.price ? "border-red-500" : "border-slate-200"
+                    } rounded-xl px-4 py-3 text-sm outline-none font-semibold`}
                 />
                 {errors.price && (
                   <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1">
@@ -401,9 +409,8 @@ const AdminProducts = () => {
                   name="currentPrice"
                   value={form.currentPrice}
                   onChange={handleChange}
-                  className={`w-full bg-slate-50 border ${
-                    errors.currentPrice ? "border-red-500" : "border-slate-200"
-                  } rounded-xl px-4 py-3 text-sm outline-none font-semibold`}
+                  className={`w-full bg-slate-50 border ${errors.currentPrice ? "border-red-500" : "border-slate-200"
+                    } rounded-xl px-4 py-3 text-sm outline-none font-semibold`}
                 />
                 {errors.currentPrice && (
                   <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1">
@@ -421,9 +428,8 @@ const AdminProducts = () => {
                   name="weight"
                   value={form.weight}
                   onChange={handleChange}
-                  className={`w-full bg-slate-50 border ${
-                    errors.weight ? "border-red-500" : "border-slate-200"
-                  } rounded-xl px-4 py-3 text-sm outline-none font-semibold`}
+                  className={`w-full bg-slate-50 border ${errors.weight ? "border-red-500" : "border-slate-200"
+                    } rounded-xl px-4 py-3 text-sm outline-none font-semibold`}
                 />
                 {errors.weight && (
                   <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1">
@@ -440,9 +446,8 @@ const AdminProducts = () => {
                   name="unit"
                   value={form.unit}
                   onChange={handleChange}
-                  className={`w-full bg-slate-50 border ${
-                    errors.unit ? "border-red-500" : "border-slate-200"
-                  } rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500/20 outline-none font-semibold`}
+                  className={`w-full bg-slate-50 border ${errors.unit ? "border-red-500" : "border-slate-200"
+                    } rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500/20 outline-none font-semibold`}
                 >
                   <option value="">---Choose Unit---</option>
                   <option value="kg">Kilogram (kg)</option>
@@ -464,9 +469,8 @@ const AdminProducts = () => {
                   name="stock"
                   value={form.stock}
                   onChange={handleChange}
-                  className={`w-full bg-slate-50 border ${
-                    errors.stock ? "border-red-500" : "border-slate-200"
-                  } rounded-xl px-4 py-3 text-sm outline-none font-semibold`}
+                  className={`w-full bg-slate-50 border ${errors.stock ? "border-red-500" : "border-slate-200"
+                    } rounded-xl px-4 py-3 text-sm outline-none font-semibold`}
                 />
                 {errors.stock && (
                   <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1">
@@ -519,25 +523,60 @@ const AdminProducts = () => {
 
             <div className="space-y-1">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex justify-between">
-                Description <span>{form.description.length}/200</span>
+                Description <span>{(form.description || "").length}</span>
               </label>
+
               <textarea
+                ref={descriptionRef}
                 name="description"
-                value={form.description}
-                onChange={handleChange}
+                value={form.description || ""}
+                onChange={(e) => {
+                  handleChange(e);
+                  autoResizeTextarea();
+                }}
+                onPaste={() => {
+                  setTimeout(() => {
+                    autoResizeTextarea();
+                  }, 0);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+
+                    const textarea = e.target;
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const value = form.description || "";
+
+                    const newValue =
+                      value.substring(0, start) + "\n• " + value.substring(end);
+
+                    if (newValue.length <= 1000) {
+                      setForm((prev) => ({
+                        ...prev,
+                        description: newValue,
+                      }));
+
+                      setTimeout(() => {
+                        textarea.selectionStart = textarea.selectionEnd = start + 3;
+                        autoResizeTextarea();
+                      }, 0);
+                    }
+                  }
+                }}
                 rows={3}
-                className={`w-full bg-slate-50 border ${
-                  errors.description ? "border-red-500" : "border-slate-200"
-                } rounded-xl px-4 py-3 text-sm outline-none font-medium`}
+                maxLength={500}
+                className={`w-full min-h-[120px] max-h-[300px] overflow-y-auto bg-slate-50 border ${errors.description ? "border-red-500" : "border-slate-200"
+                  } rounded-xl px-4 py-3 text-sm outline-none font-medium resize-none`}
                 placeholder="Enter product details..."
               />
+
               {errors.description && (
                 <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1">
                   <AlertCircle size={12} /> {errors.description}
                 </p>
               )}
             </div>
-
             <div className="flex justify-end gap-3 border-t pt-6">
               <button
                 type="button"
@@ -664,9 +703,8 @@ const AdminProducts = () => {
                     <td className="px-6 py-4">
                       <p className="text-sm font-black text-slate-800">{p.name}</p>
                       <p
-                        className={`text-[9px] font-black uppercase mt-1 ${
-                          p.status === "active" ? "text-green-500" : "text-red-400"
-                        }`}
+                        className={`text-[9px] font-black uppercase mt-1 ${p.status === "active" ? "text-green-500" : "text-red-400"
+                          }`}
                       >
                         {p.status}
                       </p>
@@ -696,9 +734,8 @@ const AdminProducts = () => {
 
                     <td className="px-6 py-4 text-center">
                       <span
-                        className={`text-sm font-black ${
-                          p.stock < 10 ? "text-red-500" : "text-slate-600"
-                        }`}
+                        className={`text-sm font-black ${p.stock < 10 ? "text-red-500" : "text-slate-600"
+                          }`}
                       >
                         {p.stock}
                       </span>
@@ -764,11 +801,10 @@ const AdminProducts = () => {
                   <button
                     key={page}
                     onClick={() => goToPage(page)}
-                    className={`h-10 min-w-10 rounded-xl px-3 text-sm font-bold transition ${
-                      currentPage === page
-                        ? "bg-green-600 text-white shadow-sm"
-                        : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
-                    }`}
+                    className={`h-10 min-w-10 rounded-xl px-3 text-sm font-bold transition ${currentPage === page
+                      ? "bg-green-600 text-white shadow-sm"
+                      : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                      }`}
                   >
                     {page}
                   </button>
