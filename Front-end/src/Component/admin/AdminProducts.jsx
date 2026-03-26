@@ -565,7 +565,7 @@ const AdminProducts = () => {
                   }
                 }}
                 rows={3}
-                maxLength={500}
+                maxLength={1000}
                 className={`w-full min-h-[120px] max-h-[300px] overflow-y-auto bg-slate-50 border ${errors.description ? "border-red-500" : "border-slate-200"
                   } rounded-xl px-4 py-3 text-sm outline-none font-medium resize-none`}
                 placeholder="Enter product details..."
