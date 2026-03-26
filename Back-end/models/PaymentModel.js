@@ -4,17 +4,17 @@ const paymentSchema = new mongoose.Schema({
 
   orderId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Order"
+    ref: "orders"
   },
 
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
+    ref: "users"
   },
 
   productId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Product"
+    ref: "products"
   },
 
   paymentMethod: {
