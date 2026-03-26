@@ -61,28 +61,15 @@ const ProductDetails = () => {
     fetchProduct();
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-green-50 to-emerald-100">
-        <div className="relative w-16 h-16">
-          <div className="absolute inset-0 border-4 border-green-100 rounded-full"></div>
-          <div className="absolute inset-0 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!product) return <div className="text-center py-20 font-bold">Product Not Found</div>;
-
-  const sellerPrice = Number(product.currentPrice) || 0;
-  const Price = Number(product.price) || 0;
+  const sellerPrice = Number(product?.currentPrice) || 0;
+  const Price = Number(product?.price) || 0;
 
   const discountPercent =
     sellerPrice > 0 && sellerPrice !== Price
       ? Math.round((Math.abs(sellerPrice - Price) / Math.max(sellerPrice, Price)) * 100)
       : 0;
 
-  const productImage = product.imagePath
+  const productImage = product?.imagePath
     ? product.imagePath.startsWith("http")
       ? product.imagePath
       : `${API_URL}/uploads/${product.imagePath}`
@@ -105,7 +92,7 @@ const ProductDetails = () => {
 
   const cartItem = cart.find((item) => {
     const pid = item.productId?._id || item.productId;
-    return String(pid) === String(product._id);
+    return String(pid) === String(product?._id);
   });
 
   const reviewRating = Number(reviewForm.rating);
@@ -265,11 +252,24 @@ const ProductDetails = () => {
     }
   };
 
-  // useEffect(() => {
-  //   fetchReviewsAndSummary();
-  //   fetchWishlistState();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [product?._id, userId, token]);
+  useEffect(() => {
+    fetchReviewsAndSummary();
+    fetchWishlistState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?._id, userId, token]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-green-50 to-emerald-100">
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 border-4 border-green-100 rounded-full"></div>
+          <div className="absolute inset-0 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) return <div className="text-center py-20 font-bold">Product Not Found</div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f8fffb] via-white to-[#eefbf3] pb-20 font-sans selection:bg-green-100 selection:text-slate-900">
