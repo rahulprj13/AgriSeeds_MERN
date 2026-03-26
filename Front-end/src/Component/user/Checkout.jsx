@@ -97,7 +97,7 @@ const Checkout = () => {
     if (confirmRemoval) {
       if (isBuyNow) {
         toast.info("Buy Now cancelled");
-        navigate(-1); // Vapas bhej dega
+        navigate(-1); 
       } else {
         removeFromCart(itemId);
         toast.success("Item removed from checkout");
