@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import img from "../../assets/Images/background.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSeedling } from "@fortawesome/free-solid-svg-icons";
@@ -17,8 +17,21 @@ const AdminLogin = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm();
+
+  // Load remembered credentials on mount (Implemented by AI Agent)
+  useEffect(() => {
+    const rememberedEmail = localStorage.getItem("adminRememberedEmail");
+    const rememberedPassword = localStorage.getItem("adminRememberedPassword");
+
+    if (rememberedEmail && rememberedPassword) {
+      setValue("email", rememberedEmail);
+      setValue("password", rememberedPassword);
+      setValue("rememberMe", true);
+    }
+  }, [setValue]);
 
   const validationRules = {
     email: {
@@ -39,6 +52,15 @@ const AdminLogin = () => {
       if (res?.user?.role !== "admin") {
         toast.error("Only admin users can log in here.");
         return;
+      }
+
+      // Remember Me functionality - Accepted (Implemented by AI Agent)
+      if (data.rememberMe) {
+        localStorage.setItem("adminRememberedEmail", data.email);
+        localStorage.setItem("adminRememberedPassword", data.password);
+      } else {
+        localStorage.removeItem("adminRememberedEmail");
+        localStorage.removeItem("adminRememberedPassword");
       }
 
       toast.success("Admin login successful");
@@ -123,6 +145,18 @@ const AdminLogin = () => {
                 {errors.password.message}
               </p>
             )}
+          </div>
+
+          <div className="mb-4 flex items-center">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              {...register("rememberMe")}
+              className="accent-green-500 w-4 h-4 mr-2 cursor-pointer"
+            />
+            <label htmlFor="rememberMe" className="text-sm cursor-pointer">
+              Remember me
+            </label>
           </div>
 
           <button

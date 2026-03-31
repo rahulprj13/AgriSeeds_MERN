@@ -37,6 +37,23 @@ exports.createOrderFromCart = async (req, res) => {
       return res.status(400).json({ message: "Cart is empty" });
     }
 
+    // --- Inventory Check (Implemented by AI Agent) ---
+    const productIds = cartItems.map(item => item.productId);
+    const products = await Product.find({ _id: { $in: productIds } });
+
+    for (const item of cartItems) {
+      const product = products.find(p => p._id.toString() === item.productId.toString());
+      if (!product) {
+        return res.status(404).json({ message: `Product not found: ${item.name}` });
+      }
+      if (product.stock < item.quantity) {
+        return res.status(400).json({ 
+          message: `Insufficient stock for ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}` 
+        });
+      }
+    }
+    // -----------------------
+
     const itemsWithPrice = cartItems.map((item) => {
       const price = item.currentPrice ?? item.price;
       return {
@@ -83,11 +100,19 @@ exports.createOrderFromCart = async (req, res) => {
       )
     );
 
+    // --- Deduct Stock (Implemented by AI Agent) ---
+    await Promise.all(
+      cartItems.map(item => 
+        Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } })
+      )
+    );
+    // --------------------
+
     // Clear cart after order
     await Cart.deleteMany({ userId });
 
     return res.status(201).json({
-      message: "Order created",
+      message: "Order created and inventory updated",
       order,
       items: orderItems,
     });
@@ -264,6 +289,15 @@ exports.cancelOrderByUser = async (req, res) => {
     });
     await order.save();
 
+    // --- Restore Inventory (Implemented by AI Agent) ---
+    const orderItems = await OrderItem.find({ orderId: order._id });
+    await Promise.all(
+      orderItems.map(item => 
+        Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } })
+      )
+    );
+    // -------------------------
+
     const updatedOrder = await Order.findById(order._id)
       .populate("addressId")
       .populate("userId", "firstname lastname email mobile");
@@ -312,6 +346,14 @@ exports.createBuyNowOrder = async (req, res) => {
     const product = await Product.findById(productId);
     if (!product) return res.status(404).json({ message: "Product not found" });
 
+    // --- Inventory Check (Implemented by AI Agent) ---
+    if (product.stock < qty) {
+      return res.status(400).json({ 
+        message: `Insufficient stock for ${product.name}. Available: ${product.stock}, Requested: ${qty}` 
+      });
+    }
+    // -----------------------
+
     const cartItem = await Cart.findOne({ userId, productId });
     if (!cartItem) {
       return res.status(400).json({ message: "Product not found in cart" });
@@ -351,6 +393,10 @@ exports.createBuyNowOrder = async (req, res) => {
       totalPrice,
     });
 
+    // --- Deduct Stock (Implemented by AI Agent) ---
+    await Product.findByIdAndUpdate(productId, { $inc: { stock: -qty } });
+    // --------------------
+
     // Update cart: decrement only this product
     if (cartItem.quantity > qty) {
       cartItem.quantity -= qty;
@@ -367,7 +413,7 @@ exports.createBuyNowOrder = async (req, res) => {
     ];
 
     return res.status(201).json({
-      message: "Buy Now order created",
+      message: "Buy Now order created and inventory updated",
       order,
       items: populatedItems,
     });

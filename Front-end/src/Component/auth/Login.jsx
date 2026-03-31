@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import img from "../../assets/Images/background.jpg";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
@@ -19,8 +19,21 @@ const Login = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm();
+
+  // Load remembered credentials on mount (Implemented by AI Agent)
+  useEffect(() => {
+    const rememberedEmail = localStorage.getItem("rememberedEmail");
+    const rememberedPassword = localStorage.getItem("rememberedPassword");
+
+    if (rememberedEmail && rememberedPassword) {
+      setValue("email", rememberedEmail);
+      setValue("password", rememberedPassword);
+      setValue("rememberMe", true);
+    }
+  }, [setValue]);
 
   const validationRules = {
     email: {
@@ -47,12 +60,21 @@ const Login = () => {
 
       const res = await login(data);
 
-      
+
       // Check account status
       if (res?.user?.status === "active") {
-        
-      // Store token and role in localStorage
-      
+
+        // Remember Me functionality - Accepted (Implemented by AI Agent)
+        if (data.rememberMe) {
+          localStorage.setItem("rememberedEmail", data.email);
+          localStorage.setItem("rememberedPassword", data.password);
+        } else {
+          localStorage.removeItem("rememberedEmail");
+          localStorage.removeItem("rememberedPassword");
+        }
+
+        // Store token and role in localStorage
+
         localStorage.setItem("token", res.token);
         localStorage.setItem("role", res.user.role);
 
@@ -206,8 +228,12 @@ const Login = () => {
 
             <div className="flex justify-between text-sm">
 
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="accent-green-500" />
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  {...register("rememberMe")}
+                  className="accent-green-500 w-4 h-4" 
+                />
                 Remember me
               </label>
 

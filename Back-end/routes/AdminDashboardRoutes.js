@@ -160,9 +160,21 @@ router.put(
         return res.status(404).json({ message: "Order not found" });
       }
 
+      const oldStatus = order.orderStatus;
       if (orderStatus) order.orderStatus = orderStatus;
       if (paymentStatus) order.paymentStatus = paymentStatus;
       await order.save();
+
+      // --- Restore Inventory if cancelled by admin (Implemented by AI Agent) ---
+      if (orderStatus === "cancelled" && oldStatus !== "cancelled") {
+        const orderItems = await OrderItem.find({ orderId: order._id });
+        await Promise.all(
+          orderItems.map(item => 
+            Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } })
+          )
+        );
+      }
+      // -----------------------------------------------
 
       const updatedOrder = await Order.findById(order._id)
         .populate("addressId")
