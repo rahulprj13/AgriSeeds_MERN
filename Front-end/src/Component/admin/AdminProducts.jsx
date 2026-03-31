@@ -17,7 +17,7 @@ import { useRef } from "react";
 
 const emptyProduct = {
   name: "",
-  description: "",
+  description: "• ",
   price: "",
   currentPrice: "",
   weight: "",
@@ -34,13 +34,14 @@ const AdminProducts = () => {
   const { token } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [form, setForm] = useState(emptyProduct, { description: "• " });
+  const [form, setForm] = useState(emptyProduct);
   const [errors, setErrors] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 20;
@@ -117,7 +118,13 @@ const AdminProducts = () => {
   };
 
   const handleFileChange = (e) => {
-    setForm((prev) => ({ ...prev, imagePath: e.target.files[0] }));
+    const file = e.target.files[0];
+    setForm((prev) => ({ ...prev, imagePath: file }));
+    if (file) {
+      setImagePreview(URL.createObjectURL(file));
+    } else {
+      setImagePreview(null);
+    }
   };
 
   const resetForm = () => {
@@ -125,6 +132,7 @@ const AdminProducts = () => {
     setErrors({});
     setEditingId(null);
     setShowForm(false);
+    setImagePreview(null);
   };
 
   const handleSubmit = async (e) => {
@@ -182,7 +190,9 @@ const AdminProducts = () => {
 
     setForm({
       name: p.name,
-      description: p.description,
+      description: Array.isArray(p.description) 
+        ? p.description.map(s => "• " + s).join("\n") 
+        : p.description,
       price: p.price.toString(),
       currentPrice: p.currentPrice ? p.currentPrice.toString() : "",
       weight: p.weight ? p.weight.toString() : "",
@@ -195,6 +205,7 @@ const AdminProducts = () => {
 
     setErrors({});
     setShowForm(true);
+    setImagePreview(null);
   };
 
   const executeDelete = async (id) => {
@@ -503,8 +514,19 @@ const AdminProducts = () => {
                   onChange={handleFileChange}
                   className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-green-50 file:text-green-700 font-bold"
                 />
-                {form.imagePath && !(form.imagePath instanceof File) && (
-                  <div className="mt-2">
+                {imagePreview ? (
+                  <div className="mt-2 animate-in fade-in duration-300">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                      Image Preview:
+                    </p>
+                    <img
+                      src={imagePreview}
+                      className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"
+                      alt="New product preview"
+                    />
+                  </div>
+                ) : form.imagePath && !(form.imagePath instanceof File) && (
+                  <div className="mt-2 animate-in fade-in duration-300">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
                       Current Image:
                     </p>

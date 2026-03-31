@@ -349,10 +349,24 @@ const ProductDetails = () => {
                 {product.name}
               </h1>
 
-              <p className="mt-5 text-slate-600 text-base md:text-lg leading-relaxed max-w-2xl">
-                {product.description ||
-                  "Handpicked premium selection ensuring maximum freshness and superior quality for your daily needs."}
-              </p>
+              <div className="mt-6 space-y-4">
+                {Array.isArray(product.description) && product.description.length > 0 ? (
+                  <ul className="space-y-3">
+                    {product.description.map((point, index) => (
+                      <li key={index} className="flex items-start gap-3 text-slate-600 text-base md:text-lg leading-relaxed">
+                        <div className="mt-2 h-2 w-2 shrink-0 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]" />
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-slate-600 text-base md:text-lg leading-relaxed max-w-2xl italic">
+                    {typeof product.description === "string" && product.description
+                      ? product.description
+                      : "Handpicked premium selection ensuring maximum freshness and superior quality for your daily needs."}
+                  </p>
+                )}
+              </div>
 
               <div className="mt-8 inline-flex flex-wrap items-center gap-5 rounded-[1.8rem] bg-gradient-to-r from-slate-50 to-green-50 p-5 md:p-6 border border-slate-100 shadow-sm">
                 <div>

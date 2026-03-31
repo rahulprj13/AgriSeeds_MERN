@@ -12,9 +12,14 @@ exports.createProduct = async (req, res) => {
       imagePath = cloudinaryResponse.secure_url;
     }
 
+    // Format description: split by newline and remove existing bullets
+    const descriptionArray = req.body.description
+      ? req.body.description.split("\n").map(s => s.trim().replace(/^•\s*/, "")).filter(s => s)
+      : [];
+
     const product = new Product({
       name: req.body.name,
-      description: req.body.description,
+      description: descriptionArray,
       price: req.body.price,
       currentPrice: req.body.currentPrice,
       weight: req.body.weight,
@@ -97,7 +102,14 @@ exports.updateProduct = async (req, res) => {
     }
 
     product.name = req.body.name;
-    product.description = req.body.description;
+    
+    // Format description: split by newline and remove existing bullets
+    if (req.body.description !== undefined) {
+      product.description = req.body.description
+        ? req.body.description.split("\n").map(s => s.trim().replace(/^•\s*/, "")).filter(s => s)
+        : [];
+    }
+
     product.price = req.body.price;
     product.currentPrice = req.body.currentPrice;
     product.weight = req.body.weight;
