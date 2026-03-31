@@ -6,8 +6,11 @@ const uploadToCloudinary = require("../utils/cloudinaryUtils");
 
 exports.createProduct = async (req, res) => {
   try {
-
-    const conrdinaryResponse = await uploadToCloudinary(req.file.path)
+    // Updated by Antigravity - 2026-03-31: Added check for req.file to prevent crash
+    if (req.file) {
+      const cloudinaryResponse = await uploadToCloudinary(req.file.path);
+      imagePath = cloudinaryResponse.secure_url;
+    }
 
     const product = new Product({
       name: req.body.name,
@@ -19,20 +22,19 @@ exports.createProduct = async (req, res) => {
       categoryId: req.body.categoryId,
       stock: req.body.stock,
       status: req.body.status,
-      imagePath: conrdinaryResponse.secure_url
-      // image: req.file ? req.file.filename : ""
+      imagePath: imagePath
     });
 
-    
     await product.save();
-
     res.json(product);
 
   } catch (error) {
-
-    console.log(error);
-    res.status(500).json({ message: "Server error" });
-
+    // Updated by Antigravity - 2026-03-31: Improved error logging
+    console.error("Error in createProduct:", error);
+    res.status(500).json({ 
+      message: "Server error", 
+      error: error.message 
+    });
   }
 };
 
@@ -48,11 +50,11 @@ exports.getProducts = async (req, res) => {
     res.json(products);
 
   } catch (error) {
-
-    console.log(error);
-
+    // Updated by Antigravity - 2026-03-31: Improved error logging
+    console.error("Error in getProducts:", error);
     res.status(500).json({
-      message: "Server error"
+      message: "Server error",
+      error: error.message
     });
   }
 };
@@ -74,9 +76,11 @@ exports.getSingleProduct = async (req, res) => {
     res.json(product);
 
   } catch (error) {
-
+    // Updated by Antigravity - 2026-03-31: Improved error logging
+    console.error("Error in getSingleProduct:", error);
     res.status(500).json({
-      message: "Server error"
+      message: "Server error",
+      error: error.message
     });
   }
 };
@@ -103,6 +107,7 @@ exports.updateProduct = async (req, res) => {
     product.status = req.body.status;
 
     // IMAGE UPDATE
+    // Updated by Antigravity - 2026-03-31: Added signature to existing image check
     if (req.file) {
       const cloudinaryResponse = await uploadToCloudinary(req.file.path);
       product.imagePath = cloudinaryResponse.secure_url;
@@ -113,10 +118,12 @@ exports.updateProduct = async (req, res) => {
     res.json(product);
 
   } catch (error) {
-
-    console.log(error);
-    res.status(500).json({ message: "Server error" });
-
+    // Updated by Antigravity - 2026-03-31: Improved error logging
+    console.error("Error in updateProduct:", error);
+    res.status(500).json({ 
+      message: "Server error",
+      error: error.message
+    });
   }
 };
 
@@ -131,9 +138,11 @@ exports.deleteProduct = async (req, res) => {
     });
 
   } catch (error) {
-
+    // Updated by Antigravity - 2026-03-31: Improved error logging
+    console.error("Error in deleteProduct:", error);
     res.status(500).json({
-      message: "Server error"
+      message: "Server error",
+      error: error.message
     });
   }
 };
