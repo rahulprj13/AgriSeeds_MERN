@@ -15,6 +15,8 @@ const crypto = require("crypto");     // Node.js built-in - used to verify the H
 // --- Mongoose Models used in this file ---
 const Order = require("../models/OrderModel");     // Used to update paymentStatus after successful payment
 const Payment = require("../models/PaymentModel"); // Used to save and retrieve payment records in DB
+const OrderItem = require("../models/OrderItemModel"); // Used for stock rollback on failed payment
+const Product = require("../models/ProductModel");   // Used for stock rollback on failed payment
 
 // =============================================================================
 // RAZORPAY INSTANCE SETUP
@@ -236,10 +238,33 @@ exports.handlePaymentFailure = async (req, res) => {
       paymentStatus: "failed", // Payment failed
     });
 
+    // Update order status so failed payments don't remain as processing orders
+    const order = await Order.findOne({ _id: orderId, userId });
+    if (order) {
+      order.paymentStatus = "failed";
+      order.orderStatus = "cancelled";
+      order.trackingHistory = order.trackingHistory || [];
+      order.trackingHistory.push({
+        status: "cancelled",
+        location: "",
+        note: "Payment failed, order cancelled",
+      });
+      await order.save();
+
+      // Restore stock for items in this failed order
+      const orderItems = await OrderItem.find({ orderId: order._id });
+      await Promise.all(
+        orderItems.map(item =>
+          Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } })
+        )
+      );
+    }
+
     return res.status(200).json({
       message: "Payment failure recorded",
       error:   error_description || "Payment failed",
       payment,
+      order,
     });
 
   } catch (error) {

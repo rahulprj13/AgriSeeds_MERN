@@ -92,46 +92,69 @@ exports.adminUpdateUser = async (req, res) => {
   }
 };
 
-// LOGIN
+// ─────────────────────────────────────────────
+// LOGIN — Used in: Login.jsx → AuthContext → POST /api/users/login
+// ─────────────────────────────────────────────
 exports.loginUser = async (req, res) => {
 
   try {
 
+    // Step 1: Extract email and password from the request body
+    // (sent from Login.jsx via axios POST request)
     const { email, password } = req.body
 
+    // Step 2: Search the database for a user with the given email
+    // Using MongoDB's findOne via Mongoose User model
     const user = await User.findOne({ email })
 
-    // Check if user is inactive
-    if (user.status === 'inactive') {
-      return res.status(403).json({ message: "Your account is inactive. Please contact support." })
-    }
-    // Check if user is blocked
-    if (user.status === 'blocked') {
-      return res.status(403).json({ message: "Your account is blocked. Please contact support." })
-    }
-
+    // Step 3: If no user found with this email, return 400 error
+    // This check MUST come BEFORE accessing user.status
+    // (previously this was placed after status checks, causing a crash → "Server error")
     if (!user) {
       return res.status(400).json({ message: "Invalid Email" })
     }
 
+    // Step 4:Check if the user's account is inactive
+    // Admin can set user status to "inactive" from the admin panel (AdminUsers.jsx)
+    if (user.status === 'inactive') {
+      return res.status(403).json({ message: "Your account is inactive. Please contact support." })
+    }
+
+    // Step 5: Check if the user's account is blocked
+    // Admin can block users from the admin panel (AdminUsers.jsx)
+    if (user.status === 'blocked') {
+      return res.status(403).json({ message: "Your account is blocked. Please contact support." })
+    }
+
+    // Step 6: Compare the entered password with the hashed password stored in DB
+    // bcrypt.compare() returns true if they match, false otherwise
+    // Used here to avoid showing "Server error" when password is wrong
     const isMatch = await bcrypt.compare(password, user.password)
 
     if (!isMatch) {
+      // Password does not match — show proper toast in Login.jsx
       return res.status(400).json({ message: "Invalid Password" })
     }
 
+    // Step 7: Generate a JWT token with user id and role
+    // Token is stored in localStorage in Login.jsx and used for protected routes
     const token = jwt.sign(
       { id: user._id, role: user.role },
       "secretkey",
-      { expiresIn: "1d" }
+      { expiresIn: "1d" } // Token expires in 1 day
     )
 
+    // Step 8: Build the profile image URL
+    // If image is already a full URL (Cloudinary), use it directly
+    // Otherwise, prefix with local server URL
     const profileImage = user.profileImage
       ? user.profileImage.startsWith("http")
         ? user.profileImage
         : `http://localhost:5000/uploads/${user.profileImage}`
       : null;
 
+    // Step 9: Send success response with token and user data
+    // Login.jsx reads res.user.status and res.user.role to decide navigation
     res.status(200).json({
       message: "Login successful",
       token,
@@ -140,14 +163,15 @@ exports.loginUser = async (req, res) => {
         firstname: user.firstname,
         lastname: user.lastname,
         email: user.email,
-        role: user.role,
-        status: user.status,
+        role: user.role,       // Used in Login.jsx to navigate: admin → /admin, user → /
+        status: user.status,   // Used in Login.jsx to check active/inactive/blocked
         profileImage,
       }
     })
 
   }
   catch (err) {
+    // Catch any unexpected server errors (e.g., DB connection issues)
     res.status(500).json({ message: "Server error" })
   }
 

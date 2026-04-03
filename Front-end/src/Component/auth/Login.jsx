@@ -64,7 +64,7 @@ const Login = () => {
       // Check account status
       if (res?.user?.status === "active") {
 
-        // Remember Me functionality - Accepted (Implemented by AI Agent)
+        // Remember Me functionality - Accepted
         if (data.rememberMe) {
           localStorage.setItem("rememberedEmail", data.email);
           localStorage.setItem("rememberedPassword", data.password);

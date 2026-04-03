@@ -38,8 +38,7 @@ const API_URL = "http://localhost:5000";
 // Test keys start with: rzp_test_
 // Live keys start with: rzp_live_
 // WARNING: KEY_SECRET must NEVER be placed here - backend only!
-// ============================================================================
-const RAZORPAY_KEY_ID = "rzp_test_REPLACE_WITH_YOUR_KEY_ID";
+const RAZORPAY_KEY_ID = "rzp_test_SYtp8i7wvk235k";
 
 // Address form validation rules (used by react-hook-form)
 // Each rule is applied to its corresponding input field in the form
