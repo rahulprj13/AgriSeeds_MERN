@@ -9,12 +9,19 @@ const secret = "secret"
 
 // admincrate user
 exports.adminCreateUser = async (req, res) => {
+  console.log(req.body);
   try {
     const { firstname, lastname, mobile, email, password, role, status } = req.body;
 
     const userExists = await User.findOne({ email });
+    const mobileExists = await User.findOne({ mobile });
+
     if (userExists) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: "Email already exists" });
+    }
+    if (mobileExists) {
+      return res.status(400).json({ message: "Mobile already exists" });
+      
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -28,10 +35,11 @@ exports.adminCreateUser = async (req, res) => {
       role,
       status,
     });
-
+    console.log(user)
+    console.log("hashed Password : ",hashedPassword)
     res.status(201).json({ user });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({message: err});
   }
 };
 
