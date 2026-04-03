@@ -5,6 +5,13 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>seeds_selling</title>
+    <!--
+      Razorpay Payment Gateway SDK
+      REQUIRED for: window.Razorpay() in Checkout.jsx -> openRazorpayPopup()
+      This loads the Razorpay payment modal popup globally
+      Without this script, the payment popup will NOT open and you'll get "window.Razorpay is not a function"
+    -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   </head>
   <body>
     <div id="root"></div>
