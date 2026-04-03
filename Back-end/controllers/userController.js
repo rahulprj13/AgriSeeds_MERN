@@ -294,6 +294,8 @@ exports.getProfile = async (req, res) => {
 //     res.status(500).json({ message: "Server error" });
 //   }
 // };
+
+
 exports.registerUser = async (req, res) => {
   try {
     const { firstname, lastname, mobile, email, password, otp } = req.body;
@@ -361,7 +363,7 @@ exports.registerUser = async (req, res) => {
     // OTP delete after successful registration
     await Otp.deleteMany({ email });
 
-    // welcome mail fail ho to registration fail mat karo
+    // send mail when user register successfully...
     try {
       await mailSend(
         user.email,
