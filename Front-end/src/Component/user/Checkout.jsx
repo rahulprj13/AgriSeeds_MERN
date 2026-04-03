@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -49,11 +49,71 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
 
   // --- Buy Now Local State ---
+  //   const isBuyNow = location.state?.isBuyNow;
+  //   const buyNowProduct = location.state?.buyNowProduct;
+  //   const [buyNowQty, setBuyNowQty] = useState(1);
+
+
+  //   useEffect(() => {
+  //   if (isBuyNow) {
+  //     setBuyNowQty(1);
+  //   }
+  // }, [isBuyNow]);
+
+  //   // In buy-now mode, max quantity should come from cart (so backend decrement won't fail)
+  //   // const buyNowCartItem = isBuyNow && buyNowProduct
+  //   //   ? cart.find((ci) => {
+  //   //     const pid = ci.productId?._id || ci.productId;
+  //   //     return String(pid) === String(buyNowProduct._id);
+  //   //   })
+  //   //   : null;
+
+  //   // // Buy Now order will decrement quantity only from the cart item,
+  //   // // so frontend should not allow qty > cart item's qty.
+  //   // const buyNowMaxQty = isBuyNow ? Number(buyNowCartItem?.quantity ?? 1) : null;
+
+  //   const buyNowCartItem = isBuyNow && buyNowProduct
+  //   ? cart.find((ci) => {
+  //       const pid = ci.productId?._id || ci.productId;
+  //       return String(pid) === String(buyNowProduct._id);
+  //     })
+  //   : null;
+
+  // // Buy Now quantity should follow product stock, not cart quantity
+  // const buyNowMaxQty = isBuyNow
+  //   ? Number(buyNowProduct?.stock ?? buyNowCartItem?.stock ?? 0)
+  //   : null;
+
+  //   // Items Memoization
+  //   const items = useMemo(() => {
+  //     if (isBuyNow && buyNowProduct) {
+  //       return [{ ...buyNowProduct, quantity: buyNowQty }];
+  //     }
+  //     return cart || [];
+  //   }, [cart, isBuyNow, buyNowProduct, buyNowQty]);
+
+  //   // Final Total Calculation
+  //   const finalTotalPrice = useMemo(() => {
+  //     if (isBuyNow && buyNowProduct) {
+  //       return Number(buyNowProduct.currentPrice || buyNowProduct.price) * buyNowQty;
+  //     }
+  //     return cartTotal;
+  //   }, [cartTotal, isBuyNow, buyNowProduct, buyNowQty]);
+
+
+  // --- Buy Now Local State ---
   const isBuyNow = location.state?.isBuyNow;
   const buyNowProduct = location.state?.buyNowProduct;
   const [buyNowQty, setBuyNowQty] = useState(1);
 
-  // In buy-now mode, max quantity should come from cart (so backend decrement won't fail)
+  useEffect(() => {
+    if (isBuyNow) {
+      setBuyNowQty(1);
+    }
+  }, [isBuyNow]);
+
+  
+  //   // In buy-now mode, max quantity should come from cart (so backend decrement won't fail)
   const buyNowCartItem = isBuyNow && buyNowProduct
     ? cart.find((ci) => {
       const pid = ci.productId?._id || ci.productId;
@@ -61,11 +121,13 @@ const Checkout = () => {
     })
     : null;
 
-  // Buy Now order will decrement quantity only from the cart item,
-  // so frontend should not allow qty > cart item's qty.
-  const buyNowMaxQty = isBuyNow ? Number(buyNowCartItem?.quantity ?? 1) : null;
+  // // Buy Now quantity should follow product stock, not cart quantity
 
-  // Items Memoization
+  const buyNowMaxQty = isBuyNow
+    ? Number(buyNowProduct?.stock ?? buyNowCartItem?.stock ?? 0)
+    : null;
+
+  //   // Items Memoization
   const items = useMemo(() => {
     if (isBuyNow && buyNowProduct) {
       return [{ ...buyNowProduct, quantity: buyNowQty }];
@@ -73,13 +135,14 @@ const Checkout = () => {
     return cart || [];
   }, [cart, isBuyNow, buyNowProduct, buyNowQty]);
 
-  // Final Total Calculation
+  //   // Final Total Calculation
   const finalTotalPrice = useMemo(() => {
     if (isBuyNow && buyNowProduct) {
       return Number(buyNowProduct.currentPrice || buyNowProduct.price) * buyNowQty;
     }
     return cartTotal;
   }, [cartTotal, isBuyNow, buyNowProduct, buyNowQty]);
+
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     mode: "onTouched",
@@ -97,7 +160,7 @@ const Checkout = () => {
     if (confirmRemoval) {
       if (isBuyNow) {
         toast.info("Buy Now cancelled");
-        navigate(-1); 
+        navigate(-1);
       } else {
         removeFromCart(itemId);
         toast.success("Item removed from checkout");
@@ -171,12 +234,21 @@ const Checkout = () => {
               ) : (
                 <div className="space-y-4">
                   {items.map((item) => {
-                    const currentStock = Number(item.stock ?? 10);
-                    const isOutOfStock = currentStock <= 0 || (item.status && item.status !== "active");
+                    // const currentStock = Number(item.stock ?? 10);
+                    // const isOutOfStock = currentStock <= 0 || (item.status && item.status !== "active");
+                    // const canIncrement = isBuyNow
+                    //   ? buyNowMaxQty != null
+                    //     ? item.quantity < buyNowMaxQty
+                    //     : item.quantity < currentStock
+                    //   : !isOutOfStock && item.quantity < currentStock;
+
+                    const currentStock = Number(item.stock ?? 0);
+                    const isOutOfStock =currentStock <= 0 || (item.status && item.status !== "active");
+
+                    const displayQty = isBuyNow ? buyNowQty : item.quantity;
+
                     const canIncrement = isBuyNow
-                      ? buyNowMaxQty != null
-                        ? item.quantity < buyNowMaxQty
-                        : item.quantity < currentStock
+                      ? !isOutOfStock && displayQty < buyNowMaxQty
                       : !isOutOfStock && item.quantity < currentStock;
 
                     const itemImage = item.imagePath
@@ -191,7 +263,7 @@ const Checkout = () => {
                         <div className="flex items-center gap-4 w-full sm:w-auto">
                           {/* Image with Link */}
                           <div
-                             onClick={() => navigate(`/category/${item.productId?.categoryId.name}/${item.productId.name}/${item.productId?._id}`)}
+                            onClick={() => navigate(`/category/${item.productId?.categoryId.name}/${item.productId.name}/${item.productId?._id}`)}
                             className="w-20 h-20 rounded-xl bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer hover:border-indigo-500 transition-all group"
                           >
                             <img
@@ -219,34 +291,44 @@ const Checkout = () => {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        {/* <div className="flex items-center gap-3">
                           <div className="flex items-center justify-center bg-slate-50 rounded-xl p-1 border border-slate-100">
                             <button
                               type="button"
                               onClick={() => {
                                 if (isBuyNow) {
-                                  setBuyNowQty(prev => Math.max(1, prev - 1));
+                                  setBuyNowQty((prev) => Math.max(1, prev - 1));
                                 } else {
                                   decrementQuantity(item._id, item.quantity);
                                 }
                               }}
                               className="p-2 hover:bg-white hover:text-red-500 rounded-lg transition-all"
-                              disabled={isOutOfStock || item.quantity <= 1}
+                              disabled={isBuyNow ? buyNowQty <= 1 : isOutOfStock || item.quantity <= 1}
                             >
                               <Minus size={16} strokeWidth={3} />
                             </button>
-                            <span className="w-10 text-center font-black text-slate-800">{item.quantity}</span>
+
+                            <span className="w-10 text-center font-black text-slate-800">
+                              {isBuyNow ? buyNowQty : item.quantity}
+                            </span>
+
                             <button
                               type="button"
                               onClick={() => {
                                 if (isBuyNow) {
-                                  setBuyNowQty(prev => (prev < (buyNowMaxQty ?? currentStock) ? prev + 1 : prev));
+                                  setBuyNowQty((prev) =>
+                                    prev < (buyNowMaxQty ?? currentStock) ? prev + 1 : prev
+                                  );
                                 } else {
                                   canIncrement && incrementQuantity(item._id, item.quantity);
                                 }
                               }}
                               className="p-2 hover:bg-white hover:text-green-600 rounded-lg transition-all disabled:opacity-30"
-                              disabled={!canIncrement}
+                              disabled={
+                                isBuyNow
+                                  ? buyNowQty >= (buyNowMaxQty ?? currentStock)
+                                  : !canIncrement
+                              }
                             >
                               <Plus size={16} strokeWidth={3} />
                             </button>
@@ -254,7 +336,7 @@ const Checkout = () => {
 
                           <div className="text-right min-w-20">
                             <p className="font-black text-slate-900">
-                              ₹{(item.currentPrice ?? item.price) * item.quantity}
+                              ₹{(item.currentPrice ?? item.price) * (isBuyNow ? buyNowQty : item.quantity)}
                             </p>
                             <p className="text-xs text-slate-500 font-bold">
                               ₹{item.currentPrice ?? item.price} / unit
@@ -264,7 +346,63 @@ const Checkout = () => {
                           <button
                             type="button"
                             onClick={() => handleRemoveItem(item._id)}
-                            className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                            className="p-3 text-red-600 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                            title="Remove item"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div> */}
+
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center justify-center bg-slate-50 rounded-xl p-1 border border-slate-100">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (isBuyNow) {
+                                  setBuyNowQty((prev) => Math.max(1, prev - 1));
+                                } else {
+                                  decrementQuantity(item._id, item.quantity);
+                                }
+                              }}
+                              className="p-2 hover:bg-white hover:text-red-500 rounded-lg transition-all"
+                              disabled={isBuyNow ? buyNowQty <= 1 : isOutOfStock || item.quantity <= 1}
+                            >
+                              <Minus size={16} strokeWidth={3} />
+                            </button>
+
+                            <span className="w-10 text-center font-black text-slate-800">
+                              {isBuyNow ? buyNowQty : item.quantity}
+                            </span>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (isBuyNow) {
+                                  setBuyNowQty((prev) => (prev < buyNowMaxQty ? prev + 1 : prev));
+                                } else {
+                                  canIncrement && incrementQuantity(item._id, item.quantity);
+                                }
+                              }}
+                              className="p-2 hover:bg-white hover:text-green-600 rounded-lg transition-all disabled:opacity-30"
+                              disabled={isBuyNow ? buyNowQty >= buyNowMaxQty : !canIncrement}
+                            >
+                              <Plus size={16} strokeWidth={3} />
+                            </button>
+                          </div>
+
+                          <div className="text-right min-w-20">
+                            <p className="font-black text-slate-900">
+                              ₹{(item.currentPrice ?? item.price) * (isBuyNow ? buyNowQty : item.quantity)}
+                            </p>
+                            <p className="text-xs text-slate-500 font-bold">
+                              ₹{item.currentPrice ?? item.price} / unit
+                            </p>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveItem(item._id)}
+                            className="p-3 text-red-600 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                             title="Remove item"
                           >
                             <Trash2 size={18} />

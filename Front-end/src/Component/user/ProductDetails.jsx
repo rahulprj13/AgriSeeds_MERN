@@ -308,11 +308,10 @@ const ProductDetails = () => {
                 type="button"
                 onClick={handleWishlistToggle}
                 disabled={wishlistLoading}
-                className={`absolute top-6 right-6 z-20 h-12 w-12 rounded-full border shadow-lg backdrop-blur-md flex items-center justify-center transition-all duration-300 ${
-                  isWishlisted
+                className={`absolute top-6 right-6 z-20 h-12 w-12 rounded-full border shadow-lg backdrop-blur-md flex items-center justify-center transition-all duration-300 ${isWishlisted
                     ? "bg-red-50 border-red-200 text-red-500"
                     : "bg-white/90 border-slate-200 text-slate-600 hover:bg-white hover:text-red-500"
-                } disabled:opacity-60`}
+                  } disabled:opacity-60`}
               >
                 <Heart
                   size={20}
@@ -419,7 +418,7 @@ const ProductDetails = () => {
                       {cartItem.quantity}
                     </div>
                     <button
-                      onClick={() => incrementQuantity(cartItem._id, cartItem.quantity)}
+                      onClick={() => incrementQuantity(cartItem._id, cartItem.quantity )}
                       className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 font-bold shadow-sm"
                     >
                       +
@@ -441,7 +440,7 @@ const ProductDetails = () => {
                   </button>
                 )}
 
-                <button
+                {/* <button
                   onClick={async () => {
                     if (!user) {
                       toast.info("Please login first");
@@ -457,6 +456,41 @@ const ProductDetails = () => {
 
                       navigate("/checkout", {
                         state: { isBuyNow: true, buyNowProduct: product },
+                      });
+                    } catch (e) {
+                      toast.error(e?.response?.data?.message || e?.message || "Buy Now failed");
+                    }
+                  }}
+                  className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white min-h-[58px] rounded-[1.25rem] font-black text-base md:text-lg flex items-center justify-center gap-3 hover:opacity-95 transition-all shadow-lg active:scale-[0.98]"
+                >
+                  <Zap size={20} fill="currentColor" />
+                  Buy Now
+                </button> */}
+
+
+
+                <button
+                  onClick={async () => {
+                    if (!user) {
+                      toast.info("Please login first");
+                      navigate("/login", { replace: true, state: { from: location.pathname } });
+                      return;
+                    }
+
+                    try {
+                      if (!cartItem) {
+                        await addToCart(product);
+                        toast.success("Added to cart");
+                      }
+
+                      navigate("/checkout", {
+                        state: {
+                          isBuyNow: true,
+                          buyNowProduct: {
+                            ...product,
+                            quantity: 1,
+                          },
+                        },
                       });
                     } catch (e) {
                       toast.error(e?.response?.data?.message || e?.message || "Buy Now failed");
@@ -627,11 +661,10 @@ const ProductDetails = () => {
                   type="button"
                   onClick={handleSaveReview}
                   disabled={!isReviewValid}
-                  className={`w-full px-6 py-3.5 rounded-2xl font-bold transition ${
-                    isReviewValid
+                  className={`w-full px-6 py-3.5 rounded-2xl font-bold transition ${isReviewValid
                       ? "bg-slate-900 text-white hover:bg-green-600"
                       : "bg-slate-200 text-slate-500 cursor-not-allowed"
-                  }`}
+                    }`}
                 >
                   {myReview ? "Save changes" : "Submit review"}
                 </button>
