@@ -12,18 +12,26 @@ const paymentSchema = new mongoose.Schema({
     ref: "users"
   },
 
-  productId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "products"
-  },
-
   paymentMethod: {
     type: String,
-    enum: ["UPI", "Card", "NetBanking", "COD"]
+    enum: ["razorpay", "cod"]
   },
 
   transactionId: {
     type: String
+  },
+
+  razorpayOrderId: {
+    type: String
+  },
+
+  razorpayPaymentId: {
+    type: String
+  },
+
+  currency: {
+    type: String,
+    default: "INR"
   },
 
   amount: {
@@ -32,7 +40,8 @@ const paymentSchema = new mongoose.Schema({
 
   paymentStatus: {
     type: String,
-    enum: ["pending", "success", "failed"]
+    enum: ["pending", "success", "failed"],
+    default: "pending"
   }
 
 }, { timestamps: true });

@@ -43,17 +43,6 @@ const AdminOrders = () => {
     }
   };
 
-  const updatePaymentStatus = async (orderId, newStatus) => {
-    try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(`${API_URL}/api/admin/orders/${orderId}`, { paymentStatus: newStatus }, config);
-      toast.success("Payment status updated");
-      fetchOrders(); // Refresh list
-    } catch (e) {
-      toast.error(e?.response?.data?.message || "Failed to update status");
-    }
-  };
-
   const getOrderStatusStyle = (status) => {
     switch (status?.toLowerCase()) {
       case "delivered": return "bg-green-100 text-green-700 border-green-200";
@@ -121,15 +110,9 @@ const AdminOrders = () => {
                       </select>
                     </td>
                     <td className="px-6 py-4">
-                      <select
-                        value={order.paymentStatus || 'pending'}
-                        onChange={(e) => updatePaymentStatus(order._id, e.target.value)}
-                        className={`px-3 py-1 text-xs font-medium rounded-full ${getPaymentStatusStyle(order.paymentStatus)}`}
-                      >
-                        <option value="pending">Pending</option>
-                        <option value="paid">Paid</option>
-                        <option value="failed">Failed</option>
-                      </select>
+                      <span className={`px-3 py-1 text-xs font-medium rounded-full inline-block ${getPaymentStatusStyle(order.paymentStatus)}`}>
+                        {(order.paymentStatus || 'pending').charAt(0).toUpperCase() + (order.paymentStatus || 'pending').slice(1)}
+                      </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-500">
                       {new Date(order.createdAt).toLocaleDateString()}

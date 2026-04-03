@@ -168,34 +168,101 @@ const Checkout = () => {
     }
   };
 
+  const [paymentMethod, setPaymentMethod] = useState("razorpay");
+
+  const loadRazorpayScript = () =>
+    new Promise((resolve) => {
+      if (document.getElementById("razorpay-script")) {
+        return resolve(true);
+      }
+      const script = document.createElement("script");
+      script.id = "razorpay-script";
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+
+  const handlePaymentSuccess = async (response, orderId) => {
+    const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+    try {
+      const res = await axios.post(
+        `${API_URL}/api/payment/verify`,
+        {
+          razorpayPaymentId: response.razorpay_payment_id,
+          razorpayOrderId: response.razorpay_order_id,
+          razorpaySignature: response.razorpay_signature,
+          orderId,
+        },
+        { headers }
+      );
+
+      toast.success("Payment verified successfully");
+      if (typeof reloadCart === "function") await reloadCart();
+      navigate(`/payment-success/${orderId}`);
+      return res.data;
+    } catch (err) {
+      throw new Error(err?.response?.data?.message || "Payment verification failed");
+    }
+  };
+
   const onSubmit = async (formData) => {
     try {
       setLoading(true);
       const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
 
-      if (isBuyNow) {
-        const res = await axios.post(
-          `${API_URL}/api/orders/buy-now`,
-          {
-            address: formData,
-            productId: buyNowProduct?._id,
-            quantity: buyNowQty,
-          },
-          { headers }
-        );
+      const payload = {
+        address: formData,
+        paymentMethod,
+        isBuyNow,
+        productId: buyNowProduct?._id,
+        quantity: buyNowQty,
+      };
 
-        toast.success("Order placed successfully");
+      const { data } = await axios.post(`${API_URL}/api/payment/create-order`, payload, { headers });
+
+      if (data.type === "cod") {
+        toast.success("Order placed successfully (COD)");
         if (typeof reloadCart === "function") await reloadCart();
-        navigate(`/orders/${res.data.order._id}`);
-      } else {
-        const payload = { address: formData };
-        const res = await axios.post(`${API_URL}/api/user/orders`, payload, { headers });
-        toast.success("Order placed successfully");
-        if (typeof reloadCart === "function") await reloadCart();
-        navigate(`/orders/${res.data.order._id}`);
+        navigate(`/orders/${data.orderId}`);
+        return;
       }
+
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        throw new Error("Razorpay SDK failed to load");
+      }
+
+      const { razorpayOrderId, amount, currency, key, orderId } = data;
+      const options = {
+        key,
+        amount: Math.round(amount * 100),
+        currency,
+        name: "Seeds Shop",
+        description: "Complete your purchase",
+        order_id: razorpayOrderId,
+        handler: async function (response) {
+          try {
+            await handlePaymentSuccess(response, orderId);
+          } catch (error) {
+            toast.error(error.message);
+          }
+        },
+        prefill: {
+          name: user?.firstname || user?.name || "",
+          email: user?.email || "",
+          contact: formData?.phone || "",
+        },
+        theme: { color: "#4f46e5" },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", function (resp) {
+        toast.error(resp.error?.description || "Payment failed");
+      });
+      rzp.open();
     } catch (e) {
-      toast.error(e?.response?.data?.message || "Order failed");
+      toast.error(e?.response?.data?.message || e.message || "Order failed");
     } finally {
       setLoading(false);
     }
@@ -477,6 +544,17 @@ const Checkout = () => {
                 <div className="flex justify-between text-slate-600 font-medium">
                   <span>Delivery Charge</span>
                   <span className="text-green-600 font-black">Free</span>
+                </div>
+                <div className="mt-4">
+                  <label className="text-sm font-black text-slate-700 mb-2 block">Payment Method</label>
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white"
+                  >
+                    <option value="razorpay">Razorpay</option>
+                    <option value="cod">Cash on Delivery (COD)</option>
+                  </select>
                 </div>
                 <div className="pt-3 border-t border-slate-100 flex justify-between text-slate-900">
                   <span className="font-black text-lg">Total</span>

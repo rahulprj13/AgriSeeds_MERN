@@ -17,6 +17,7 @@ import ProductDetails from "../Component/user/ProductDetails";
 import Search from "../Component/user/Search";
 import Cart from "../Component/user/Cart";
 import Checkout from "../Component/user/Checkout";
+import PaymentSuccess from "../Component/user/PaymentSuccess";
 import Orders from "../Component/user/Orders";
 import OrderDetails from "../Component/user/OrderDetails";
 import Wishlist from "../Component/user/Wishlist";
@@ -85,6 +86,7 @@ const router = createBrowserRouter([
       { path: "category/:type/:item/:id", element: <ProductDetails /> },
       { path: "cart", element: <Cart /> },
       { path: "checkout", element: <Checkout /> },
+      { path: "payment-success/:orderId", element: <PaymentSuccess /> },
       { path: "orders", element: <Orders /> },
       { path: "orders/:id", element: <OrderDetails /> },
       { path: "wishlist", element: <Wishlist /> },

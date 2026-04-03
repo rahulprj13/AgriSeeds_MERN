@@ -54,20 +54,6 @@ const AdminOrderItem = () => {
     }
   };
 
-  const updatePaymentStatus = async (newStatus) => {
-    try {
-      setUpdating(true);
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(`${API_URL}/api/admin/orders/${id}`, { paymentStatus: newStatus }, config);
-      setOrder(prev => ({ ...prev, paymentStatus: newStatus }));
-      toast.success("Payment status updated");
-    } catch (e) {
-      toast.error(e?.response?.data?.message || "Failed to update status");
-    } finally {
-      setUpdating(false);
-    }
-  };
-
   const getOrderStatusStyle = (status) => {
     switch (status?.toLowerCase()) {
       case "delivered": return "bg-green-100 text-green-700 border-green-200";
@@ -134,16 +120,9 @@ const AdminOrderItem = () => {
               <CheckCircle className="w-5 h-5" />
               Payment Status
             </h3>
-            <select
-              value={order.paymentStatus || 'pending'}
-              onChange={(e) => updatePaymentStatus(e.target.value)}
-              disabled={updating}
-              className={`w-full px-4 py-2 text-sm font-medium rounded-xl ${getPaymentStatusStyle(order.paymentStatus)} focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-            >
-              <option value="pending">Pending</option>
-              <option value="paid">Paid</option>
-              <option value="failed">Failed</option>
-            </select>
+            <div className={`px-4 py-2 text-sm font-medium rounded-xl inline-block ${getPaymentStatusStyle(order.paymentStatus)}`}>
+              {(order.paymentStatus || 'pending').charAt(0).toUpperCase() + (order.paymentStatus || 'pending').slice(1)}
+            </div>
           </div>
         </div>
 

@@ -153,7 +153,7 @@ router.put(
   async (req, res) => {
     try {
       const { id } = req.params;
-      const { orderStatus, paymentStatus } = req.body;
+      const { orderStatus } = req.body;
 
       const order = await Order.findById(id);
       if (!order) {
@@ -161,7 +161,6 @@ router.put(
       }
 
       if (orderStatus) order.orderStatus = orderStatus;
-      if (paymentStatus) order.paymentStatus = paymentStatus;
       await order.save();
 
       const updatedOrder = await Order.findById(order._id)
