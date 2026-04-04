@@ -5,6 +5,7 @@ const Category = require("../models/CategoryModel.js");
 const Cart = require("../models/CartModel.js");
 const Order = require("../models/OrderModel.js");
 const OrderItem = require("../models/OrderItemModel.js");
+const Payments = require("../models/PaymentModel.js")
 const { getOrderDetails } = require("../controllers/orderController");
 const authMiddleware = require("../middleware/authmiddleware.js");
 const adminMiddleware = require("../middleware/adminMiddleware.js");
@@ -18,22 +19,54 @@ router.get(
   adminMiddleware,
   async (req, res) => {
     try {
-      const [totalUsers, totalProducts, totalCategories, totalCartItems, totalOrders] =
-        await Promise.all([
-          User.countDocuments(),
-          Product.countDocuments(),
-          Category.countDocuments(),
-          Cart.countDocuments(),
-          Order.countDocuments(),
+      const monthStart = new Date();
+      monthStart.setDate(1);
+      monthStart.setHours(0, 0, 0, 0);
 
-        ]);
+      const [
+        totalUsers,
+        totalProducts,
+        totalCategories,
+        totalCartItems,
+        totalOrders,
+        totalPayments,
+        totalPaidPayments,
+        revenueResult,
+        monthlyRevenueResult,
+        monthlyPaymentsCount,
+      ] = await Promise.all([
+        User.countDocuments(),
+        Product.countDocuments(),
+        Category.countDocuments(),
+        Cart.countDocuments(),
+        Order.countDocuments(),
+        Payments.countDocuments(),
+        Payments.countDocuments({ paymentStatus: "success" }),
+        Payments.aggregate([
+          { $match: { paymentStatus: "success", amount: { $ne: null } } },
+          { $group: { _id: null, total: { $sum: "$amount" } } },
+        ]),
+        Payments.aggregate([
+          { $match: { paymentStatus: "success", createdAt: { $gte: monthStart }, amount: { $ne: null } } },
+          { $group: { _id: null, total: { $sum: "$amount" } } },
+        ]),
+        Payments.countDocuments({ paymentStatus: "success", createdAt: { $gte: monthStart } }),
+      ]);
+
+      const totalRevenue = revenueResult?.[0]?.total ?? 0;
+      const monthlyRevenue = monthlyRevenueResult?.[0]?.total ?? 0;
 
       res.json({
         totalUsers,
         totalProducts,
         totalCategories,
         totalCartItems,
-        totalOrders
+        totalOrders,
+        totalPayments,
+        totalPaidPayments,
+        totalRevenue,
+        monthlyRevenue,
+        monthlyPaymentsCount,
       });
     } catch (err) {
       res.status(500).json({ message: "Server error" });
@@ -181,6 +214,24 @@ router.put(
       res.json({ message: "Order updated", order: updatedOrder, items });
     } catch (err) {
       res.status(500).json({ message: "Error updating order" });
+    }
+  }
+);
+
+// Admin: Get all payments
+router.get(
+  "/api/admin/payments",
+  authMiddleware,
+  adminMiddleware,
+  async (req, res) => {
+    try {
+      const payments = await Payments.find()
+        .populate("userId", "firstname lastname email")
+        .sort({ createdAt: -1 });
+
+      res.json({ data: payments });
+    } catch (err) {
+      res.status(500).json({ message: "Error fetching payments" });
     }
   }
 );

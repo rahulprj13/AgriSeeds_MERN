@@ -31,6 +31,7 @@ import AdminUsers from "../Component/admin/AdminUsers";
 import AdminCategories from "../Component/admin/AdminCategories";
 import AdminProducts from "../Component/admin/AdminProducts";
 import AdminLogin from "../Component/admin/AdminLogin";
+import AdminPayment from "../Component/admin/AdminPayment";
 
 import { AuthContext } from "../Component/context/AuthContext";
 import { ForgotPassword } from "../Component/auth/ForgotPassword";
@@ -118,6 +119,7 @@ const router = createBrowserRouter([
       { path: "products", element: <AdminProducts /> },
       { path: "orders", element: <AdminOrders /> },
       { path: "orders/:id", element: <AdminOrderItem /> },
+      { path: "payments", element: <AdminPayment /> },
     ],
   },
 

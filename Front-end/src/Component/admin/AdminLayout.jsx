@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { Sprout, LogOut, LayoutDashboard, FolderTree, Package, Bell, Menu, X, MapPin, ChevronRight, UserCog, Users, ShoppingCart } from "lucide-react";
+import { Sprout, LogOut, LayoutDashboard, FolderTree, Package, Bell, Menu, X, MapPin, ChevronRight, UserCog, Users, ShoppingCart, CreditCard } from "lucide-react";
 import { useLocation, NavLink, Outlet, useNavigate } from "react-router-dom";
 
 const AdminLayout = () => {
@@ -15,6 +15,7 @@ const AdminLayout = () => {
     { path: "/admin/categories", label: "Category", icon: <FolderTree size={18} /> },
     { path: "/admin/products", label: "Product", icon: <Package size={18} /> },
     { path: "/admin/orders", label: "Orders", icon: <ShoppingCart size={18} /> },
+    { path: "/admin/payments", label: "Payments", icon: <CreditCard size={18} /> },
   ];
 
   const activeItem = menuItems.find(item => item.path === location.pathname);

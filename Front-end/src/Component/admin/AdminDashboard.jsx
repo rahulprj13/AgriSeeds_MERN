@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Added for navigation
-import { Users, Box, Layers, ShoppingCart, ShoppingBag } from "lucide-react";
+import {
+  Users,
+  Box,
+  Layers,
+  ShoppingCart,
+  ShoppingBag,
+  CreditCard,
+  TrendingUp,
+  CalendarDays,
+  DollarSign,
+} from "lucide-react";
 
 const AdminDashboard = () => {
   const navigate = useNavigate(); // Initialize navigate
@@ -29,49 +39,93 @@ const AdminDashboard = () => {
 
   const { stats, loading } = data;
 
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(amount ?? 0);
+
+  const formatNumber = (value) => value ?? 0;
+
   if (loading) return <div className="p-10 text-center text-gray-400 font-bold">Loading Stats...</div>;
 
   return (
     <div className="bg-[#F8F9FD] min-h-screen p-6 font-sans">
       
       {/* --- TOP STATS CARDS WITH NAVIGATION --- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
 
         <StatCard 
           icon={<Users className="w-6 h-6 text-white" />} 
           label="Total Users" 
-          value={stats.totalUsers ?? 0} 
+          value={formatNumber(stats.totalUsers)} 
           color="bg-pink-400" 
           onClick={() => navigate("/admin/users")} // Link added
         />
         <StatCard 
           icon={<Box className="w-6 h-6 text-white" />} 
           label="Total Products" 
-          value={stats.totalProducts ?? 0} 
+          value={formatNumber(stats.totalProducts)} 
           color="bg-cyan-400" 
           onClick={() => navigate("/admin/products")} // Link added
         />
         <StatCard 
           icon={<Layers className="w-6 h-6 text-white" />} 
           label="Total Categories" 
-          value={stats.totalCategories ?? 0} 
+          value={formatNumber(stats.totalCategories)} 
           color="bg-indigo-500" 
           onClick={() => navigate("/admin/categories")} // Link added
         />
         <StatCard 
           icon={<ShoppingCart className="w-6 h-6 text-white" />} 
-          label="Total Cart-Items" 
-          value={stats.totalCartItems ?? 0} 
+          label="Total Cart Items" 
+          value={formatNumber(stats.totalCartItems)} 
           color="bg-amber-500" 
           onClick={() => navigate("/admin/carts")} // Link added
         />
         <StatCard 
           icon={<ShoppingBag className="w-6 h-6 text-white" />} 
           label="Total Orders" 
-          value={stats.totalOrders ?? 0} 
+          value={formatNumber(stats.totalOrders)} 
           color="bg-emerald-500" 
           onClick={() => navigate("/admin/orders")} // Link added
         />
+        <StatCard 
+          icon={<ShoppingBag className="w-6 h-6 text-white" />} 
+          label="Total Payments" 
+          value={formatNumber(stats.totalPayments)} 
+          color="bg-amber-500" 
+          onClick={() => navigate("/admin/payments")} // Link added
+        />
+        <StatCard 
+          icon={<DollarSign className="w-6 h-6 text-white" />} 
+          label="Total Revenue" 
+          value={formatCurrency(stats.totalRevenue)} 
+          color="bg-violet-500" 
+          onClick={() => navigate("/admin/payments")} 
+        />
+        <StatCard 
+          icon={<CalendarDays className="w-6 h-6 text-white" />} 
+          label="This Month Collection" 
+          value={formatCurrency(stats.monthlyRevenue)} 
+          color="bg-sky-500" 
+          onClick={() => navigate("/admin/payments")} 
+        />
+        <StatCard 
+          icon={<CreditCard className="w-6 h-6 text-white" />} 
+          label="Paid Payments" 
+          value={formatNumber(stats.totalPaidPayments)} 
+          color="bg-emerald-500" 
+          onClick={() => navigate("/admin/payments")} 
+        />
+        {/* <StatCard 
+          icon={<TrendingUp className="w-6 h-6 text-white" />} 
+          label="Payments This Month" 
+          value={formatNumber(stats.monthlyPaymentsCount)} 
+          color="bg-fuchsia-500" 
+          onClick={() => navigate("/admin/payments")} 
+        /> */}
       </div>
     </div>
   );

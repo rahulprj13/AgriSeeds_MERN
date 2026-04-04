@@ -6,6 +6,7 @@ import {
   Eye,
   Package,
   Search,
+  ShoppingCart,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -169,7 +170,7 @@ const AdminOrders = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
         <div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-            <Package className="text-blue-600" /> ORDERS
+            <ShoppingCart className="text-green-600" /> ORDERS
           </h2>
           <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">
             Order Management System
