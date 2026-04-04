@@ -207,7 +207,7 @@ const AdminDashboard = () => {
 
               <div className="h-3 w-full overflow-hidden rounded-full bg-slate-200">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-sky-500 to-blue-600 transition-all duration-500"
+                  className="h-full rounded-full bg-linear-to-r from-sky-500 to-blue-600 transition-all duration-500"
                   style={{ width: `${monthlyRevenuePercentage}%` }}
                 />
               </div>
@@ -273,7 +273,7 @@ const AdminDashboard = () => {
 
               <div className="h-3 w-full overflow-hidden rounded-full bg-slate-200">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-green-600 transition-all duration-500"
+                  className="h-full rounded-full bg-linear-to-r from-emerald-500 to-green-600 transition-all duration-500"
                   style={{ width: `${paidPaymentPercentage}%` }}
                 />
               </div>
@@ -368,7 +368,7 @@ const MiniInfoCard = ({ icon, title, value, bg }) => (
 const FeatureCard = ({ icon, title, value, description, gradient, onClick }) => (
   <div
     onClick={onClick}
-    className={`cursor-pointer overflow-hidden rounded-3xl bg-gradient-to-br ${gradient} p-6 text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl active:scale-[0.98]`}
+    className={`cursor-pointer overflow-hidden rounded-3xl bg-linear-to-br ${gradient} p-6 text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl active:scale-[0.98]`}
   >
     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
       {icon}
