@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/AuthContext";
-import { ArrowLeft, Package, ChevronRight, Clock, Truck, MapPin, CheckCircle, AlertCircle } from "lucide-react";
+import { ArrowLeft, Package, ChevronRight, Clock, Truck, MapPin, CheckCircle, AlertCircle, ShoppingBag } from "lucide-react";
 
 const API_URL = "http://localhost:5000";
 
@@ -75,6 +75,27 @@ const Orders = () => {
     }
   };
 
+//  Empty Order UI
+  if (orders.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-slate-50 px-4">
+        <div className="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-100 text-center max-w-md">
+          <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <ShoppingBag className="text-slate-300" size={40} />
+          </div>
+          <h1 className="text-2xl font-black text-slate-800 mb-2">Your order is empty</h1>
+          <p className="text-slate-400 font-medium mb-8">Looks like you haven't placed any orders yet.</p>
+          <button 
+            onClick={() => navigate("/")} 
+            className="w-full bg-green-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-green-700 transition-all active:scale-95 shadow-xl shadow-green-100"
+          >
+            Start Shopping
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!isLoggedIn) return null;
 
   return (
@@ -92,7 +113,7 @@ const Orders = () => {
           <div>
             <h1 className="text-2xl font-black text-slate-900">My Orders</h1>
             <p className="text-sm text-slate-500 font-medium">Manage and track your recent purchases</p>
-          </div>
+            </div>
         </div>
 
         {loading ? (
