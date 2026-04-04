@@ -309,8 +309,8 @@ const ProductDetails = () => {
                 onClick={handleWishlistToggle}
                 disabled={wishlistLoading}
                 className={`absolute top-6 right-6 z-20 h-12 w-12 rounded-full border shadow-lg backdrop-blur-md flex items-center justify-center transition-all duration-300 ${isWishlisted
-                    ? "bg-red-50 border-red-200 text-red-500"
-                    : "bg-white/90 border-slate-200 text-slate-600 hover:bg-white hover:text-red-500"
+                  ? "bg-red-50 border-red-200 text-red-500"
+                  : "bg-white/90 border-slate-200 text-slate-600 hover:bg-white hover:text-red-500"
                   } disabled:opacity-60`}
               >
                 <Heart
@@ -348,10 +348,31 @@ const ProductDetails = () => {
                 {product.name}
               </h1>
 
-              <p className="mt-5 text-slate-600 text-base md:text-lg leading-relaxed max-w-2xl">
-                {product.description ||
-                  "Handpicked premium selection ensuring maximum freshness and superior quality for your daily needs."}
-              </p>
+              <div className="mt-5 max-w-2xl">
+                {product.description ? (
+                  <ul className="space-y-3">
+                    {product.description
+                      .split("\n")
+                      .filter((line) => line.trim() !== "")
+                      .map((line, index) => {
+                        const cleanLine = line.replace(/^•\s*/, "").trim();
+                        return (
+                          <li
+                            key={index}
+                            className="flex items-start gap-3 text-slate-600 text-base md:text-lg leading-relaxed"
+                          >
+                            <span className="mt-2 h-2.5 w-2.5 rounded-full bg-green-500 shrink-0"></span>
+                            <span>{cleanLine}</span>
+                          </li>
+                        );
+                      })}
+                  </ul>
+                ) : (
+                  <p className="text-slate-600 text-base md:text-lg leading-relaxed">
+                    Handpicked premium selection ensuring maximum freshness and superior quality for your daily needs.
+                  </p>
+                )}
+              </div>
 
               <div className="mt-8 inline-flex flex-wrap items-center gap-5 rounded-[1.8rem] bg-gradient-to-r from-slate-50 to-green-50 p-5 md:p-6 border border-slate-100 shadow-sm">
                 <div>
@@ -418,7 +439,7 @@ const ProductDetails = () => {
                       {cartItem.quantity}
                     </div>
                     <button
-                      onClick={() => incrementQuantity(cartItem._id, cartItem.quantity )}
+                      onClick={() => incrementQuantity(cartItem._id, cartItem.quantity)}
                       className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 font-bold shadow-sm"
                     >
                       +
@@ -662,8 +683,8 @@ const ProductDetails = () => {
                   onClick={handleSaveReview}
                   disabled={!isReviewValid}
                   className={`w-full px-6 py-3.5 rounded-2xl font-bold transition ${isReviewValid
-                      ? "bg-slate-900 text-white hover:bg-green-600"
-                      : "bg-slate-200 text-slate-500 cursor-not-allowed"
+                    ? "bg-slate-900 text-white hover:bg-green-600"
+                    : "bg-slate-200 text-slate-500 cursor-not-allowed"
                     }`}
                 >
                   {myReview ? "Save changes" : "Submit review"}
