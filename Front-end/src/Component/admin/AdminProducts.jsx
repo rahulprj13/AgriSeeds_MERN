@@ -322,10 +322,19 @@ const AdminProducts = () => {
           </p>
         </div>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => {
+            if (showForm) {
+              resetForm();
+            } else {
+              setEditingId(null);
+              setErrors({});
+              setForm({ ...emptyProduct, description: "• " });
+              setShowForm(true);
+            }
+          }}
           className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-lg ${showForm
-            ? "bg-slate-100 text-slate-600"
-            : "bg-green-600 text-white hover:bg-green-700 shadow-green-200"
+              ? "bg-slate-100 text-slate-600"
+              : "bg-green-600 text-white hover:bg-green-700 shadow-green-200"
             }`}
         >
           {showForm ? <X size={18} /> : <Plus size={18} />}
@@ -566,7 +575,7 @@ const AdminProducts = () => {
                 }}
                 rows={3}
                 maxLength={1000}
-                className={`w-full min-h-[120px] max-h-[300px] overflow-y-auto bg-slate-50 border ${errors.description ? "border-red-500" : "border-slate-200"
+                className={`w-full min-h-30 max-h-75 overflow-y-auto bg-slate-50 border ${errors.description ? "border-red-500" : "border-slate-200"
                   } rounded-xl px-4 py-3 text-sm outline-none font-medium resize-none`}
                 placeholder="Enter product details..."
               />
@@ -597,231 +606,233 @@ const AdminProducts = () => {
         </section>
       )}
 
-      <div className="space-y-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1 group">
-            <Search
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-green-500 transition-colors"
-              size={20}
-            />
-            <input
-              type="text"
-              placeholder="Search by name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-4 py-4 text-sm font-bold shadow-sm outline-none focus:ring-2 focus:ring-green-500/10"
-            />
+      {!showForm && (
+        <div className="space-y-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1 group">
+              <Search
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-green-500 transition-colors"
+                size={20}
+              />
+              <input
+                type="text"
+                placeholder="Search by name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-4 py-4 text-sm font-bold shadow-sm outline-none focus:ring-2 focus:ring-green-500/10"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-2xl px-4 py-2 shadow-sm shrink-0">
+              <Filter size={18} className="text-slate-400" />
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="bg-transparent text-sm font-black text-slate-600 outline-none"
+              >
+                <option value="">All Categories</option>
+                {categories.map((c) => (
+                  <option key={c._id} value={c._id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-2xl px-4 py-2 shadow-sm shrink-0">
-            <Filter size={18} className="text-slate-400" />
-            <select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="bg-transparent text-sm font-black text-slate-600 outline-none"
-            >
-              <option value="">All Categories</option>
-              {categories.map((c) => (
-                <option key={c._id} value={c._id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-slate-50/50 border-b border-slate-100">
+                <tr>
+                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
+                    Sr. No.
+                  </th>
+                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Image
+                  </th>
+                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Product Info
+                  </th>
+                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Category
+                  </th>
+                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
+                    Actual Price
+                  </th>
+                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
+                    Current Price
+                  </th>
+                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
+                    Unit
+                  </th>
+                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
+                    Weight
+                  </th>
+                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
+                    Stock
+                  </th>
+                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
 
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-slate-50/50 border-b border-slate-100">
-              <tr>
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
-                  Sr. No.
-                </th>
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  Image
-                </th>
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  Product Info
-                </th>
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  Category
-                </th>
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
-                  Actual Price
-                </th>
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
-                  Current Price
-                </th>
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
-                  Unit
-                </th>
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
-                  Weight
-                </th>
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
-                  Stock
-                </th>
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            <tbody className="divide-y divide-slate-50">
-              {currentProducts.map((p, index) => {
-                let imgSrc = "https://placehold.co/100x100?text=No+Img";
-                if (p.imagePath) {
-                  if (typeof p.imagePath === "string" && p.imagePath.startsWith("http")) {
-                    imgSrc = p.imagePath;
-                  } else if (
-                    typeof p.imagePath === "string" &&
-                    p.imagePath.startsWith("/")
-                  ) {
-                    imgSrc = `${API_URL}${p.imagePath}`;
-                  } else if (typeof p.imagePath === "string") {
-                    imgSrc = `${API_URL}/uploads/${p.imagePath}`;
+              <tbody className="divide-y divide-slate-50">
+                {currentProducts.map((p, index) => {
+                  let imgSrc = "https://placehold.co/100x100?text=No+Img";
+                  if (p.imagePath) {
+                    if (typeof p.imagePath === "string" && p.imagePath.startsWith("http")) {
+                      imgSrc = p.imagePath;
+                    } else if (
+                      typeof p.imagePath === "string" &&
+                      p.imagePath.startsWith("/")
+                    ) {
+                      imgSrc = `${API_URL}${p.imagePath}`;
+                    } else if (typeof p.imagePath === "string") {
+                      imgSrc = `${API_URL}/uploads/${p.imagePath}`;
+                    }
                   }
-                }
 
-                return (
-                  <tr key={p._id} className="hover:bg-slate-50/80 transition-all group">
-                    <td className="px-6 py-4 text-center font-black text-slate-600">
-                      {startIndex + index + 1}
-                    </td>
+                  return (
+                    <tr key={p._id} className="hover:bg-slate-50/80 transition-all group">
+                      <td className="px-6 py-4 text-center font-black text-slate-600">
+                        {startIndex + index + 1}
+                      </td>
 
-                    <td className="px-6 py-4">
-                      <img
-                        src={imgSrc}
-                        className="w-12 h-12 rounded-xl object-cover border border-slate-200 shadow-sm"
-                        alt=""
-                        onError={(e) =>
-                          (e.target.src = "https://placehold.co/100x100?text=No+Img")
-                        }
-                      />
-                    </td>
+                      <td className="px-6 py-4">
+                        <img
+                          src={imgSrc}
+                          className="w-12 h-12 rounded-xl object-cover border border-slate-200 shadow-sm"
+                          alt=""
+                          onError={(e) =>
+                            (e.target.src = "https://placehold.co/100x100?text=No+Img")
+                          }
+                        />
+                      </td>
 
-                    <td className="px-6 py-4">
-                      <p className="text-sm font-black text-slate-800">{p.name}</p>
-                      <p
-                        className={`text-[9px] font-black uppercase mt-1 ${p.status === "active" ? "text-green-500" : "text-red-400"
-                          }`}
-                      >
-                        {p.status}
-                      </p>
-                    </td>
-
-                    <td className="px-6 py-4">
-                      <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-md">
-                        {p.categoryId?.name || "None"}
-                      </span>
-                    </td>
-
-                    <td className="px-6 py-4 text-center font-black text-slate-800">
-                      ₹{p.price}
-                    </td>
-
-                    <td className="px-6 py-4 text-center font-black text-slate-800">
-                      ₹{p.currentPrice}
-                    </td>
-
-                    <td className="px-6 py-4 text-center">
-                      <span className="text-sm font-black text-slate-600">{p.unit}</span>
-                    </td>
-
-                    <td className="px-6 py-4 text-center">
-                      <span className="text-sm font-black text-slate-600">{p.weight}</span>
-                    </td>
-
-                    <td className="px-6 py-4 text-center">
-                      <span
-                        className={`text-sm font-black ${p.stock < 10 ? "text-red-500" : "text-slate-600"
-                          }`}
-                      >
-                        {p.stock}
-                      </span>
-                    </td>
-
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => handleEdit(p)}
-                          className="p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                      <td className="px-6 py-4">
+                        <p className="text-sm font-black text-slate-800">{p.name}</p>
+                        <p
+                          className={`text-[9px] font-black uppercase mt-1 ${p.status === "active" ? "text-green-500" : "text-red-400"
+                            }`}
                         >
-                          <Pencil size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(p._id, p.name)}
-                          className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                          {p.status}
+                        </p>
+                      </td>
 
-          {filteredProducts.length === 0 && (
-            <div className="p-20 text-center text-slate-300 font-bold uppercase tracking-widest text-xs">
-              No products found
+                      <td className="px-6 py-4">
+                        <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-md">
+                          {p.categoryId?.name || "None"}
+                        </span>
+                      </td>
+
+                      <td className="px-6 py-4 text-center font-black text-slate-800">
+                        ₹{p.price}
+                      </td>
+
+                      <td className="px-6 py-4 text-center font-black text-slate-800">
+                        ₹{p.currentPrice}
+                      </td>
+
+                      <td className="px-6 py-4 text-center">
+                        <span className="text-sm font-black text-slate-600">{p.unit}</span>
+                      </td>
+
+                      <td className="px-6 py-4 text-center">
+                        <span className="text-sm font-black text-slate-600">{p.weight}</span>
+                      </td>
+
+                      <td className="px-6 py-4 text-center">
+                        <span
+                          className={`text-sm font-black ${p.stock < 10 ? "text-red-500" : "text-slate-600"
+                            }`}
+                        >
+                          {p.stock}
+                        </span>
+                      </td>
+
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => handleEdit(p)}
+                            className="p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                          >
+                            <Pencil size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(p._id, p.name)}
+                            className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+
+            {filteredProducts.length === 0 && (
+              <div className="p-20 text-center text-slate-300 font-bold uppercase tracking-widest text-xs">
+                No products found
+              </div>
+            )}
+          </div>
+
+          {filteredProducts.length > 0 && (
+            <div className="mt-5 flex flex-col items-center justify-between gap-3 rounded-2xl bg-white px-4 py-4 shadow-sm md:flex-row">
+              <p className="text-sm font-medium text-gray-500">
+                Showing <span className="font-bold text-gray-700">{startIndex + 1}</span> to{" "}
+                <span className="font-bold text-gray-700">
+                  {Math.min(endIndex, filteredProducts.length)}
+                </span>{" "}
+                of <span className="font-bold text-gray-700">{filteredProducts.length}</span> products
+              </p>
+
+              <div className="flex items-center gap-2 flex-wrap justify-center">
+                <button
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Prev
+                </button>
+
+                {paginationPages.map((page, index) =>
+                  page === "..." ? (
+                    <span
+                      key={`dots-${index}`}
+                      className="px-2 text-sm font-bold text-gray-400"
+                    >
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      key={page}
+                      onClick={() => goToPage(page)}
+                      className={`h-10 min-w-10 rounded-xl px-3 text-sm font-bold transition ${currentPage === page
+                          ? "bg-green-600 text-white shadow-sm"
+                          : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                        }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
+
+                <button
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </div>
-
-        {filteredProducts.length > 0 && (
-          <div className="mt-5 flex flex-col items-center justify-between gap-3 rounded-2xl bg-white px-4 py-4 shadow-sm md:flex-row">
-            <p className="text-sm font-medium text-gray-500">
-              Showing <span className="font-bold text-gray-700">{startIndex + 1}</span> to{" "}
-              <span className="font-bold text-gray-700">
-                {Math.min(endIndex, filteredProducts.length)}
-              </span>{" "}
-              of <span className="font-bold text-gray-700">{filteredProducts.length}</span> products
-            </p>
-
-            <div className="flex items-center gap-2 flex-wrap justify-center">
-              <button
-                onClick={() => goToPage(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Prev
-              </button>
-
-              {paginationPages.map((page, index) =>
-                page === "..." ? (
-                  <span
-                    key={`dots-${index}`}
-                    className="px-2 text-sm font-bold text-gray-400"
-                  >
-                    ...
-                  </span>
-                ) : (
-                  <button
-                    key={page}
-                    onClick={() => goToPage(page)}
-                    className={`h-10 min-w-10 rounded-xl px-3 text-sm font-bold transition ${currentPage === page
-                      ? "bg-green-600 text-white shadow-sm"
-                      : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
-                      }`}
-                  >
-                    {page}
-                  </button>
-                )
-              )}
-
-              <button
-                onClick={() => goToPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };
