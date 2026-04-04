@@ -30,6 +30,7 @@ router.get(
         totalCartItems,
         totalOrders,
         totalPayments,
+        totalPendingPayments,
         totalPaidPayments,
         revenueResult,
         monthlyRevenueResult,
@@ -41,16 +42,36 @@ router.get(
         Cart.countDocuments(),
         Order.countDocuments(),
         Payments.countDocuments(),
+
+        // pending payments count
+        Payments.countDocuments({ paymentStatus: "pending" }),
+
+        // paid/success payments count
         Payments.countDocuments({ paymentStatus: "success" }),
+
+        // total revenue from success payments
         Payments.aggregate([
           { $match: { paymentStatus: "success", amount: { $ne: null } } },
           { $group: { _id: null, total: { $sum: "$amount" } } },
         ]),
+
+        // monthly revenue from success payments
         Payments.aggregate([
-          { $match: { paymentStatus: "success", createdAt: { $gte: monthStart }, amount: { $ne: null } } },
+          {
+            $match: {
+              paymentStatus: "success",
+              createdAt: { $gte: monthStart },
+              amount: { $ne: null },
+            },
+          },
           { $group: { _id: null, total: { $sum: "$amount" } } },
         ]),
-        Payments.countDocuments({ paymentStatus: "success", createdAt: { $gte: monthStart } }),
+
+        // this month paid payments count
+        Payments.countDocuments({
+          paymentStatus: "success",
+          createdAt: { $gte: monthStart },
+        }),
       ]);
 
       const totalRevenue = revenueResult?.[0]?.total ?? 0;
@@ -63,12 +84,14 @@ router.get(
         totalCartItems,
         totalOrders,
         totalPayments,
+        totalPendingPayments,
         totalPaidPayments,
         totalRevenue,
         monthlyRevenue,
         monthlyPaymentsCount,
       });
     } catch (err) {
+      console.error("ADMIN_STATS_ERROR:", err);
       res.status(500).json({ message: "Server error" });
     }
   }
