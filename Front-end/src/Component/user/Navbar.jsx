@@ -6,6 +6,7 @@ import { faCartShopping, faSearch, faUser, faBars, faXmark, faHeart } from '@for
 import { CategoryContext } from '../context/CategoryContext'
 import { AuthContext } from '../context/AuthContext'
 import { CartContext } from '../context/CartContext'
+import { Sprout } from 'lucide-react';
 
 export const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false)
@@ -116,10 +117,19 @@ export const Navbar = () => {
 
                     {/* TOP SECTION: Logo + Cart + Hamburger (Visible on Mobile) */}
                     <div className="flex items-center justify-between w-full lg:w-auto gap-4">
-                        <Link to="/home" onClick={closeAll} className="text-white text-2xl font-semibold shrink-0">
-                            SeedStore
-                        </Link>
+                        <Link
+                            to="/home"
+                            onClick={closeAll}
+                            className="flex items-center gap-3 shrink-0 cursor-pointer"
+                        >
+                            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-green-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/20">
+                                <Sprout size={22} strokeWidth={2.5} className="text-white" />
+                            </div>
 
+                            <h1 className="text-xl md:text-2xl font-black tracking-tight uppercase text-white leading-none">
+                                Seed<span className="text-green-500">Store</span>
+                            </h1>
+                        </Link>
                         <div className="flex items-center gap-4 lg:hidden">
                             <NavLink to="/cart" className="relative text-gray-300 hover:text-white">
                                 <FontAwesomeIcon icon={faCartShopping} />
