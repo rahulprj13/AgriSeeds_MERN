@@ -150,37 +150,39 @@ const AdminPayment = () => {
           />
         </div>
 
-        <div className="overflow-hidden rounded-2xl bg-white shadow-md">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden overflow-x-auto">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    Sr. No.
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    Payment ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    User
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    Amount
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    Method
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    Transaction ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    Date
-                  </th>
-                </tr>
-              </thead>
+              
+              <thead className="bg-slate-50/50 border-b border-slate-100">
+              <tr>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
+                  Sr. No.
+                </th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  Payment ID
+                </th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  User
+                </th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
+                  Amount
+                </th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
+                  Method
+                </th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
+                  Transaction ID
+                </th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
+                  Status
+                </th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
+                  Date
+                </th>
+                
+              </tr>
+            </thead>
 
               <tbody className="divide-y divide-gray-200 bg-white">
                 {currentPayments.map((payment, index) => (
@@ -191,12 +193,17 @@ const AdminPayment = () => {
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
                       {payment._id}
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      {payment.userId
-                        ? `${payment.userId.firstname} ${payment.userId.lastname} (${payment.userId.email})`
-                        : "N/A"}
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {payment.userId ? (
+                        <div className="text-sm font-black text-slate-800">
+                          <div>{payment.userId.firstname} {payment.userId.lastname}</div>
+                          <div className="text-xs text-gray-500">{payment.userId.email}</div>
+                        </div>
+                      ) : (
+                        "N/A"
+                      )}
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
                       {formatCurrency(payment.amount)}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
@@ -207,13 +214,12 @@ const AdminPayment = () => {
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
                       <span
-                        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                          payment.paymentStatus === "success"
+                        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${payment.paymentStatus === "success"
                             ? "bg-green-100 text-green-800"
                             : payment.paymentStatus === "failed"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
+                              ? "bg-red-100 text-red-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
                       >
                         {payment.paymentStatus}
                       </span>
@@ -269,11 +275,10 @@ const AdminPayment = () => {
                   <button
                     key={page}
                     onClick={() => goToPage(page)}
-                    className={`h-10 min-w-10 rounded-xl px-3 text-sm font-bold transition ${
-                      currentPage === page
+                    className={`h-10 min-w-10 rounded-xl px-3 text-sm font-bold transition ${currentPage === page
                         ? "bg-green-600 text-white shadow-sm"
                         : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
-                    }`}
+                      }`}
                   >
                     {page}
                   </button>
