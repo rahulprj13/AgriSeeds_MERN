@@ -39,4 +39,3 @@ router.put("/api/orders/:id/cancelled", authMiddleware, cancelOrderByUser);
 router.post("/api/orders/buy-now", authMiddleware, createBuyNowOrder);
 
 module.exports = router;
-
