@@ -67,7 +67,7 @@ exports.createOrderFromCart = async (req, res) => {
       userId,
       addressId: savedAddress._id,
       totalAmount,
-      orderStatus: "processing",
+      orderStatus: "pending",
       paymentStatus: "pending",
     });
 
