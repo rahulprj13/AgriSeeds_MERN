@@ -8,10 +8,51 @@ const uploadToCloudinary = require("../utils/cloudinaryUtils.js")
 const secret = "secret"
 
 // admincrate user
+// exports.adminCreateUser = async (req, res) => {
+//   console.log(req.body);
+//   try {
+//     const { firstname, lastname, mobile, email, password, role, status } = req.body;
+
+//     const userExists = await User.findOne({ email });
+//     const mobileExists = await User.findOne({ mobile });
+
+//     if (userExists) {
+//       return res.status(400).json({ message: "Email already exists" });
+//     }
+//     if (mobileExists) {
+//       return res.status(400).json({ message: "Mobile already exists" });
+      
+//     }
+
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     const user = await User.create({
+//       firstname,
+//       lastname,
+//       mobile,
+//       email,
+//       password: hashedPassword,
+//       role,
+//       status,
+//     });
+//     console.log(user)
+//     console.log("hashed Password : ",hashedPassword)
+//     res.status(201).json({ user });
+//   } catch (err) {
+//     res.status(500).json({message: err});
+//   }
+// };
+
+// admin create user
 exports.adminCreateUser = async (req, res) => {
-  console.log(req.body);
   try {
     const { firstname, lastname, mobile, email, password, role, status } = req.body;
+
+    if (!firstname || !lastname || !mobile || !email || !password || !role || !status) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
 
     const userExists = await User.findOne({ email });
     const mobileExists = await User.findOne({ mobile });
@@ -19,11 +60,15 @@ exports.adminCreateUser = async (req, res) => {
     if (userExists) {
       return res.status(400).json({ message: "Email already exists" });
     }
+
     if (mobileExists) {
       return res.status(400).json({ message: "Mobile already exists" });
-      
     }
 
+    // store original password for email
+    const plainPassword = password;
+
+    // hash password for DB
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
@@ -35,11 +80,43 @@ exports.adminCreateUser = async (req, res) => {
       role,
       status,
     });
-    console.log(user)
-    console.log("hashed Password : ",hashedPassword)
-    res.status(201).json({ user });
+
+    // send login details email
+    try {
+      const mailBody = `
+        <h2>Welcome to our SeedStore app</h2>
+        <p>Hello ${firstname} ${lastname},</p>
+        <p>Your account has been created successfully by admin.</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Password:</strong> ${plainPassword}</p>
+        <p><strong>Role:</strong> ${role}</p>
+        <p><strong>Status:</strong> ${status}</p>
+        <br />
+        <p>Please login and change your password after first login.</p>
+      `;
+
+      await mailSend(email, "Your Account Has Been Created", mailBody);
+    } catch (mailErr) {
+      console.error("Admin create user mail error:", mailErr);
+    }
+
+    return res.status(201).json({
+      message: "User created successfully and email sent",
+      user: {
+        id: user._id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        mobile: user.mobile,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+      },
+    });
   } catch (err) {
-    res.status(500).json({message: err});
+    console.error("adminCreateUser error:", err);
+    return res.status(500).json({
+      message: err.message || "Server error",
+    });
   }
 };
 
@@ -68,6 +145,20 @@ exports.adminUpdateUser = async (req, res) => {
         });
       }
     }
+
+      // check duplicate mobile except current user
+      if (mobile) {
+        const mobileExists = await User.findOne({
+          mobile,
+          _id: { $ne: id },
+        });
+
+        if (mobileExists) {
+          return res.status(400).json({
+            message: "Mobile already exists",
+          });
+        }
+      }
 
     const updateData = {
       firstname,
@@ -231,79 +322,6 @@ exports.getProfile = async (req, res) => {
 
 }
 
-// REGISTER
-// exports.registerUser = async (req, res) => {
-//   try {
-//     const { firstname, lastname, mobile, email, password, otp } = req.body;
-
-//     const userExists = await User.findOne({ email });
-
-//     if (userExists) {
-//       return res.status(400).json({
-//         message: "User already exists",
-//       });
-//     }
-
-//     // latest OTP record
-//     const otpRecord = await Otp.findOne({ email }).sort({ createdAt: -1 });
-
-//     if (!otpRecord) {
-//       return res.status(400).json({
-//         message: "OTP not found",
-//       });
-//     }
-
-//     // OTP match check
-//     if (otpRecord.otp != otp) {
-//       return res.status(400).json({
-//         message: "Invalid OTP",
-//       });
-//     }
-
-//     // OTP expiry check
-//     if (otpRecord.expiresAt < new Date()) {
-//       await Otp.deleteMany({ email });
-
-//       return res.status(400).json({
-//         message: "OTP expired",
-//       });
-//     }
-
-//     const hashedPassword = await bcrypt.hash(password, 10);
-
-//     const user = await User.create({
-//       firstname,
-//       lastname,
-//       mobile,
-//       email,
-//       password: hashedPassword,
-//     });
-
-//     //  OTP delete after registration
-//     await Otp.deleteMany({ email });
-
-//     await mailSend(
-//       user.email,
-//       "Welcome to our app",
-//       "Thank you for registering with our app."
-//     );
-
-//     res.status(201).json({
-//       message: "User registered successfully",
-//       user: {
-//         id: user._id,
-//         firstname: user.firstname,
-//         lastname: user.lastname,
-//         mobile: user.mobile,
-//         email: user.email,
-//       },
-//     });
-//   } catch (err) {
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
-
-
 exports.registerUser = async (req, res) => {
   try {
     const { firstname, lastname, mobile, email, password, otp } = req.body;
@@ -375,7 +393,7 @@ exports.registerUser = async (req, res) => {
     try {
       await mailSend(
         user.email,
-        "Welcome to our app",
+        "Welcome to our SEEDSTORE app",
         "Thank you for registering with our app."
       );
     } catch (mailErr) {
