@@ -276,7 +276,7 @@ const ProductDetails = () => {
       <div className="max-w-7xl mx-auto px-4 md:px-6 pt-8">
         <button
           onClick={() => navigate(-1)}
-          className="group inline-flex items-center gap-2 text-slate-500 hover:text-green-600 transition-all font-bold text-sm uppercase tracking-widest"
+          className="group inline-flex items-center gap-2 text-slate-500 hover:text-green-600 transition-all font-bold text-sm uppercase tracking-widest cursor-pointer"
         >
           <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
           Back to Shop

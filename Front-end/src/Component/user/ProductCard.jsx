@@ -31,7 +31,7 @@ const ProductCard = ({ product }) => {
         : "https://placehold.co/400x400?text=No+Image";
 
     return (
-        <div className={`group bg-white rounded-3xl border border-slate-100 shadow-sm transition-all duration-500 overflow-hidden flex flex-col relative 
+        <div className={`group bg-white rounded-3xl border border-slate-100 shadow-sm transition-all duration-500 overflow-hidden flex flex-col relative cursor-pointer
             ${isOutOfStock ? "opacity-75 grayscale-[0.5]" : "hover:shadow-2xl hover:shadow-green-900/5"}`}>
             
             {/* Image Container */}
@@ -101,7 +101,7 @@ const ProductCard = ({ product }) => {
                     <button
                         disabled={isOutOfStock}
                         onClick={() => !isOutOfStock && navigate(`/category/${categoryName}/${productName}/${product._id}`, { state: product })}
-                        className={`p-4 rounded-2xl transition-all duration-300 shadow-lg flex items-center justify-center
+                        className={`p-4 rounded-2xl transition-all duration-300 shadow-lg flex items-center justify-center cursor-pointer
                             ${isOutOfStock 
                                 ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
                                 : "bg-slate-900 text-white hover:bg-green-600 shadow-slate-200 hover:shadow-green-200"}`}
