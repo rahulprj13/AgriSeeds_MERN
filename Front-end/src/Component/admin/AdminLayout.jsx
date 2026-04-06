@@ -1,4 +1,5 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
+import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import { Sprout, LogOut, LayoutDashboard, FolderTree, Package, Bell, Menu, X, MapPin, ChevronRight, UserCog, Users, ShoppingCart, CreditCard } from "lucide-react";
 import { useLocation, NavLink, Outlet, useNavigate } from "react-router-dom";
@@ -8,6 +9,105 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // notification alert system 
+  const [notifications, setNotifications] = useState([]);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const lastOrderCountRef = useRef(0);
+  const lastCancelledCountRef = useRef(0);
+  const lastUserUpdateCountRef = useRef(0);
+  const isInitialLoadRef = useRef(true);
+  const pollingIntervalRef = useRef(null);
+
+  // Load notifications from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('adminNotifications');
+    if (stored) {
+      try {
+        setNotifications(JSON.parse(stored));
+      } catch (e) {
+        console.error('Error parsing stored notifications:', e);
+      }
+    }
+  }, []);
+
+  // Save notifications to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('adminNotifications', JSON.stringify(notifications));
+  }, [notifications]);
+
+  // Polling notifications from backend notification endpoint
+  useEffect(() => {
+    console.log('📊 Starting polling for notifications');
+
+    const pollNotifications = async () => {
+      try {
+        const notifyRes = await axios.get('/api/admin/notifications');
+        if (Array.isArray(notifyRes.data)) {
+          setNotifications(notifyRes.data);
+        }
+      } catch (notifyError) {
+        console.error('⚠️ Notification endpoint failed:', notifyError.message);
+      }
+    };
+
+    pollNotifications();
+    pollingIntervalRef.current = setInterval(pollNotifications, 15000); // Poll every 15 seconds
+
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+    };
+  }, []);
+
+  const getNavigatePath = (notification) => {
+    switch (notification.type) {
+      case 'order':
+      case 'cancelled':
+      case 'user_update':
+        const orderId = notification?.order?._id || notification?.orderId;
+        return orderId ? `/admin/orders/${orderId}` : '/admin/orders';
+
+      default:
+        return '/admin';
+    }
+  };
+
+  const handleNotificationClick = async (e, notification) => {
+    e.stopPropagation(); // prevent other clicks
+    try {
+      await axios.delete(`/api/admin/notifications/${notification.id}`);
+      setNotifications(prev => prev.filter(n => n.id !== notification.id));
+      // setIsNotificationOpen(false); // do not close if they only want to mark read
+      // But the user requested: "notification disappear instead of refresh"
+      // They didn't specifically say we shouldn't navigate if they click the whole card, but let's just make it disappear.
+    } catch (err) {
+      console.error("Failed to mark as read", err);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await Promise.all(notifications.map(n => axios.delete(`/api/admin/notifications/${n.id}`)));
+      setNotifications([]);
+      setIsNotificationOpen(false);
+    } catch (err) {
+      console.error("Failed to mark all as read", err);
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isNotificationOpen && !event.target.closest('.notification-dropdown')) {
+        setIsNotificationOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isNotificationOpen]);
 
   const menuItems = [
     { path: "/admin", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
@@ -121,10 +221,95 @@ const AdminLayout = () => {
               </p>
             </div>
 
-            <button className="relative w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-500 hover:text-green-600 transition-all border border-slate-100">
-              <Bell size={18} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
+            <div className="relative">
+              <button 
+                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                className="relative w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-500 hover:text-green-600 transition-all border border-slate-100"
+              >
+                <Bell size={18} />
+                {notifications.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold text-white">
+                    {notifications.length > 9 ? '9+' : notifications.length}
+                  </span>
+                )}
+              </button>
+
+              {/* Notification Dropdown */}
+              {isNotificationOpen && (
+                <div className="notification-dropdown absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 z-50 max-h-96 overflow-y-auto">
+                  <div className="p-4 border-b border-slate-200">
+                    <h3 className="text-lg font-bold text-slate-900">Notifications</h3>
+                    <p className="text-sm text-slate-500">Recent activity</p>
+                  </div>
+                  <div className="p-2">
+                    {notifications.length === 0 ? (
+                      <div className="p-4 text-center text-slate-500">
+                        <Bell className="mx-auto mb-2 h-8 w-8 text-slate-300" />
+                        <p className="text-sm">No new notifications</p>
+                      </div>
+                    ) : (
+                      notifications.map((notification) => {
+                        const getIcon = (type) => {
+                          switch (type) {
+                            case 'order':
+                            case 'cancelled':
+                              return <ShoppingCart className="h-4 w-4 text-blue-600" />;
+                            case 'user_update':
+                              return <Users className="h-4 w-4 text-green-600" />;
+                            default:
+                              return <Bell className="h-4 w-4 text-gray-600" />;
+                          }
+                        };
+
+                        const getBgColor = (type) => {
+                          switch (type) {
+                            case 'order':
+                              return 'bg-blue-100';
+                            case 'cancelled':
+                              return 'bg-red-100';
+                            case 'user_update':
+                              return 'bg-green-100';
+                            default:
+                              return 'bg-gray-100';
+                          }
+                        };
+
+                        return (
+                          <div key={notification.id} className="p-3 hover:bg-slate-50 rounded-xl cursor-default border-b border-slate-100 last:border-b-0 group">
+                            <div className="flex items-start gap-3">
+                              <div className={`w-8 h-8 ${getBgColor(notification.type)} rounded-full flex items-center justify-center flex-shrink-0 cursor-pointer`} onClick={() => { navigate(getNavigatePath(notification)); setIsNotificationOpen(false); }}>
+                                {getIcon(notification.type)}
+                              </div>
+                              <div className="flex-1 min-w-0 pr-2 cursor-pointer" onClick={() => { navigate(getNavigatePath(notification)); setIsNotificationOpen(false); }}>
+                                <p className="text-sm font-semibold text-slate-900">{notification.message}</p>
+                                <p className="text-xs text-slate-500 mt-1">{notification.time}</p>
+                              </div>
+                              <button 
+                                onClick={(e) => handleNotificationClick(e, notification)} 
+                                className="flex-shrink-0 text-xs font-bold text-slate-400 hover:text-green-600 bg-slate-100 hover:bg-green-100 px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-all"
+                                title="Mark as read"
+                              >
+                                Clear
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                  {notifications.length > 0 && (
+                    <div className="p-3 border-t border-slate-200">
+                      <button 
+                        onClick={handleMarkAllAsRead}
+                        className="w-full py-2 bg-slate-900 text-white rounded-xl font-semibold text-sm hover:bg-slate-800 transition-colors"
+                      >
+                        Mark All as Read
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </header>
 

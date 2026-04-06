@@ -188,6 +188,12 @@ const AdminOrderItem = () => {
               <p className="text-slate-600">Total Amount: <span className="font-medium text-slate-900">₹{order.totalAmount}</span></p>
               <p className="text-slate-600">Items: <span className="font-medium text-slate-900">{items.length}</span></p>
             </div>
+
+            {/* <div>
+               
+              <p className="text-slate-600">Payment Method: <span className="font-medium text-slate-900">{order.paymentMethod || 'N/A'}</span></p>
+              
+            </div> */}
           </div>
         </div>
 

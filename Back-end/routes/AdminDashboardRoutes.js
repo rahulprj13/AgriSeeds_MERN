@@ -5,7 +5,8 @@ const Category = require("../models/CategoryModel.js");
 const Cart = require("../models/CartModel.js");
 const Order = require("../models/OrderModel.js");
 const OrderItem = require("../models/OrderItemModel.js");
-const Payments = require("../models/PaymentModel.js")
+const Payments = require("../models/PaymentModel.js");
+const Notification = require("../models/NotificationModel.js");
 const { getOrderDetails } = require("../controllers/orderController");
 const authMiddleware = require("../middleware/authmiddleware.js");
 const adminMiddleware = require("../middleware/adminMiddleware.js");
@@ -259,5 +260,53 @@ router.get(
   }
 );
 
-module.exports = router;
+// Admin: Get unread notifications
+router.get(
+  "/api/admin/notifications",
+  authMiddleware,
+  adminMiddleware,
+  async (req, res) => {
+    try {
+      const notifications = await Notification.find({ isRead: false })
+        .sort({ createdAt: -1 });
+      
+      const mappedNotifications = notifications.map(n => ({
+        id: n._id,
+        message: n.message,
+        type: n.type,
+        time: new Date(n.createdAt).toLocaleTimeString(),
+        read: n.isRead,
+        orderId: n.orderId
+      }));
 
+      res.json(mappedNotifications);
+    } catch (err) {
+      res.status(500).json({ message: "Error fetching notifications" });
+    }
+  }
+);
+
+// Admin: Mark notification as read
+router.delete(
+  "/api/admin/notifications/:id",
+  authMiddleware,
+  adminMiddleware,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const notification = await Notification.findById(id);
+      if (!notification) {
+        return res.status(404).json({ message: "Notification not found" });
+      }
+      
+      notification.isRead = true;
+      await notification.save();
+      
+      res.json({ message: "Notification marked as read successfully" });
+    } catch (err) {
+      res.status(500).json({ message: "Error updating notification" });
+    }
+  }
+);
+
+module.exports = router;
