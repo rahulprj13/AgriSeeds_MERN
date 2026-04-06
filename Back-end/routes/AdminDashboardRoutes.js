@@ -288,7 +288,7 @@ router.get(
   }
 );
 
-// Admin: Mark notification as read
+// Admin: Delete notification
 router.delete(
   "/api/admin/notifications/:id",
   authMiddleware,
@@ -296,17 +296,14 @@ router.delete(
   async (req, res) => {
     try {
       const { id } = req.params;
-      const notification = await Notification.findById(id);
+      const notification = await Notification.findByIdAndDelete(id);
       if (!notification) {
         return res.status(404).json({ message: "Notification not found" });
       }
       
-      notification.isRead = true;
-      await notification.save();
-      
-      res.json({ message: "Notification marked as read successfully" });
+      res.json({ message: "Notification deleted successfully" });
     } catch (err) {
-      res.status(500).json({ message: "Error updating notification" });
+      res.status(500).json({ message: "Error deleting notification" });
     }
   }
 );

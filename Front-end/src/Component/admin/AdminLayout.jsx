@@ -76,15 +76,28 @@ const AdminLayout = () => {
   };
 
   const handleNotificationClick = async (e, notification) => {
-    e.stopPropagation(); // prevent other clicks
+    e.stopPropagation();
     try {
+      // Mark as read in backend
       await axios.delete(`/api/admin/notifications/${notification.id}`);
+      // Remove from frontend state (decrease count)
       setNotifications(prev => prev.filter(n => n.id !== notification.id));
-      // setIsNotificationOpen(false); // do not close if they only want to mark read
-      // But the user requested: "notification disappear instead of refresh"
-      // They didn't specifically say we shouldn't navigate if they click the whole card, but let's just make it disappear.
     } catch (err) {
       console.error("Failed to mark as read", err);
+    }
+  };
+
+  const handleNotificationNavigate = async (notification) => {
+    try {
+      // Mark as read in backend
+      await axios.delete(`/api/admin/notifications/${notification.id}`);
+      // Remove from frontend state (decrease count)
+      setNotifications(prev => prev.filter(n => n.id !== notification.id));
+      // Navigate to order details
+      navigate(getNavigatePath(notification));
+      setIsNotificationOpen(false);
+    } catch (err) {
+      console.error("Failed to navigate", err);
     }
   };
 
@@ -277,10 +290,10 @@ const AdminLayout = () => {
                         return (
                           <div key={notification.id} className="p-3 hover:bg-slate-50 rounded-xl cursor-default border-b border-slate-100 last:border-b-0 group">
                             <div className="flex items-start gap-3">
-                              <div className={`w-8 h-8 ${getBgColor(notification.type)} rounded-full flex items-center justify-center flex-shrink-0 cursor-pointer`} onClick={() => { navigate(getNavigatePath(notification)); setIsNotificationOpen(false); }}>
+                              <div className={`w-8 h-8 ${getBgColor(notification.type)} rounded-full flex items-center justify-center flex-shrink-0 cursor-pointer`} onClick={() => handleNotificationNavigate(notification)}>
                                 {getIcon(notification.type)}
                               </div>
-                              <div className="flex-1 min-w-0 pr-2 cursor-pointer" onClick={() => { navigate(getNavigatePath(notification)); setIsNotificationOpen(false); }}>
+                              <div className="flex-1 min-w-0 pr-2 cursor-pointer" onClick={() => handleNotificationNavigate(notification)}>
                                 <p className="text-sm font-semibold text-slate-900">{notification.message}</p>
                                 <p className="text-xs text-slate-500 mt-1">{notification.time}</p>
                               </div>

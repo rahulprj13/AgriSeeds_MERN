@@ -17,4 +17,5 @@ const notificationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+notificationSchema.index({ createdAt: -1 }, { expireAfterSeconds: 30 }); // Auto-delete after 7 days
 module.exports = mongoose.model("Notification", notificationSchema);
