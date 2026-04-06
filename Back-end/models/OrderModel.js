@@ -12,6 +12,11 @@ const orderSchema = new mongoose.Schema({
     ref: "Address"
   },
 
+  paymentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Payment"
+  },
+
   totalAmount: {
     type: Number
   },

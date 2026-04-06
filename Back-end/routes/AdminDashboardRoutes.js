@@ -142,7 +142,8 @@ router.get(
     try {
       const orders = await Order.find()
         .sort({ createdAt: -1 })
-        .populate("userId", "firstname lastname email phone");
+        .populate("userId", "firstname lastname email phone")
+        .populate("paymentId", "paymentMethod");
 
       const ordersWithItems = await Promise.all(
         orders.map(async (order) => {
@@ -179,7 +180,8 @@ router.get(
 
       const order = await Order.findById(id)
         .populate("addressId")
-        .populate("userId", "firstname lastname email mobile");
+        .populate("userId", "firstname lastname email mobile")
+        .populate("paymentId", "paymentMethod");
 
       if (!order) {
         return res.status(404).json({ message: "Order not found" });

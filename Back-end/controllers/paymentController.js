@@ -116,7 +116,7 @@ exports.createRazorpayOrder = async (req, res) => {
 
     if (paymentMethod === "cod") {
       await reduceStockAndClearCart(userId, orderItemsData);
-      await Payment.create({
+      const payment = await Payment.create({
         orderId: order._id,
         userId,
         paymentMethod,
@@ -125,6 +125,9 @@ exports.createRazorpayOrder = async (req, res) => {
         paymentStatus: "pending",
         transactionId: `COD_${Date.now()}`,
       });
+
+      // Update order with paymentId
+      await Order.findByIdAndUpdate(order._id, { paymentId: payment._id });
 
       await Notification.create({
         message: `A new COD order has been placed`,
@@ -149,7 +152,7 @@ exports.createRazorpayOrder = async (req, res) => {
     };
     const razorpayOrder = await Razorpay.orders.create(razorpayPayload);
 
-    await Payment.create({
+    const payment = await Payment.create({
       orderId: order._id,
       userId,
       paymentMethod,
@@ -158,6 +161,9 @@ exports.createRazorpayOrder = async (req, res) => {
       razorpayOrderId: razorpayOrder.id,
       paymentStatus: "pending",
     });
+
+    // Update order with paymentId
+    await Order.findByIdAndUpdate(order._id, { paymentId: payment._id });
 
     return res.status(201).json({
       message: "Razorpay order created",

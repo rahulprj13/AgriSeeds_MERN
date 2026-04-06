@@ -3,7 +3,7 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/AuthContext";
-import { ArrowLeft, Package, Truck, CheckCircle, XCircle, Clock, Save } from "lucide-react";
+import { ArrowLeft, Package, Truck, CheckCircle, XCircle, Clock, Save, CreditCard } from "lucide-react";
 
 const API_URL = "http://localhost:5000";
 
@@ -29,10 +29,10 @@ const AdminOrderItem = () => {
       // Use admin-specific endpoint for order details
       const res = await axios.get(`${API_URL}/api/admin/orders/${id}`, config);
       console.log("Admin Order Details:", res.data);
-      
+
       setOrder(res.data?.order || null);
       setItems(Array.isArray(res.data?.items) ? res.data.items : []);
-      
+
     } catch (e) {
       toast.error(e?.response?.data?.message || "Failed to load order");
     } finally {
@@ -152,7 +152,7 @@ const AdminOrderItem = () => {
                   <p className="font-medium text-indigo-600">{estimatedDelivery.toLocaleDateString()}</p>
                   {!order.expectedDelivery && <p className="text-xs text-slate-500 italic">(estimated)</p>}
                 </div>
-                <div className={`p-4 rounded-lg border ${isDelivered ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}` }>
+                <div className={`p-4 rounded-lg border ${isDelivered ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
                   <p className="text-slate-600 text-xs font-semibold uppercase mb-2">{isDelivered ? 'Delivered On' : 'Current Status'}</p>
                   <p className={`font-medium ${isDelivered ? 'text-green-600' : 'text-yellow-600'} capitalize`}>
                     {isDelivered ? new Date(order.updatedAt).toLocaleDateString() : order.orderStatus || 'In Transit'}
@@ -189,11 +189,24 @@ const AdminOrderItem = () => {
               <p className="text-slate-600">Items: <span className="font-medium text-slate-900">{items.length}</span></p>
             </div>
 
-            {/* <div>
-               
-              <p className="text-slate-600">Payment Method: <span className="font-medium text-slate-900">{order.paymentMethod || 'N/A'}</span></p>
-              
-            </div> */}
+
+            <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-linear-to-r from-slate-50 to-white px-4 py-3 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                  <CreditCard size={18} />
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                    Payment Method
+                  </p>
+
+                </div>
+              </div>
+
+              <span className="rounded-full bg-emerald-100 px-3 py-1 text-sm font-bold capitalize text-emerald-700">
+                {order?.paymentId?.paymentMethod || "N/A"}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -214,8 +227,8 @@ const AdminOrderItem = () => {
             {items.map((item, index) => (
               <div key={index} className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl">
                 <img
-                  src={item.productId?.imagePath ? 
-                    (item.productId.imagePath.startsWith('http') ? item.productId.imagePath : `${API_URL}/uploads/${item.productId.imagePath}`) 
+                  src={item.productId?.imagePath ?
+                    (item.productId.imagePath.startsWith('http') ? item.productId.imagePath : `${API_URL}/uploads/${item.productId.imagePath}`)
                     : 'https://via.placeholder.com/80'
                   }
                   alt={item.productId?.name}

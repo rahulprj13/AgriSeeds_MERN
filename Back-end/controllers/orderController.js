@@ -70,6 +70,7 @@ exports.createOrderFromCart = async (req, res) => {
       totalAmount,
       orderStatus: "pending",
       paymentStatus: "pending",
+      
     });
 
     const orderItems = await Promise.all(
@@ -112,8 +113,11 @@ exports.getOrdersForUser = async (req, res) => {
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    // 1. Saare orders fetch karein
-    const orders = await Order.find({ userId }).sort({ createdAt: -1 });
+    // 1. Saare orders fetch karein with paymentId populated
+    const orders = await Order.find({ userId }).sort({ createdAt: -1 }).populate(
+      "paymentId",
+      "paymentMethod"
+    );
 
     // 2. Har order ke liye uske items populate karein
     const ordersWithItems = await Promise.all(
@@ -155,9 +159,9 @@ exports.getOrderDetails = async (req, res) => {
       populate: { path: "categoryId", select: "name" },
     });
 
-    const populatedOrder = await Order.findOne({ _id: order._id, userId }).populate(
-      "addressId"
-    );
+    const populatedOrder = await Order.findOne({ _id: order._id, userId })
+      .populate("addressId")
+      .populate("paymentId", "paymentMethod");
 
     return res.status(200).json({
       order: populatedOrder || order,
