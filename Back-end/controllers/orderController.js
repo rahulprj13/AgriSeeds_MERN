@@ -3,6 +3,7 @@ const Order = require("../models/OrderModel");
 const OrderItem = require("../models/OrderItemModel");
 const Address = require("../models/AddressModel");
 const Product = require("../models/ProductModel");
+const { formatDateTimeDDMMYY } = require("../utils/dateUtils");
 
 const toNumber = (v) => {
   const n = Number(v);
@@ -84,7 +85,7 @@ exports.createOrderFromCart = async (req, res) => {
       userId,
       addressId: savedAddress._id,
       totalAmount,
-      orderStatus: "processing",
+      orderStatus: "confirmed",
       paymentStatus: "pending",
     });
 
@@ -141,9 +142,16 @@ exports.getOrdersForUser = async (req, res) => {
         populate: { path: "categoryId", select: "name" },
       });
         
+        // Format trackingHistory dates to dd/mm/yy format
+        const formattedTrackingHistory = order.trackingHistory.map(entry => ({
+          ...entry._doc,
+          updatedAt: formatDateTimeDDMMYY(entry.updatedAt)
+        }));
+        
         return {
           ...order._doc,
-          items: items // Ab frontend ko 'items' array milega jisme product image hogi
+          items: items,
+          trackingHistory: formattedTrackingHistory
         };
       })
     );
@@ -176,8 +184,17 @@ exports.getOrderDetails = async (req, res) => {
       "addressId"
     );
 
+    // Format trackingHistory dates to dd/mm/yy format
+    const formattedTrackingHistory = populatedOrder.trackingHistory.map(entry => ({
+      ...entry._doc,
+      updatedAt: formatDateTimeDDMMYY(entry.updatedAt)
+    }));
+
     return res.status(200).json({
-      order: populatedOrder || order,
+      order: {
+        ...populatedOrder._doc,
+        trackingHistory: formattedTrackingHistory
+      },
       items,
     });
   } catch (error) {
@@ -307,7 +324,20 @@ exports.cancelOrderByUser = async (req, res) => {
       "name imagePath currentPrice price weight unit categoryId"
     );
 
-    return res.status(200).json({ message: "Order cancelled", order: updatedOrder, items });
+    // Format trackingHistory dates to dd/mm/yy format
+    const formattedTrackingHistory = updatedOrder.trackingHistory.map(entry => ({
+      ...entry._doc,
+      updatedAt: formatDateTimeDDMMYY(entry.updatedAt)
+    }));
+
+    return res.status(200).json({ 
+      message: "Order cancelled", 
+      order: {
+        ...updatedOrder._doc,
+        trackingHistory: formattedTrackingHistory
+      }, 
+      items 
+    });
   } catch (error) {
     console.error("CANCEL_ORDER_ERROR:", error);
     return res.status(500).json({ message: "Error cancelling order" });
@@ -381,7 +411,7 @@ exports.createBuyNowOrder = async (req, res) => {
       userId,
       addressId: savedAddress._id,
       totalAmount: totalPrice,
-      orderStatus: "processing",
+      orderStatus: "confirmed",
       paymentStatus: "pending",
     });
 
@@ -420,6 +450,104 @@ exports.createBuyNowOrder = async (req, res) => {
   } catch (error) {
     console.error("CREATE_BUY_NOW_ORDER_ERROR:", error);
     return res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
+// Update order status (Admin only) - Progress through stages
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { orderStatus, trackingNumber, courier, note } = req.body || {};
+
+    // Valid order status transitions
+    const validStatuses = ["confirmed", "processing", "packed", "shipped", "delivered", "cancelled"];
+    if (!validStatuses.includes(orderStatus)) {
+      return res.status(400).json({ message: `Invalid order status. Must be one of: ${validStatuses.join(", ")}` });
+    }
+
+    const order = await Order.findById(id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    // Cannot update status of cancelled or delivered orders (except move to delivered)
+    if (order.orderStatus === "cancelled" && orderStatus !== "cancelled") {
+      return res.status(400).json({ message: "Cannot update status of a cancelled order" });
+    }
+    if (order.orderStatus === "delivered" && orderStatus !== "delivered") {
+      return res.status(400).json({ message: "Cannot update status of a delivered order" });
+    }
+
+    // Update order status
+    order.orderStatus = orderStatus;
+    
+    // Update tracking info if provided
+    if (trackingNumber) order.trackingNumber = trackingNumber;
+    if (courier) order.courier = courier;
+
+    // Add to tracking history
+    order.trackingHistory.push({
+      status: orderStatus,
+      location: "",
+      note: note || `Order status updated to ${orderStatus}`,
+      updatedAt: new Date(),
+    });
+
+    await order.save();
+
+    const updatedOrder = await Order.findById(id).populate("addressId");
+
+    // Format trackingHistory dates to dd/mm/yy format
+    const formattedTrackingHistory = updatedOrder.trackingHistory.map(entry => ({
+      ...entry._doc,
+      updatedAt: formatDateTimeDDMMYY(entry.updatedAt)
+    }));
+
+    return res.status(200).json({ 
+      message: `Order status updated to ${orderStatus}`, 
+      order: {
+        ...updatedOrder._doc,
+        trackingHistory: formattedTrackingHistory
+      }
+    });
+  } catch (error) {
+    console.error("UPDATE_ORDER_STATUS_ERROR:", error);
+    return res.status(500).json({ message: "Error updating order status" });
+  }
+};
+
+// Get all orders (Admin) - view all orders with details
+exports.getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .populate("userId", "firstname lastname email mobile")
+      .populate("addressId")
+      .sort({ createdAt: -1 });
+
+    const ordersWithItems = await Promise.all(
+      orders.map(async (order) => {
+        const items = await OrderItem.find({ orderId: order._id }).populate({
+          path: "productId",
+          select: "name imagePath image categoryId",
+          populate: { path: "categoryId", select: "name" },
+        });
+        
+        // Format trackingHistory dates to dd/mm/yy format
+        const formattedTrackingHistory = order.trackingHistory.map(entry => ({
+          ...entry._doc,
+          updatedAt: formatDateTimeDDMMYY(entry.updatedAt)
+        }));
+        
+        return {
+          ...order._doc,
+          items,
+          trackingHistory: formattedTrackingHistory
+        };
+      })
+    );
+
+    return res.status(200).json({ data: ordersWithItems });
+  } catch (error) {
+    console.error("GET_ALL_ORDERS_ERROR:", error);
+    return res.status(500).json({ message: "Error fetching orders" });
   }
 };
 
