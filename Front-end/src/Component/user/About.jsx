@@ -11,6 +11,7 @@ import {
   faComments,
   faLeaf
 } from "@fortawesome/free-solid-svg-icons";
+import { Link, Navigate } from "react-router-dom";
 
 const About = () => {
   return (
@@ -145,9 +146,10 @@ const About = () => {
             Explore our premium seed collection and start your farming journey today.
           </p>
 
-          <button className="mt-8 bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full text-lg shadow-lg transition duration-300 hover:scale-105">
-            Shop Now
-          </button>
+            <Link to="/home" className="mt-8 inline-block bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full text-lg shadow-lg transition duration-300 hover:scale-105">
+              Shop Now
+            </Link>
+         
         </div>
       </div>
 

@@ -136,7 +136,7 @@ const Home = () => {
 
       {/* --- OUR COLLECTION --- */}
       <div className="max-w-7xl mx-auto py-24 px-6 group">
-        <div className="flex justify-between items-center mb-12">
+        <div className="flex justify-between items-center mb-12 ">
           <div className="flex items-center gap-2">
             <span className="w-8 h-0.5 bg-green-500"></span>
             <span className="text-[20px] font-black tracking-[0.3em] text-green-600 uppercase">Our Collection</span>
@@ -185,9 +185,9 @@ const Home = () => {
       <div className="bg-gray-50 py-24 px-6">
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-4xl font-black text-gray-800 mb-16">Shop By Category</h2>
-          <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-10">
+          <div className="grid lg:grid-cols-5 md:grid-cols-2 gap-10 cursor-pointer">
             {categories.map((cat, index) => (
-              <div key={index} className="group bg-white rounded-[2.5rem] p-10 transition-all duration-500 hover:shadow-2xl border border-slate-100">
+              <div key={index}  onClick={() => navigate(`/category/${cat.name}`)} className="group bg-white rounded-[2.5rem] p-10 transition-all duration-500 hover:shadow-2xl border border-slate-100 ">
                 <div className="w-20 h-20 mx-auto flex items-center justify-center rounded-3xl bg-green-100 text-green-600 mb-6">
                   <FontAwesomeIcon icon={faLeaf} className="text-3xl" />
                 </div>
