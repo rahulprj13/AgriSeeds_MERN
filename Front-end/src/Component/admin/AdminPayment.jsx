@@ -129,7 +129,7 @@ const AdminPayment = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="mi n-h-screen bg-gray-50 p-6">
       <div className="mx-auto max-w-7xl space-y-4">
         <div className="flex items-center">
           <CreditCard className="mr-3 h-8 w-8 text-green-600" />
