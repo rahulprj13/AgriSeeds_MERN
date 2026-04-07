@@ -82,9 +82,10 @@ const Home = () => {
         {/* Full Background Swiper */}
         <div className="absolute inset-0">
           <Swiper
-            modules={[Pagination, EffectFade]}
+            modules={[Autoplay, Pagination, EffectFade]}
             effect="fade"
             fadeEffect={{ crossFade: true }}
+            autoplay={{ delay: 4000, disableOnInteraction: false }}
             pagination={{ clickable: true }}
             loop={true}
             className="w-full h-full cursor-pointer select-none"
@@ -102,8 +103,8 @@ const Home = () => {
                     alt={`Hero Slide ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-black/150" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#03140f]/80 via-[#06251b]/45 to-[#041d14]/60" />
+                  <div className="absolute inset-0 bg-black/25" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-black/15 to-transparent" />
                 </div>
               </SwiperSlide>
             ))}
