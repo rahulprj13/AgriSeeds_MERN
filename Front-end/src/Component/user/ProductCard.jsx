@@ -35,7 +35,7 @@ const ProductCard = ({ product }) => {
             ${isOutOfStock ? "opacity-75 grayscale-[0.5]" : "hover:shadow-2xl hover:shadow-green-900/5"}`}>
             
             {/* Image Container */}
-            <div className="relative h-60 overflow-hidden bg-slate-100">
+            <div className="relative h-100 overflow-hidden bg-slate-100">
                 <img
                     src={imageSrc}
                     alt={product.name}
@@ -44,7 +44,7 @@ const ProductCard = ({ product }) => {
                 />
                 
                 {/* Status Badges */}
-                <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+                <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
                     {isOutOfStock ? (
                         <span className="bg-slate-900 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg uppercase tracking-wider">
                             Out of Stock
