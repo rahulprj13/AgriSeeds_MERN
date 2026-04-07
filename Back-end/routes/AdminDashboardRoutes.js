@@ -219,7 +219,30 @@ router.put(
         return res.status(404).json({ message: "Order not found" });
       }
 
-      if (orderStatus) order.orderStatus = orderStatus;
+      // if (orderStatus) order.orderStatus = orderStatus;
+      // await order.save();
+
+      if (orderStatus) {
+        // If changing TO cancelled from something else, restore stock
+        if (orderStatus === "cancelled" && order.orderStatus !== "cancelled") {
+          const Payments = require("../models/PaymentModel");
+          const payment = await Payments.findOne({ orderId: order._id });
+          const stockWasReduced = payment && (payment.paymentMethod === "cod" || payment.paymentStatus === "success");
+
+          if (stockWasReduced) {
+            const itemsToRestore = await OrderItem.find({ orderId: order._id });
+            for (const item of itemsToRestore) {
+              if (item.productId) {
+                await Product.findByIdAndUpdate(
+                  item.productId,
+                  { $inc: { stock: item.quantity } }
+                );
+              }
+            }
+          }
+        }
+        order.orderStatus = orderStatus;
+      }
       await order.save();
 
       const updatedOrder = await Order.findById(order._id)

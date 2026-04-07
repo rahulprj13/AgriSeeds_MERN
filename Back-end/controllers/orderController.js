@@ -283,6 +283,26 @@ exports.cancelOrderByUser = async (req, res) => {
     });
     await order.save();
 
+
+    // Increment inventory only if stock was actually reduced 
+    // (i.e. COD order, or verified Razorpay order)
+    const Payment = require("../models/PaymentModel");
+    const payment = await Payment.findOne({ orderId: order._id });
+    const stockWasReduced = payment && (payment.paymentMethod === "cod" || payment.paymentStatus === "success");
+
+    if (stockWasReduced) {
+      const itemsToRestore = await OrderItem.find({ orderId: order._id });
+      for (const item of itemsToRestore) {
+        if (item.productId) {
+          await Product.findByIdAndUpdate(
+            item.productId,
+            { $inc: { stock: item.quantity } }
+          );
+        }
+      }
+    }
+
+    
     await Notification.create({
       message: `An order has been cancelled by the customer`,
       type: "cancelled",
