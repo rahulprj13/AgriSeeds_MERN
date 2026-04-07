@@ -1,5 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
+import img from "../../assets/Images/seeds.jpg";
+import img1 from "../../assets/Images/agriseeds.jpeg";
+import img2 from "../../assets/Images/background.jpg";
+import img3 from "../../assets/Images/background1.jpg";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CategoryContext } from "../context/CategoryContext";
@@ -25,32 +29,42 @@ const Home = () => {
   const { categories } = useContext(CategoryContext);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeSlide, setActiveSlide] = useState(0);
   const navigate = useNavigate();
 
   // Slider Data
   const seedPackages = [
     {
-      image: "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?q=80&w=2070",
+      image: img,
       tag: "100% Organic",
-      title: "Premium Vegetable Seeds",
+      title: "Premium Seeds For Better Farming",
+      subtitle: "High-quality organic seeds for stronger roots, healthy crops, and better yield.",
     },
     {
-      image: "https://images.unsplash.com/photo-1615811361523-6bd03d7748e7?q=80&w=1974",
-      tag: "Lab Tested",
-      title: "High Yielding Seeds",
+      image: img1,
+      tag: "High Yield",
+      title: "Grow Faster With Trusted Quality",
+      subtitle: "Carefully selected seeds that help improve productivity and support every season.",
     },
     {
-      image: "https://images.unsplash.com/photo-1592150621744-aca64f48394a?q=80&w=2000",
+      image: img2,
+      tag: "Fresh Collection",
+      title: "Healthy Crops Start With Best Seeds",
+      subtitle: "Choose from reliable seed varieties, fertilizers, and crop care essentials.",
+    },
+    {
+      image: img3,
       tag: "Fast Delivery",
-      title: "Start Your Home Garden",
-    }
+      title: "Everything You Need For Your Farm",
+      subtitle: "Discover premium products for planting, growth, and crop protection in one place.",
+    },
   ];
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const res = await axios.get(`${API_URL}/api/admin/products`);
-        setFeaturedProducts(res.data.slice(0, 8));
+        setFeaturedProducts(res.data);
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {
@@ -64,92 +78,92 @@ const Home = () => {
     <div className="bg-white text-gray-900 font-sans">
 
       {/* --- HERO SECTION --- */}
-      <div className="relative w-full min-h-[60vh] bg-[#041d14] flex items-center py-10 overflow-hidden">
-
-        {/* Background Blur Design */}
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-green-500/5 rounded-l-full blur-3xl pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto px-6 relative z-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-          {/* LEFT SIDE: Swiper Slider (Takes 7/12 columns) */}
-          <div className="lg:col-span-7 relative h-112.5 lg:h-137.5 rounded-4xl overflow-hidden border border-white/10 shadow-2xl">
-            <Swiper
-              modules={[Autoplay, Pagination, EffectFade]}
-              effect="fade"
-              fadeEffect={{ crossFade: true }}
-              autoplay={{ delay: 3000, disableOnInteraction: false }}
-              pagination={{ clickable: true }}
-              loop={true}
-              className="w-full h-full"
-            >
-              {seedPackages.map((item, index) => (
-                <SwiperSlide key={index}>
-                  <div className="w-full h-full relative group">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="w-full h-full object-cover transition-transform duration-4000 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-10">
-                      <span className="text-green-400 font-bold uppercase tracking-widest text-sm mb-2">{item.tag}</span>
-                      <h2 className="text-white text-4xl font-black leading-tight max-w-md">{item.title}</h2>
-                    </div>
-                  </div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
-
-          {/* RIGHT SIDE: 2 Static Images (Takes 5/12 columns) */}
-          <div className="lg:col-span-5 flex flex-col gap-6">
-            {/* Top Static Banner */}
-            <div className="relative h-53.75 lg:h-65.75 rounded-4xl overflow-hidden group shadow-xl">
-              <img src="https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?q=80&w=2000" alt="Pesticides" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-end p-8">
-                <div className="text-right">
-                  <span className="bg-green-600 text-white text-[10px] px-3 py-1 rounded-full uppercase font-bold">New Arrivals</span>
-                  <h3 className="text-white text-2xl font-black mt-2">Pesticides</h3>
+      <div className="relative w-full min-h-[78vh] flex items-center overflow-hidden">
+        {/* Full Background Swiper */}
+        <div className="absolute inset-0">
+          <Swiper
+            modules={[Pagination, EffectFade]}
+            effect="fade"
+            fadeEffect={{ crossFade: true }}
+            pagination={{ clickable: true }}
+            loop={true}
+            className="w-full h-full cursor-pointer select-none"
+            onSlideChange={(swiper) => setActiveSlide(swiper.realIndex)}
+            onSwiper={(swiper) => {
+              setActiveSlide(swiper.realIndex);
+              swiper.el.onclick = () => swiper.slideNext();
+            }}
+          >
+            {seedPackages.map((item, index) => (
+              <SwiperSlide key={index}>
+                <div className="relative w-full h-[78vh]">
+                  <img
+                    src={item.image}
+                    alt={`Hero Slide ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/150" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#03140f]/80 via-[#06251b]/45 to-[#041d14]/60" />
                 </div>
-              </div>
-            </div>
-
-            {/* Bottom Static Banner */}
-            <div className="relative h-53.75 lg:h-65.75 rounded-4xl overflow-hidden group shadow-xl">
-              <img src="https://images.unsplash.com/photo-1628352081506-83c43123ed6d?q=80&w=2000" alt="Fertilizers" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-end p-8">
-                <div className="text-right">
-                  <span className="bg-yellow-500 text-black text-[10px] px-3 py-1 rounded-full uppercase font-bold">Best Quality</span>
-                  <h3 className="text-white text-2xl font-black mt-2">Fertilizers</h3>
-                </div>
-              </div>
-            </div>
-          </div>
-
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
 
-        <style dangerouslySetInnerHTML={{
-          __html: `
-          .swiper-pagination-bullet { background: #22c55e !important; width: 10px; height: 10px; }
-          .swiper-pagination-bullet-active { width: 30px; border-radius: 5px; }
-        `}} />
+        {/* Overlay Content */}
+        <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl py-20">
+            <span className="inline-flex items-center rounded-full bg-green-500/20 border border-green-400/30 px-4 py-1.5 text-green-300 text-xs md:text-sm font-bold uppercase tracking-[0.25em] backdrop-blur-md">
+              {seedPackages[activeSlide]?.tag}
+            </span>
+
+            <h1 className="mt-5 text-white text-4xl sm:text-5xl lg:text-6xl font-black leading-tight">
+              {seedPackages[activeSlide]?.title}
+            </h1>
+
+            <p className="mt-5 text-white/85 text-base sm:text-lg leading-relaxed max-w-2xl">
+              {seedPackages[activeSlide]?.subtitle}
+            </p>
+
+            <p className="mt-4 text-white/70 text-sm font-medium">
+              Click anywhere on hero section to view next image
+            </p>
+
+          </div>
+        </div>
+
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+        .swiper-pagination {
+          bottom: 24px !important;
+        }
+        .swiper-pagination-bullet {
+          background: rgba(255,255,255,0.55) !important;
+          width: 10px;
+          height: 10px;
+          opacity: 1 !important;
+          transition: all 0.3s ease;
+        }
+        .swiper-pagination-bullet-active {
+          background: #22c55e !important;
+          width: 28px;
+          border-radius: 999px;
+        }
+      `,
+          }}
+        />
       </div>
 
       {/* --- OUR COLLECTION --- */}
-      <div className="max-w-7xl mx-auto py-24 px-6 group">
-        <div className="flex justify-between items-center mb-12 ">
+      <div className="max-w-[80%] mx-auto py-4 px-2">
+        <div className="flex justify-between items-center m-12">
           <div className="flex items-center gap-2">
             <span className="w-8 h-0.5 bg-green-500"></span>
-            <span className="text-[20px] font-black tracking-[0.3em] text-green-600 uppercase">Our Collection</span>
-          </div>
+            <span className="text-[29px] font-black tracking-[0.3em] text-green-600 uppercase">
+              Our Collection
 
-          {/* Custom Navigation Icons */}
-          <div className="flex gap-3">
-            <button className="prev-btn w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-green-600 hover:text-white transition-all cursor-pointer">
-              <FontAwesomeIcon icon={faChevronLeft} />
-            </button>
-            <button className="next-btn w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-green-600 hover:text-white transition-all cursor-pointer">
-              <FontAwesomeIcon icon={faChevronRight} />
-            </button>
+            </span>
           </div>
         </div>
 
@@ -158,36 +172,23 @@ const Home = () => {
             <div className="w-12 h-12 border-4 border-green-600/20 border-t-green-600 rounded-full animate-spin" />
           </div>
         ) : (
-          <Swiper
-            modules={[Navigation, Autoplay]}
-            spaceBetween={30}
-            slidesPerView={1}
-            navigation={{
-              prevEl: ".prev-btn",
-              nextEl: ".next-btn",
-            }}
-            autoplay={{ delay: 5000 }}
-            breakpoints={{
-              640: { slidesPerView: 2 },
-              1024: { slidesPerView: 4 },
-            }}
-            className="pb-10"
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map((product) => (
-              <SwiperSlide key={product._id}>
+              <div key={product._id} className="h-full">
                 <ProductCard product={product} navigate={navigate} />
-              </SwiperSlide>
+              </div>
             ))}
-          </Swiper>
+          </div>
         )}
       </div>
+
       {/* --- CATEGORY SECTION --- */}
-      <div className="bg-gray-50 py-24 px-6">
+      <div className="bg-gray-50 py-24 px-6 bg-amber-900">
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-4xl font-black text-gray-800 mb-16">Shop By Category</h2>
           <div className="grid lg:grid-cols-5 md:grid-cols-2 gap-10 cursor-pointer">
             {categories.map((cat, index) => (
-              <div key={index}  onClick={() => navigate(`/category/${cat.name}`)} className="group bg-white rounded-[2.5rem] p-10 transition-all duration-500 hover:shadow-2xl border border-slate-100 ">
+              <div key={index} onClick={() => navigate(`/category/${cat.name}`)} className="group bg-white rounded-[2.5rem] p-10 transition-all duration-500 hover:shadow-2xl border border-slate-100 ">
                 <div className="w-20 h-20 mx-auto flex items-center justify-center rounded-3xl bg-green-100 text-green-600 mb-6">
                   <FontAwesomeIcon icon={faLeaf} className="text-3xl" />
                 </div>
@@ -202,7 +203,7 @@ const Home = () => {
       </div>
 
       {/* --- SERVICES SECTION --- */}
-      <div className="bg-[#f8f9fa] py-12 border-y border-gray-100">
+      <div className="bg-[#e0ece3] py-12 border-y border-gray-100">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 items-center">
 
