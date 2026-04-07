@@ -17,7 +17,7 @@ import { useRef } from "react";
 
 const emptyProduct = {
   name: "",
-  description: "",
+  description: "• ",
   price: "",
   currentPrice: "",
   weight: "",
@@ -34,7 +34,8 @@ const AdminProducts = () => {
   const { token } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [form, setForm] = useState(emptyProduct, { description: "• " });
+  const [form, setForm] = useState({ ...emptyProduct });
+  const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
@@ -117,16 +118,22 @@ const AdminProducts = () => {
   };
 
   const handleFileChange = (e) => {
-    setForm((prev) => ({ ...prev, imagePath: e.target.files[0] }));
+    const file = e.target.files[0];
+    if (file) {
+      setForm((prev) => ({ ...prev, imagePath: file }));
+      setImagePreview(URL.createObjectURL(file));
+    }
   };
 
   const resetForm = () => {
-    setForm(emptyProduct);
+    setForm({ ...emptyProduct });
     setErrors({});
     setEditingId(null);
     setShowForm(false);
+    setImagePreview(null);
   };
 
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) {
@@ -136,7 +143,7 @@ const AdminProducts = () => {
 
     setLoading(true);
     const formData = new FormData();
-    const cleanDesc = sanitizeHTML(form.description);
+    const cleanDesc = form.description;
 
     Object.keys(form).forEach((key) => {
       if (key === "description") {
@@ -177,6 +184,7 @@ const AdminProducts = () => {
 
   const handleEdit = (p) => {
     setEditingId(p._id);
+    setImagePreview(null);
 
     const catId = p.categoryId?._id || p.category?._id || p.categoryId || "";
 
@@ -328,7 +336,7 @@ const AdminProducts = () => {
             } else {
               setEditingId(null);
               setErrors({});
-              setForm({ ...emptyProduct, description: "• " });
+              setForm({ ...emptyProduct });
               setShowForm(true);
             }
           }}
@@ -518,12 +526,24 @@ const AdminProducts = () => {
                       Current Image:
                     </p>
                     <img
-                      src={`${API_URL}/uploads/${form.imagePath}`}
+                      src={typeof form.imagePath === 'string' && form.imagePath.startsWith("http") ? form.imagePath : `${API_URL}/uploads/${form.imagePath}`}
                       className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"
                       alt="Current product image"
                       onError={(e) =>
                         (e.target.src = "https://placehold.co/100x100?text=No+Img")
                       }
+                    />
+                  </div>
+                )}
+                {imagePreview && (
+                  <div className="mt-2">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                      New Image Preview:
+                    </p>
+                    <img
+                      src={imagePreview}
+                      className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"
+                      alt="New preview"
                     />
                   </div>
                 )}
