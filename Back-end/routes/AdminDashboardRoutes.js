@@ -331,4 +331,53 @@ router.delete(
   }
 );
 
+
+// Dashboard Insights (Conversion Rate, Top Seeds, Graphs Data)
+router.get(
+  "/api/admin/dashboard-insights",
+  authMiddleware,
+  adminMiddleware,
+  async (req, res) => {
+    try {
+      // Top Selling Seeds (limit to 5)
+      const topSellingItems = await OrderItem.aggregate([
+        {
+          $group: {
+            _id: "$productId",
+            totalQuantitySold: { $sum: "$quantity" },
+            totalRevenue: { $sum: "$totalPrice" }
+          }
+        },
+        { $sort: { totalQuantitySold: -1 } },
+        { $limit: 5 },
+        {
+          $lookup: {
+            from: "products", // Ensure this matches actual DB collection name for products
+            localField: "_id",
+            foreignField: "_id",
+            as: "productDetails"
+          }
+        },
+        { $unwind: "$productDetails" }
+      ]);
+
+      const formattedTopSeeds = topSellingItems.map(item => ({
+        _id: item._id,
+        name: item.productDetails.name,
+        image: item.productDetails.imagePath || item.productDetails.image,
+        price: item.productDetails.price,
+        totalQuantitySold: item.totalQuantitySold,
+        totalRevenue: item.totalRevenue
+      }));
+
+        res.json({
+              topSellingSeeds: formattedTopSeeds,
+      });
+
+    } catch (err) {
+      console.error("DASHBOARD_INSIGHTS_ERROR:", err);
+      res.status(500).json({ message: "Server error fetching insights" });
+    }
+  }
+);
 module.exports = router;

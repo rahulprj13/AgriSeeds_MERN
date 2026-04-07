@@ -29,8 +29,11 @@ const AdminDashboard = () => {
     const loadDashboard = async () => {
       try {
         const statsRes = await axios.get("/api/admin/stats");
+        const insightsRes = await axios.get("/api/admin/dashboard-insights");
+
         setData({
           stats: statsRes.data || {},
+          insights: insightsRes.data || {},
           loading: false,
         });
       } catch (e) {
@@ -42,7 +45,7 @@ const AdminDashboard = () => {
     loadDashboard();
   }, []);
 
-  const { stats, loading } = data;
+  const { stats, loading, insights } = data;
 
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("en-IN", {
@@ -67,7 +70,7 @@ const AdminDashboard = () => {
   const paidPaymentPercentage =
     totalPayments > 0 ? Math.round((totalPaidPayments / totalPayments) * 100) : 0;
 
-    
+
   const pendingPaymentPercentage =
     totalPayments > 0 ? Math.round((totalPendingPayments / totalPayments) * 100) : 0;
 
@@ -148,6 +151,39 @@ const AdminDashboard = () => {
             onClick={() => navigate("/admin/carts")}
           />
         </div>
+
+
+        {/* Top Seeds */}
+        <div className="flex flex-1 flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="mb-4 text-sm font-black uppercase tracking-[0.2em] text-slate-400">Top Selling Seeds</h2>
+          <div className="flex flex-col gap-4 overflow-y-auto pr-2">
+            {insights.topSellingSeeds?.map((seed) => (
+              <div key={seed._id} className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-100">
+                    <img
+                      src={seed.image?.startsWith('http') ? seed.image : (seed.image?.startsWith('/') ? `http://localhost:5000${seed.image}` : `http://localhost:5000/uploads/${seed.image}`)}
+                      alt={seed.name}
+                      className="h-full w-full object-cover"
+                      onError={(e) => { e.target.src = 'https://placehold.co/100x100?text=No+Img' }}
+                    />
+                  </div>
+                  <div>
+                    <p className="line-clamp-1 text-sm font-bold text-slate-800">{seed.name}</p>
+                    <p className="text-xs font-medium text-slate-400">{seed.totalQuantitySold} units</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-emerald-600">₹{seed.totalRevenue}</p>
+                </div>
+              </div>
+            ))}
+            {(!insights.topSellingSeeds || insights.topSellingSeeds.length === 0) && (
+              <p className="text-sm text-slate-400">No data available</p>
+            )}
+          </div>
+        </div>
+
 
         {/* Orders + Payments Highlight Cards */}
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
