@@ -20,9 +20,9 @@ const Cart = () => {
 
   const navigate = useNavigate();
 
-    
-    // const categoryName = product.categoryId?.name?.toLowerCase() || "seeds";
-    // const productName = product.name?.toLowerCase().replace(/\s+/g, '-');
+
+  // const categoryName = product.categoryId?.name?.toLowerCase() || "seeds";
+  // const productName = product.name?.toLowerCase().replace(/\s+/g, '-');
 
   // 1. Redirect if not logged in (Using useEffect to avoid double toast)
   // useEffect(() => {
@@ -33,13 +33,13 @@ const Cart = () => {
   // }, [user, navigate]);
 
 
-  
+
   const checkAvailability = (item) => {
     const isOutOfStock = Number(item.stock) <= 0;
     const isInactive = item.status && item.status !== "active";
     return isOutOfStock || isInactive;
   };
-  
+
   const hasInvalidItems = cart.some(item => checkAvailability(item));
 
   // Loading state if user is being redirected
@@ -55,8 +55,8 @@ const Cart = () => {
           </div>
           <h1 className="text-2xl font-black text-slate-800 mb-2">Your cart is empty</h1>
           <p className="text-slate-400 font-medium mb-8">Looks like you haven't added anything to your cart yet.</p>
-          <button 
-            onClick={() => navigate("/")} 
+          <button
+            onClick={() => navigate("/")}
             className="w-full bg-green-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-green-700 transition-all active:scale-95 shadow-xl shadow-green-100"
           >
             Start Shopping
@@ -80,12 +80,12 @@ const Cart = () => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-10">
-          
+
           {/* --- LEFT: CART ITEMS LIST --- */}
           <div className="lg:col-span-2 space-y-4">
 
             {cart.map((item) => {
-              
+
               const currentStock = Number(item.stock);
               const isUnavailable = (item.status && item.status !== "active") || currentStock <= 0;
               const productId = item.productId?._id || item.productId;
@@ -94,7 +94,7 @@ const Cart = () => {
               const productNameSlug = (item.productId?.name || item.name || "")
                 .toLowerCase()
                 .replace(/\s+/g, "-");
-              
+
               const itemImage = item.imagePath
                 ? (item.imagePath.startsWith('http') ? item.imagePath : `${API_URL}/uploads/${item.imagePath}`)
                 : "https://placehold.co/400x400?text=Product";
@@ -102,16 +102,15 @@ const Cart = () => {
               return (
                 <div
                   key={item._id}
-                  className={`bg-white p-5 rounded-4xl border transition-all flex flex-col sm:flex-row gap-6 items-center group relative ${
-                    isUnavailable ? "border-red-200 bg-red-50/40" : "border-slate-100 shadow-sm hover:shadow-md"
-                  }`}
+                  className={`bg-white p-5 rounded-4xl border transition-all flex flex-col sm:flex-row gap-6 items-center group relative ${isUnavailable ? "border-red-200 bg-red-50/40" : "border-slate-100 shadow-sm hover:shadow-md"
+                    }`}
                 >
                   {/* Product Image */}
                   <div className={`relative w-32 h-32 rounded-2xl overflow-hidden shrink-0 ${isUnavailable ? "grayscale opacity-50" : "bg-slate-50"}`}>
-                    <img 
-                      src={itemImage} 
-                      alt={item.name} 
-                      className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-500" 
+                    <img
+                      src={itemImage}
+                      alt={item.name}
+                      className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-500"
                       onClick={() => {
                         if (!productId) return;
                         navigate(`/category/${categorySlug}/${productNameSlug}/${productId}`);
@@ -122,13 +121,13 @@ const Cart = () => {
                   {/* Product Info */}
                   <div className="flex-1 text-center sm:text-left">
                     <h2 className={`text-xl font-black transition-colors ${isUnavailable ? "text-slate-400" : "text-slate-800 hover:text-green-600 cursor-pointer"}`}
-                        onClick={() => {
-                          if (isUnavailable) return;
-                          if (!productId) return;
-                          navigate(`/category/${categorySlug}/${productNameSlug}/${productId}`);
-                        }}>
+                      onClick={() => {
+                        if (isUnavailable) return;
+                        if (!productId) return;
+                        navigate(`/category/${categorySlug}/${productNameSlug}/${productId}`);
+                      }}>
                       {item.name}
-                      
+
                     </h2>
                     <p className="text-slate-600 text-sm font-bold uppercase tracking-widest mt-1">
                       {item.weight} {item.unit}
@@ -141,16 +140,28 @@ const Cart = () => {
                       </div>
                     ) : (
                       <div className="flex items-center justify-center sm:justify-start mt-4 bg-slate-50 w-fit rounded-xl p-1 border border-slate-100">
-                        <button 
-                          onClick={() => decrementQuantity(item._id, item.quantity)} 
+                        <button
+                          onClick={() => decrementQuantity(item._id, item.quantity)}
                           className="p-2 hover:bg-white hover:text-red-500 rounded-lg transition-all"
                         >
                           <Minus size={16} strokeWidth={3} />
                         </button>
                         <span className="w-10 text-center font-black text-slate-800">{item.quantity}</span>
                         <button
-                          onClick={() => incrementQuantity(item._id, item.quantity)}
-                          disabled={item.quantity >= currentStock}
+                          onClick={() => {
+                            if (currentStock <= 0) {
+                              toast.error("Product is out of stock");
+                              return;
+                            }
+
+                            if (item.quantity >= currentStock) {
+                              toast.warning(`Only ${currentStock} stock available`);
+                              return;
+                            }
+
+                            incrementQuantity(item._id, item.quantity);
+                          }}
+                          disabled={isUnavailable}
                           className="p-2 hover:bg-white hover:text-green-600 rounded-lg disabled:opacity-20 transition-all"
                         >
                           <Plus size={16} strokeWidth={3} />
@@ -167,8 +178,8 @@ const Cart = () => {
                       </p>
                       <p className="text-xs font-bold text-slate-400">₹{item.currentPrice} /per unit</p>
                     </div>
-                    <button 
-                      onClick={() => removeFromCart(item._id)} 
+                    <button
+                      onClick={() => removeFromCart(item._id)}
                       className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all active:scale-90"
                       title="Remove Item"
                     >
@@ -213,11 +224,10 @@ const Cart = () => {
               <button
                 disabled={hasInvalidItems}
                 onClick={() => navigate("/checkout")}
-                className={`w-full py-5 rounded-2xl font-bold text-lg transition-all shadow-xl flex items-center justify-center gap-3 active:scale-95 ${
-                  hasInvalidItems
+                className={`w-full py-5 rounded-2xl font-bold text-lg transition-all shadow-xl flex items-center justify-center gap-3 active:scale-95 ${hasInvalidItems
                     ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
                     : "bg-slate-900 text-white hover:bg-green-600 shadow-slate-200"
-                }`}
+                  }`}
               >
                 {hasInvalidItems ? "Check Items Again" : "Checkout Now"}
               </button>
