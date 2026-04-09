@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
-import { Sprout, LogOut, LayoutDashboard, FolderTree, Package, Bell, Menu, X, MapPin, ChevronRight, UserCog, Users, ShoppingCart, CreditCard, Mail } from "lucide-react";
+import { Sprout, LogOut, LayoutDashboard, FolderTree, Package, Bell, Menu, X, MapPin, ChevronRight, UserCog, Users, ShoppingCart, CreditCard, Mail, Star } from "lucide-react";
 import { useLocation, NavLink, Outlet, useNavigate } from "react-router-dom";
 
 const AdminLayout = () => {
@@ -129,6 +129,7 @@ const AdminLayout = () => {
     { path: "/admin/products", label: "Product", icon: <Package size={18} /> },
     { path: "/admin/orders", label: "Orders", icon: <ShoppingCart size={18} /> },
     { path: "/admin/payments", label: "Payments", icon: <CreditCard size={18} /> },
+    { path: "/admin/reviews", label: "Reviews", icon: <Star size={18} /> },
     { path: "/admin/contact", label: "Contact", icon: <MapPin size={18} /> },
     { path: "/admin/messages", label: "Messages", icon: <Mail size={18} /> },
   ];
