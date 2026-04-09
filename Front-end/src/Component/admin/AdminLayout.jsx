@@ -129,6 +129,7 @@ const AdminLayout = () => {
     { path: "/admin/products", label: "Product", icon: <Package size={18} /> },
     { path: "/admin/orders", label: "Orders", icon: <ShoppingCart size={18} /> },
     { path: "/admin/payments", label: "Payments", icon: <CreditCard size={18} /> },
+    { path: "/admin/contact", label: "Contact", icon: <MapPin size={18} /> },
   ];
 
   const activeItem = menuItems.find(item => item.path === location.pathname);
