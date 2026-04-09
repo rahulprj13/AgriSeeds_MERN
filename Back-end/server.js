@@ -17,6 +17,7 @@ const orderRouter = require("./routes/OrderRoutes.js");
 const paymentRouter = require("./routes/PaymentRoutes.js");
 const reviewRouter = require("./routes/ReviewRoutes.js");
 const wishlistRouter = require("./routes/WishlistRoutes.js");
+const contactRouter = require("./routes/ContactRoutes.js");
 
 app.use(authRouter);
 app.use(categoryRouter);
@@ -27,6 +28,7 @@ app.use(orderRouter);
 app.use(paymentRouter);
 app.use(reviewRouter);
 app.use(wishlistRouter);
+app.use(contactRouter);
 app.use("/uploads", express.static("uploads"));
   
 const PORT = 5000;
