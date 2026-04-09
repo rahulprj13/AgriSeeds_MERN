@@ -33,6 +33,7 @@ import AdminProducts from "../Component/admin/AdminProducts";
 import AdminLogin from "../Component/admin/AdminLogin";
 import AdminPayment from "../Component/admin/AdminPayment";
 import AdminContact from "../Component/admin/AdminContact";
+import AdminReviews from "../Component/admin/AdminReviews";
 
 import { AuthContext } from "../Component/context/AuthContext";
 import { ForgotPassword } from "../Component/auth/ForgotPassword";
@@ -122,6 +123,7 @@ const router = createBrowserRouter([
       { path: "orders", element: <AdminOrders /> },
       { path: "orders/:id", element: <AdminOrderItem /> },
       { path: "payments", element: <AdminPayment /> },
+      { path: "reviews", element: <AdminReviews /> },
       { path: "contact", element: <AdminContact /> },
       { path: "messages", element: <AdminMessages /> },
     ],
