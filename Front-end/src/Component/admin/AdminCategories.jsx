@@ -316,14 +316,14 @@ const AdminCategories = () => {
                         <div className="flex justify-end gap-2">
                           <button
                             onClick={() => handleEdit(cat)}
-                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                            className="p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                           >
                             <Pencil size={18} />
                           </button>
 
                           <button
                             onClick={() => handleDelete(cat._id, cat.name)}
-                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                            className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                           >
                             <Trash2 size={18} />
                           </button>
