@@ -110,3 +110,60 @@ exports.deleteMyReview = async (req, res) => {
   }
 };
 
+// ADMIN: GET ALL REVIEWS
+exports.getAllReviews = async (req, res) => {
+  try {
+    const reviews = await Review.find()
+      .populate("userId", "firstname lastname email")
+      .populate("productId", "name price image")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      message: "Reviews fetched successfully",
+      data: reviews,
+    });
+  } catch (error) {
+    console.error("GET_ALL_REVIEWS_ERROR:", error);
+    return res.status(500).json({ message: "Error fetching reviews" });
+  }
+};
+
+// ADMIN: DELETE REVIEW
+exports.deleteReviewAdmin = async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+
+    const deleted = await Review.findByIdAndDelete(reviewId);
+    if (!deleted) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    return res.status(200).json({
+      message: "Review deleted successfully",
+      data: deleted,
+    });
+  } catch (error) {
+    console.error("DELETE_REVIEW_ADMIN_ERROR:", error);
+    return res.status(500).json({ message: "Error deleting review" });
+  }
+};
+
+// ADMIN: GET REVIEWS BY PRODUCT
+exports.getReviewsByProductAdmin = async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const reviews = await Review.find({ productId })
+      .populate("userId", "firstname lastname email")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      message: "Product reviews fetched successfully",
+      data: reviews,
+    });
+  } catch (error) {
+    console.error("GET_PRODUCT_REVIEWS_ADMIN_ERROR:", error);
+    return res.status(500).json({ message: "Error fetching product reviews" });
+  }
+};
+
