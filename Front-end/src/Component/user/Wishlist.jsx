@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/AuthContext";
 import { CartContext } from "../context/CartContext";
-import { Heart, ShoppingCart, Trash2 } from "lucide-react";
+import { Heart, ShoppingBag, ShoppingCart, Trash2 } from "lucide-react";
 
 const API_URL = "http://localhost:5000";
 
@@ -35,16 +35,6 @@ const Wishlist = () => {
     }
   };
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      toast.info("Please login first");
-      navigate("/login", { replace: true });
-      return;
-    }
-    fetchWishlist();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn, token]);
-
   const handleRemove = async (productId) => {
     if (!productId) return;
     try {
@@ -70,13 +60,6 @@ const Wishlist = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-slate-500 font-bold">Loading wishlist...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-slate-50 pb-16">
