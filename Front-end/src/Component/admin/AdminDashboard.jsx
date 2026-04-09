@@ -143,13 +143,13 @@ const AdminDashboard = () => {
             color="bg-indigo-500"
             onClick={() => navigate("/admin/categories")}
           />
-          <StatCard
+          {/* <StatCard
             icon={<ShoppingCart className="h-6 w-6 text-white" />}
             label="Total Cart Items"
             value={formatNumber(totalCartItems)}
             color="bg-orange-500"
             onClick={() => navigate("/admin/carts")}
-          />
+          /> */}
         </div>
 
 
