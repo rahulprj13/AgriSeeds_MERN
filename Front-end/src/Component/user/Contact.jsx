@@ -152,7 +152,7 @@ const Contact = () => {
       console.error("Contact Form Error:", error);
       toast.error(
         error?.response?.data?.message ||
-          "Failed to send message. Please try again later.",
+        "Failed to send message. Please try again later.",
         {
           position: "top-center",
         }
@@ -253,17 +253,21 @@ const Contact = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Call Us */}
                 <div className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 flex flex-col items-center text-center group hover:-translate-y-1 transition duration-300">
                   <FontAwesomeIcon
                     icon={faPhone}
                     className="text-green-500 text-3xl mb-3 group-hover:scale-110 transition"
                   />
                   <h4 className="font-bold text-gray-900 text-lg">Call Us</h4>
-                  <p className="text-gray-500 text-sm mt-1">
-                    {contact?.phone || "N/A"}
+
+                  <p className="text-gray-500 text-sm mt-1 flex items-center gap-1">
+                    <span className="font-semibold text-green-600">+91</span>
+                    <span>{contact?.phone || "N/A"}</span>
                   </p>
                 </div>
 
+                {/* Email Us */}
                 <div className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 flex flex-col items-center text-center group hover:-translate-y-1 transition duration-300">
                   <FontAwesomeIcon
                     icon={faEnvelope}
@@ -275,17 +279,30 @@ const Contact = () => {
                   </p>
                 </div>
 
+                {/* Visit Us */}
                 <div className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 flex flex-col items-center text-center group hover:-translate-y-1 transition duration-300">
                   <FontAwesomeIcon
                     icon={faLocationDot}
                     className="text-green-500 text-3xl mb-3 group-hover:scale-110 transition"
                   />
                   <h4 className="font-bold text-gray-900 text-lg">Visit Us</h4>
-                  <p className="text-gray-500 text-sm mt-1">
-                    {contact?.address || contact?.location || "N/A"}
-                  </p>
+
+                  <div className="text-gray-500 text-sm mt-1 space-y-1">
+                    {contact?.address && <p>{contact.address}</p>}
+                    {(contact?.city || contact?.state) && (
+                      <p>
+                        {[contact?.city, contact?.state].filter(Boolean).join(", ")}
+                      </p>
+                    )}
+                    {contact?.country && <p>{contact.country}</p>}
+                    {!contact?.address &&
+                      !contact?.city &&
+                      !contact?.state &&
+                      !contact?.country && <p>N/A</p>}
+                  </div>
                 </div>
 
+                {/* Working Hours */}
                 <div className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 flex flex-col items-center text-center group hover:-translate-y-1 transition duration-300">
                   <FontAwesomeIcon
                     icon={faClock}
