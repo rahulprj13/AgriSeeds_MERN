@@ -173,7 +173,7 @@ const Home = () => {
             <div className="w-12 h-12 border-4 border-green-600/20 border-t-green-600 rounded-full animate-spin" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
             {featuredProducts.map((product) => (
               <div key={product._id} className="h-full">
                 <ProductCard product={product} navigate={navigate} />

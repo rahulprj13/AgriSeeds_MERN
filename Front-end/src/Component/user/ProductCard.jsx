@@ -1,117 +1,151 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, IndianRupee, Ban } from "lucide-react"; 
+import { ArrowRight, IndianRupee, Ban } from "lucide-react";
 
 const API_URL = "http://localhost:5000";
 
 const ProductCard = ({ product }) => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    // Check if product is in-stock
-    const isOutOfStock =  product.stock <= 0;
+  const isOutOfStock = product.stock <= 0;
+  const isInactive = product.status !== "active";
 
-    //check if product is Inactive
-    const isInactive = product.status !== "active"; 
+  if (isInactive) return null;
 
-    // If inactive, return null so nothing renders
-    if (isInactive) return null;
-    
-    const sellerPrice = Number(product.currentPrice) || 0;
-    const Price = Number(product.price) || 0;
+  const sellerPrice = Number(product.currentPrice) || 0;
+  const originalPrice = Number(product.price) || 0;
 
-    const discountPercent = (sellerPrice > 0 && sellerPrice !== Price)
-        ? Math.round((Math.abs(sellerPrice - Price) / Math.max(sellerPrice, Price)) * 100)
-        : 0;
+  const discountPercent =
+    sellerPrice > 0 && sellerPrice !== originalPrice
+      ? Math.round(
+          (Math.abs(originalPrice - sellerPrice) / Math.max(originalPrice, sellerPrice)) * 100
+        )
+      : 0;
 
-    const categoryName = product.categoryId?.name?.toLowerCase() || "seeds";
-    const productName = product.name?.toLowerCase().replace(/\s+/g, '-');
+  const categoryName = product.categoryId?.name?.toLowerCase() || "seeds";
+  const productName = product.name?.toLowerCase().replace(/\s+/g, "-");
 
-    const imageSrc = product.imagePath
-        ? (product.imagePath.startsWith('http') ? product.imagePath : `${API_URL}/uploads/${product.imagePath}`)
-        : "https://placehold.co/400x400?text=No+Image";
+  const imageSrc = product.imagePath
+    ? product.imagePath.startsWith("http")
+      ? product.imagePath
+      : `${API_URL}/uploads/${product.imagePath}`
+    : "https://placehold.co/400x400?text=No+Image";
 
-    return (
-        <div className={`group bg-white rounded-3xl border border-slate-100 shadow-sm transition-all duration-500 overflow-hidden flex flex-col relative cursor-pointer
-            ${isOutOfStock ? "opacity-75 grayscale-[0.5]" : "hover:shadow-2xl hover:shadow-green-900/5"}`}>
-            
-            {/* Image Container */}
-            <div className="relative h-100 overflow-hidden bg-slate-100">
-                <img
-                    src={imageSrc}
-                    alt={product.name}
-                    onClick={() => !isOutOfStock && navigate(`/category/${categoryName}/${productName}/${product._id}`, { state: product })}
-                    className={`w-full h-full object-cover transition duration-500 ${!isOutOfStock && "group-hover:scale-110"}`}
-                />
-                
-                {/* Status Badges */}
-                <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
-                    {isOutOfStock ? (
-                        <span className="bg-slate-900 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg uppercase tracking-wider">
-                            Out of Stock
-                        </span>
-                    ) : (
-                        <>
-                            <span className="bg-green-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg uppercase tracking-wider">
-                                In Stock
-                            </span>
-                            {discountPercent > 0 && (
-                                <span className="bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg uppercase">
-                                    {discountPercent}% OFF
-                                </span>
-                            )}
-                        </>
-                    )}
-                    
-                    <span className="bg-white/90 backdrop-blur-md text-slate-800 text-[10px] font-black px-3 py-1 rounded-full shadow-sm uppercase">
-                        {product.weight} {product.unit}
-                    </span>
-                </div>
+  const handleNavigate = () => {
+    if (!isOutOfStock) {
+      navigate(`/category/${categoryName}/${productName}/${product._id}`, {
+        state: product,
+      });
+    }
+  };
 
-                {/* Out of Stock Overlay Text */}
-                {isOutOfStock && (
-                    <div className="absolute inset-0 bg-slate-900/10 flex items-center justify-center">
-                         <div className="bg-white/80 backdrop-blur px-4 py-2 rounded-xl border border-white/50 shadow-xl">
-                            <p className="text-slate-900 font-black text-sm uppercase">Currently Unavailable</p>
-                         </div>
-                    </div>
-                )}
-            </div>
+  return (
+    <div
+      className={`group relative flex h-full flex-col overflow-hidden rounded-[26px] border bg-white transition-all duration-300 cursor-pointer
+      ${
+        isOutOfStock
+          ? "border-slate-200 opacity-85"
+          : "border-slate-100 shadow-sm hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-100/60"
+      }`}
+    >
+      {/* Top glow */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-emerald-50/70 to-transparent" />
 
-            {/* Content */}
-            <div className="p-6 flex flex-col grow">
-                <h3 className={`text-lg font-black transition-colors line-clamp-1 ${isOutOfStock ? "text-slate-500" : "text-slate-800 group-hover:text-green-600"}`}>
-                    {product.name}
-                </h3>
-                {/* <p className="text-slate-400 text-xs mt-1 font-medium line-clamp-2 leading-relaxed">
-                    {product.description}
-                </p> */}
+      {/* Image */}
+      <div className="relative flex h-52 items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-emerald-50/40 p-4">
+        <img
+          src={imageSrc}
+          alt={product.name}
+          onClick={handleNavigate}
+          className={`h-full w-full object-contain transition duration-500 ${
+            !isOutOfStock ? "group-hover:scale-105" : "grayscale-[0.35]"
+          }`}
+        />
 
-                <div className="mt-auto flex items-end justify-between pt-4">
-                    <div className="flex flex-col">
-                        <span className={`text-2xl font-black flex items-center ${isOutOfStock ? "text-slate-400" : "text-slate-900"}`}>
-                            <IndianRupee size={18} strokeWidth={3} /> {sellerPrice}
-                            {Price !== sellerPrice && (
-                                <span className="ml-2 text-slate-400 line-through text-xs font-bold decoration-red-400/50">
-                                    ₹{Price}
-                                </span>
-                            )}
-                        </span>
-                    </div>
-                    
-                    <button
-                        disabled={isOutOfStock}
-                        onClick={() => !isOutOfStock && navigate(`/category/${categoryName}/${productName}/${product._id}`, { state: product })}
-                        className={`p-4 rounded-2xl transition-all duration-300 shadow-lg flex items-center justify-center cursor-pointer
-                            ${isOutOfStock 
-                                ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
-                                : "bg-slate-900 text-white hover:bg-green-600 shadow-slate-200 hover:shadow-green-200"}`}
-                    >
-                        {isOutOfStock ? <Ban size={20} /> : <ArrowRight size={20} />}
-                    </button>
-                </div>
-            </div>
+        {/* badges */}
+        <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+          <span className="rounded-full border border-white/70 bg-white/90 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-700 shadow-sm backdrop-blur">
+            {product.weight} {product.unit}
+          </span>
         </div>
-    );
+
+        <div className="absolute right-3 top-3 flex flex-col gap-2">
+          {isOutOfStock ? (
+            <span className="rounded-full bg-slate-900 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-md">
+              Out of Stock
+            </span>
+          ) : (
+            <span className="rounded-full bg-emerald-500 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-md">
+              In Stock
+            </span>
+          )}
+
+          {!isOutOfStock && discountPercent > 0 && (
+            <span className="rounded-full bg-rose-500 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-md">
+              {discountPercent}% OFF
+            </span>
+          )}
+        </div>
+
+        {isOutOfStock && (
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-900/10">
+            <div className="rounded-2xl border border-white/60 bg-white/85 px-4 py-2 shadow-lg backdrop-blur">
+              <p className="text-xs font-black uppercase tracking-wider text-slate-800">
+                Currently Unavailable
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="flex flex-1 flex-col p-4">
+        <div className="mb-2">
+          <h3
+            className={`line-clamp-1 text-[16px] font-black tracking-tight ${
+              isOutOfStock
+                ? "text-slate-500"
+                : "text-slate-800 group-hover:text-emerald-600"
+            }`}
+          >
+            {product.name}
+          </h3>
+        </div>
+
+        <div className="mt-auto flex items-end justify-between pt-3">
+          <div className="flex flex-col">
+            <div
+              className={`flex items-center text-[22px] font-black ${
+                isOutOfStock ? "text-slate-400" : "text-slate-900"
+              }`}
+            >
+              <IndianRupee size={16} strokeWidth={3} />
+              <span>{sellerPrice}</span>
+            </div>
+
+            {originalPrice !== sellerPrice && (
+              <span className="text-xs font-bold text-slate-400 line-through decoration-rose-400/60">
+                ₹{originalPrice}
+              </span>
+            )}
+          </div>
+
+          <button
+            disabled={isOutOfStock}
+            onClick={handleNavigate}
+            className={`flex h-11 w-11 items-center justify-center rounded-2xl transition-all duration-300 cursor-pointer
+            ${
+              isOutOfStock
+                ? "cursor-not-allowed bg-slate-100 text-slate-400"
+                : "bg-slate-900 text-white shadow-lg shadow-slate-200 hover:bg-emerald-600 hover:shadow-emerald-200"
+            }`}
+          >
+            {isOutOfStock ? <Ban size={18} /> : <ArrowRight size={18} />}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ProductCard;
