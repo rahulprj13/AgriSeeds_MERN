@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import axios from "axios";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -14,6 +15,23 @@ import {
 const Contact = () => {
 
   const { register, handleSubmit, formState: { errors } } = useForm();
+  const [contact, setContact] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchContact = async () => {
+      try {
+        const res = await axios.get("/api/contact");
+        setContact(res.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching contact:", err);
+        setLoading(false);
+      }
+    };
+
+    fetchContact();
+  }, []);
 
   const validationRules = {
     name: {
@@ -188,38 +206,46 @@ const Contact = () => {
                   Contact Information
                 </h3>
 
-                <p className="mb-4 flex gap-3">
-                  <FontAwesomeIcon icon={faLocationDot} className="mt-1 text-green-400"/>
-                  <span>
-                    <strong>Address:</strong><br />
-                    SeedStore Pvt. Ltd.<br />
-                    Ahmedabad, Gujarat, India
-                  </span>
-                </p>
+                {loading ? (
+                  <p className="text-gray-300">Loading contact info...</p>
+                ) : contact ? (
+                  <>
+                    <p className="mb-4 flex gap-3">
+                      <FontAwesomeIcon icon={faLocationDot} className="mt-1 text-green-400"/>
+                      <span>
+                        <strong>Address:</strong><br />
+                        {contact.address}<br />
+                        {contact.city}, {contact.state}, {contact.country}
+                      </span>
+                    </p>
 
-                <p className="mb-4 flex gap-3">
-                  <FontAwesomeIcon icon={faPhone} className="mt-1 text-green-400"/>
-                  <span>
-                    <strong>Phone:</strong><br />
-                    +91 98765 43210
-                  </span>
-                </p>
+                    <p className="mb-4 flex gap-3">
+                      <FontAwesomeIcon icon={faPhone} className="mt-1 text-green-400"/>
+                      <span>
+                        <strong>Phone:</strong><br />
+                        {contact.phone}
+                      </span>
+                    </p>
 
-                <p className="mb-4 flex gap-3">
-                  <FontAwesomeIcon icon={faEnvelope} className="mt-1 text-green-400"/>
-                  <span>
-                    <strong>Email:</strong><br />
-                    support@seedstore.com
-                  </span>
-                </p>
+                    <p className="mb-4 flex gap-3">
+                      <FontAwesomeIcon icon={faEnvelope} className="mt-1 text-green-400"/>
+                      <span>
+                        <strong>Email:</strong><br />
+                        {contact.email}
+                      </span>
+                    </p>
 
-                <p className="mb-4 flex gap-3">
-                  <FontAwesomeIcon icon={faClock} className="mt-1 text-green-400"/>
-                  <span>
-                    <strong>Working Hours:</strong><br />
-                    Monday - Saturday: 9 AM – 7 PM
-                  </span>
-                </p>
+                    <p className="mb-4 flex gap-3">
+                      <FontAwesomeIcon icon={faClock} className="mt-1 text-green-400"/>
+                      <span>
+                        <strong>Working Hours:</strong><br />
+                        {contact.workingHours}
+                      </span>
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-gray-300">Contact information not available</p>
+                )}
 
                 <hr className="my-4 border-white/30" />
 
@@ -241,16 +267,20 @@ const Contact = () => {
 
 
       {/* ✅ Google Map */}
-      <div className="w-full mb-12">
-        <iframe
-          title="map"
-          src="https://maps.google.com/maps?q=Ahmedabad&t=&z=13&ie=UTF8&iwloc=&output=embed"
-          width="100%"
-          height="400"
-          style={{ border: 0 }}
-          loading="lazy"
-        ></iframe>
-      </div>
+      {!loading && contact?.mapEmbedUrl && (
+        <div className="w-full mb-12">
+          <iframe
+            title="map"
+            src={contact.mapEmbedUrl}
+            width="100%"
+            height="400"
+            style={{ border: 0 }}
+            allowFullScreen=""
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </div>
+      )}
 
     </div>
   );

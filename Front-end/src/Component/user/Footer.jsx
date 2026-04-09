@@ -1,10 +1,28 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { CategoryContext } from "../context/CategoryContext";
 import { Sprout } from "lucide-react";
+import axios from "axios";
 
 const Footer = () => {
   const { categories } = useContext(CategoryContext);
+  const [contact, setContact] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchContact = async () => {
+      try {
+        const res = await axios.get("/api/contact");
+        setContact(res.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching contact:", err);
+        setLoading(false);
+      }
+    };
+
+    fetchContact();
+  }, []);
 
   return (
     <footer className="bg-gray-900 text-gray-200 pt-10 pb-4 mt-12">
@@ -72,9 +90,21 @@ const Footer = () => {
           {/* Contact */}
           <div className="lg:col-span-3">
             <h6 className="font-semibold mb-2">Contact</h6>
-            <p>Email: support@seedstore.com</p>
-            <p>Phone: +91 98765 43210</p>
-            <p>Location: India</p>
+            {loading ? (
+              <p className="text-gray-400 text-sm">Loading...</p>
+            ) : contact ? (
+              <>
+                <p>Email: {contact.email}</p>
+                <p>Phone: {contact.phone}</p>
+                <p>Location: {contact.city}, {contact.state}, {contact.country}</p>
+              </>
+            ) : (
+              <>
+                <p>Email: support@seedstore.com</p>
+                <p>Phone: +91 98765 43210</p>
+                <p>Location: India</p>
+              </>
+            )}
           </div>
         </div>
 
