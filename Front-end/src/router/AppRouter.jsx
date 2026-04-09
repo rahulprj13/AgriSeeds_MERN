@@ -40,6 +40,7 @@ import { ResetPassword } from "../Component/auth/ResetPassword";
 import AdminOrders from "../Component/admin/AdminOrders.jsx";
 import AdminOrderItem from "../Component/admin/AdminOrderItem.jsx";
 import UserProfile from "../Component/user/UserProfile.jsx";
+import AdminMessages from "../Component/admin/AdminMessages.jsx";
 
 const AdminPrivateRoute = ({ children }) => {
 
@@ -122,6 +123,7 @@ const router = createBrowserRouter([
       { path: "orders/:id", element: <AdminOrderItem /> },
       { path: "payments", element: <AdminPayment /> },
       { path: "contact", element: <AdminContact /> },
+      { path: "messages", element: <AdminMessages /> },
     ],
   },
 
