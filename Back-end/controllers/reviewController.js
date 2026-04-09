@@ -1,6 +1,7 @@
 const Review = require("../models/ReviewModel");
 const Product = require("../models/ProductModel");
 const User = require("../models/UserModel");
+const mongoose = require("mongoose");
 
 const toRating = (v) => {
   const n = Number(v);
@@ -62,7 +63,11 @@ exports.getProductReviewSummary = async (req, res) => {
     const { id: productId } = req.params;
 
     const summary = await Review.aggregate([
-      { $match: { productId: productId } },
+      {
+        $match: {
+          productId: new mongoose.Types.ObjectId(productId),
+        },
+      },
       {
         $group: {
           _id: "$productId",
@@ -80,7 +85,7 @@ exports.getProductReviewSummary = async (req, res) => {
     return res.status(200).json({
       data: {
         count: row.count,
-        avgRating: row.avgRating,
+        avgRating: Number(row.avgRating.toFixed(1)),
       },
     });
   } catch (error) {
