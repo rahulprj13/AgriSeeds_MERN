@@ -1,9 +1,19 @@
-import React, { useContext, useEffect } from "react";
-import { AuthContext } from "../context/AuthContext";
-import { CartContext } from "../context/CartContext";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, AlertCircle, ShieldCheck } from "lucide-react";
+import {
+  Trash2,
+  Plus,
+  Minus,
+  ShoppingBag,
+  ArrowLeft,
+  AlertCircle,
+  ShieldCheck,
+  BadgeCheck,
+  Truck,
+  Tag,
+} from "lucide-react";
 import { toast } from "react-toastify";
+import { CartContext } from "../context/CartContext";
 import { CategoryContext } from "../context/CategoryContext";
 
 const API_URL = "http://localhost:5000";
@@ -20,19 +30,11 @@ const Cart = () => {
 
   const navigate = useNavigate();
 
-
-  // const categoryName = product.categoryId?.name?.toLowerCase() || "seeds";
-  // const productName = product.name?.toLowerCase().replace(/\s+/g, '-');
-
-  // 1. Redirect if not logged in (Using useEffect to avoid double toast)
-  // useEffect(() => {
-  //   if (!user) {
-  //     toast.info("Please login to view your cart", { toastId: "auth-check" });
-  //     navigate("/login");
-  //   }
-  // }, [user, navigate]);
-
-
+  const [confirmBox, setConfirmBox] = useState({
+    open: false,
+    itemId: null,
+    itemName: "",
+  });
 
   const checkAvailability = (item) => {
     const isOutOfStock = Number(item.stock) <= 0;
@@ -40,26 +42,49 @@ const Cart = () => {
     return isOutOfStock || isInactive;
   };
 
-  const hasInvalidItems = cart.some(item => checkAvailability(item));
+  const hasInvalidItems = cart.some((item) => checkAvailability(item));
 
-  // Loading state if user is being redirected
-  // if (!user) return null;
+  const openRemoveConfirm = (itemId, itemName) => {
+    setConfirmBox({
+      open: true,
+      itemId,
+      itemName,
+    });
+  };
 
-  // 3. Empty Cart UI
+  const closeRemoveConfirm = () => {
+    setConfirmBox({
+      open: false,
+      itemId: null,
+      itemName: "",
+    });
+  };
+
+  const confirmRemoveItem = () => {
+    if (!confirmBox.itemId) return;
+    removeFromCart(confirmBox.itemId);
+    closeRemoveConfirm();
+    toast.success("Item removed from cart");
+  };
+
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-slate-50 px-4">
-        <div className="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-100 text-center max-w-md">
-          <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <ShoppingBag className="text-slate-300" size={40} />
+      <div className="min-h-screen bg-[#f1f3f6] px-4 flex items-center justify-center">
+        <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-sm border border-slate-200">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50">
+            <ShoppingBag className="text-blue-600" size={30} />
           </div>
-          <h1 className="text-2xl font-black text-slate-800 mb-2">Your cart is empty</h1>
-          <p className="text-slate-400 font-medium mb-8">Looks like you haven't added anything to your cart yet.</p>
+
+          <h1 className="text-2xl font-bold text-slate-900">Your cart is empty</h1>
+          <p className="mt-2 text-sm text-slate-500">
+            Add products to your cart and continue shopping.
+          </p>
+
           <button
             onClick={() => navigate("/")}
-            className="w-full bg-green-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-green-700 transition-all active:scale-95 shadow-xl shadow-green-100"
+            className="mt-6 w-full rounded-xl bg-[#2874f0] px-6 py-3 font-semibold text-white hover:bg-[#1f63d3] transition"
           >
-            Start Shopping
+            Shop Now
           </button>
         </div>
       </div>
@@ -67,183 +92,304 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20">
-      <div className="max-w-7xl mx-auto px-4 pt-12">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-10">
-          <button onClick={() => navigate(-1)} className="p-2 bg-white rounded-xl shadow-sm hover:text-green-600 transition-colors">
-            <ArrowLeft size={20} />
-          </button>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">
-            My Cart <span className="text-green-600 text-lg">({cart.length} items)</span>
-          </h1>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-10">
-
-          {/* --- LEFT: CART ITEMS LIST --- */}
-          <div className="lg:col-span-2 space-y-4">
-
-            {cart.map((item) => {
-
-              const currentStock = Number(item.stock);
-              const isUnavailable = (item.status && item.status !== "active") || currentStock <= 0;
-              const productId = item.productId?._id || item.productId;
-              const categorySlug = (item.productId?.categoryId?.name || "seeds")
-                .toLowerCase();
-              const productNameSlug = (item.productId?.name || item.name || "")
-                .toLowerCase()
-                .replace(/\s+/g, "-");
-
-              const itemImage = item.imagePath
-                ? (item.imagePath.startsWith('http') ? item.imagePath : `${API_URL}/uploads/${item.imagePath}`)
-                : "https://placehold.co/400x400?text=Product";
-
-              return (
-                <div
-                  key={item._id}
-                  className={`bg-white p-5 rounded-4xl border transition-all flex flex-col sm:flex-row gap-6 items-center group relative ${isUnavailable ? "border-red-200 bg-red-50/40" : "border-slate-100 shadow-sm hover:shadow-md"
-                    }`}
-                >
-                  {/* Product Image */}
-                  <div className={`relative w-32 h-32 rounded-2xl overflow-hidden shrink-0 ${isUnavailable ? "grayscale opacity-50" : "bg-slate-50"}`}>
-                    <img
-                      src={itemImage}
-                      alt={item.name}
-                      className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-500"
-                      onClick={() => {
-                        if (!productId) return;
-                        navigate(`/category/${categorySlug}/${productNameSlug}/${productId}`);
-                      }}
-                    />
-                  </div>
-
-                  {/* Product Info */}
-                  <div className="flex-1 text-center sm:text-left">
-                    <h2 className={`text-xl font-black transition-colors ${isUnavailable ? "text-slate-400" : "text-slate-800 hover:text-green-600 cursor-pointer"}`}
-                      onClick={() => {
-                        if (isUnavailable) return;
-                        if (!productId) return;
-                        navigate(`/category/${categorySlug}/${productNameSlug}/${productId}`);
-                      }}>
-                      {item.name}
-
-                    </h2>
-                    <p className="text-slate-600 text-sm font-bold uppercase tracking-widest mt-1">
-                      {item.weight} {item.unit}
-                    </p>
-
-                    {/* Conditional Rendering for Availability */}
-                    {isUnavailable ? (
-                      <div className="flex items-center gap-2 mt-4 text-red-600 font-bold text-xs bg-red-100/50 w-fit px-3 py-1.5 rounded-lg border border-red-100">
-                        <AlertCircle size={14} /> Out of Stock / Unavailable
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center sm:justify-start mt-4 bg-slate-50 w-fit rounded-xl p-1 border border-slate-100">
-                        <button
-                          onClick={() => decrementQuantity(item._id, item.quantity)}
-                          className="p-2 hover:bg-white hover:text-red-500 rounded-lg transition-all"
-                        >
-                          <Minus size={16} strokeWidth={3} />
-                        </button>
-                        <span className="w-10 text-center font-black text-slate-800">{item.quantity}</span>
-                        <button
-                          onClick={() => {
-                            if (currentStock <= 0) {
-                              toast.error("Product is out of stock");
-                              return;
-                            }
-
-                            if (item.quantity >= currentStock) {
-                              toast.warning(`Only ${currentStock} stock available`);
-                              return;
-                            }
-
-                            incrementQuantity(item._id, item.quantity);
-                          }}
-                          disabled={isUnavailable}
-                          className="p-2 hover:bg-white hover:text-green-600 rounded-lg disabled:opacity-20 transition-all"
-                        >
-                          <Plus size={16} strokeWidth={3} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Price & Remove Action */}
-                  <div className="flex flex-row sm:flex-col justify-between items-center sm:items-end gap-4 w-full sm:w-auto border-t sm:border-t-0 pt-4 sm:pt-0">
-                    <div className="text-right">
-                      <p className={`text-2xl font-black ${isUnavailable ? "text-slate-300 line-through" : "text-slate-900"}`}>
-                        ₹{item.currentPrice * item.quantity}
-                      </p>
-                      <p className="text-xs font-bold text-slate-400">₹{item.currentPrice} /per unit</p>
-                    </div>
-                    <button
-                      onClick={() => removeFromCart(item._id)}
-                      className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all active:scale-90"
-                      title="Remove Item"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* --- RIGHT: ORDER SUMMARY --- */}
-          <div className="lg:col-span-1">
-            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 sticky top-10">
-              <h2 className="text-2xl font-black text-slate-800 mb-6">Order Summary</h2>
-
-              {/* Error Message for Unavailable Items */}
-              {hasInvalidItems && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex gap-3 text-red-600 text-sm font-medium animate-pulse">
-                  <AlertCircle className="shrink-0" size={20} />
-                  <p>Please remove unavailable items to continue with your purchase.</p>
-                </div>
-              )}
-
-              {/* Billing Details */}
-              <div className="space-y-4 mb-8">
-                <div className="flex justify-between text-slate-500 font-medium">
-                  <span>Subtotal</span>
-                  <span className="text-slate-800 font-bold">₹{totalPrice}</span>
-                </div>
-                <div className="flex justify-between text-slate-500 font-medium">
-                  <span>Delivery Charge</span>
-                  <span className="text-green-600 font-bold uppercase text-xs bg-green-50 px-2 py-1 rounded">Free</span>
-                </div>
-                <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
-                  <span className="text-lg font-bold text-slate-800">Total Amount</span>
-                  <span className="text-3xl font-black text-green-600">₹{totalPrice}</span>
-                </div>
-              </div>
-
-              {/* Checkout Button */}
+    <>
+      <div className="min-h-screen bg-[#f1f3f6] pb-10">
+        <div className="max-w-7xl mx-auto px-4 pt-6">
+          {/* Header */}
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
               <button
-                disabled={hasInvalidItems}
-                onClick={() => navigate("/checkout")}
-                className={`w-full py-5 rounded-2xl font-bold text-lg transition-all shadow-xl flex items-center justify-center gap-3 active:scale-95 ${hasInvalidItems
-                    ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
-                    : "bg-slate-900 text-white hover:bg-green-600 shadow-slate-200"
-                  }`}
+                onClick={() => navigate(-1)}
+                className="flex h-10 w-10 items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-700 hover:text-[#2874f0] transition"
               >
-                {hasInvalidItems ? "Check Items Again" : "Checkout Now"}
+                <ArrowLeft size={18} />
               </button>
 
-              {/* Trust Badge */}
-              <div className="mt-6 flex items-center justify-center gap-2 text-slate-400">
-                <ShieldCheck size={16} />
-                <span className="text-[10px] uppercase font-bold tracking-widest">Secure Encrypted Payment</span>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-900">My Cart</h1>
+                <p className="text-sm text-slate-500">
+                  {cart.length} item{cart.length > 1 ? "s" : ""} in your cart
+                </p>
               </div>
             </div>
           </div>
 
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Left Cart Items */}
+            <div className="lg:col-span-2 space-y-4">
+              {cart.map((item) => {
+                const currentStock = Number(item.stock);
+                const isUnavailable =
+                  (item.status && item.status !== "active") || currentStock <= 0;
+
+                const productId = item.productId?._id || item.productId;
+                const categorySlug = (item.productId?.categoryId?.name || "seeds")
+                  .toLowerCase()
+                  .replace(/\s+/g, "-");
+                const productNameSlug = (item.productId?.name || item.name || "")
+                  .toLowerCase()
+                  .replace(/\s+/g, "-");
+
+                const itemImage = item.imagePath
+                  ? item.imagePath.startsWith("http")
+                    ? item.imagePath
+                    : `${API_URL}/uploads/${item.imagePath}`
+                  : "https://placehold.co/400x400?text=Product";
+
+                return (
+                  <div
+                    key={item._id}
+                    className={`rounded-2xl border bg-white p-4 transition ${
+                      isUnavailable
+                        ? "border-red-200"
+                        : "border-slate-200 hover:shadow-sm"
+                    }`}
+                  >
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      {/* Image */}
+                      <div
+                        onClick={() => {
+                          if (!productId || isUnavailable) return;
+                          navigate(`/category/${categorySlug}/${productNameSlug}/${productId}`);
+                        }}
+                        className={`h-24 w-24 sm:h-28 sm:w-28 shrink-0 rounded-xl overflow-hidden border cursor-pointer ${
+                          isUnavailable
+                            ? "border-red-100 bg-red-50 grayscale opacity-60"
+                            : "border-slate-200 bg-slate-50"
+                        }`}
+                      >
+                        <img
+                          src={itemImage}
+                          alt={item.name}
+                          className="h-full w-full object-contain p-2"
+                        />
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <h2
+                              onClick={() => {
+                                if (isUnavailable || !productId) return;
+                                navigate(`/category/${categorySlug}/${productNameSlug}/${productId}`);
+                              }}
+                              className={`text-base md:text-lg font-semibold leading-snug ${
+                                isUnavailable
+                                  ? "text-slate-400"
+                                  : "text-slate-900 hover:text-[#2874f0] cursor-pointer"
+                              }`}
+                            >
+                              {item.name}
+                            </h2>
+
+                            <div className="mt-2 flex flex-wrap items-center gap-2">
+                              <span className="text-xs text-slate-500 font-medium">
+                                {item.weight} {item.unit}
+                              </span>
+
+                              {!isUnavailable ? (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 text-[10px] font-semibold text-green-600">
+                                  <BadgeCheck size={11} />
+                                  Available
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-semibold text-red-600">
+                                  <AlertCircle size={11} />
+                                  Unavailable
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => openRemoveConfirm(item._id, item.name)}
+                            className="flex h-9 w-9 items-center justify-center rounded-lg text-red-400 hover:bg-red-50 hover:text-red-500 transition"
+                            title="Remove Item"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+
+                        <div className="mt-4 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                          <div>
+                            <p
+                              className={`text-xl md:text-2xl font-bold ${
+                                isUnavailable ? "text-slate-300 line-through" : "text-slate-900"
+                              }`}
+                            >
+                              ₹{item.currentPrice * item.quantity}
+                            </p>
+                            <p className="text-xs text-slate-800 mt-1">
+                              ₹{item.currentPrice} per unit
+                            </p>
+                          </div>
+
+                          {isUnavailable ? (
+                            <div className="inline-flex items-center gap-2 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600">
+                              <AlertCircle size={14} />
+                              Out of Stock / Unavailable
+                            </div>
+                          ) : (
+                            <div className="inline-flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1">
+                              <button
+                                onClick={() => decrementQuantity(item._id, item.quantity)}
+                                className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-700 hover:bg-white hover:text-red-500 transition"
+                              >
+                                <Minus size={15} strokeWidth={3} />
+                              </button>
+
+                              <span className="w-10 text-center text-base font-bold text-slate-900">
+                                {item.quantity}
+                              </span>
+
+                              <button
+                                onClick={() => {
+                                  if (currentStock <= 0) {
+                                    toast.error("Product is out of stock");
+                                    return;
+                                  }
+
+                                  if (item.quantity >= currentStock) {
+                                    toast.warning(`Only ${currentStock} stock available`);
+                                    return;
+                                  }
+
+                                  incrementQuantity(item._id, item.quantity);
+                                }}
+                                disabled={isUnavailable}
+                                className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-700 hover:bg-white hover:text-green-600 transition disabled:opacity-40"
+                              >
+                                <Plus size={15} strokeWidth={3} />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Right Summary */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-6 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
+                  <h2 className="text-lg font-bold text-slate-700">PRICE DETAILS</h2>
+                </div>
+
+                <div className="p-5">
+                  {hasInvalidItems && (
+                    <div className="mb-5 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-600">
+                      <div className="flex gap-2">
+                        <AlertCircle className="shrink-0 mt-0.5" size={16} />
+                        <p>Please remove unavailable items to continue.</p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-4 text-sm">
+                    <div className="flex items-center justify-between text-slate-600">
+                      <span>Price ({cart.length} items)</span>
+                      <span className="font-semibold text-slate-900">₹{totalPrice}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600">
+                      <span>Delivery Charges</span>
+                      <span className="font-semibold text-green-600">FREE</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600">
+                      <span>Platform Fee</span>
+                      <span className="font-semibold text-slate-900">₹0</span>
+                    </div>
+
+                    <div className="border-t border-dashed border-slate-200 pt-4 flex items-center justify-between">
+                      <span className="text-base font-bold text-slate-900">Total Amount</span>
+                      <span className="text-2xl font-bold text-slate-900">₹{totalPrice}</span>
+                    </div>
+                  </div>
+
+                  <button
+                    disabled={hasInvalidItems}
+                    onClick={() => navigate("/checkout")}
+                    className={`mt-6 w-full rounded-xl py-3.5 text-base font-semibold transition ${
+                      hasInvalidItems
+                        ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                        : "bg-[#fb641b] text-white hover:bg-[#e85a16]"
+                    }`}
+                  >
+                    {hasInvalidItems ? "Check Items Again" : "Place Order"}
+                  </button>
+
+                  <div className="mt-5 space-y-3">
+                    <div className="flex items-center gap-3 text-sm text-slate-600">
+                      <ShieldCheck size={17} className="text-green-600" />
+                      <span className="font-medium">Secure payment</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-slate-600">
+                      <Truck size={17} className="text-slate-600" />
+                      <span className="font-medium">Fast delivery available</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-slate-600">
+                      <Tag size={17} className="text-blue-600" />
+                      <span className="font-medium">Best price on selected items</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Center Confirm Popup */}
+      {confirmBox.open && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden animate-[fadeIn_.2s_ease]">
+            <div className="bg-gradient-to-r from-red-50 to-rose-50 px-5 py-4 border-b border-red-100">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-red-100 text-red-600">
+                  <Trash2 size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Remove Item</h3>
+                  <p className="text-xs text-slate-500">Please confirm your action</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-5 py-5">
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Are you sure you want to remove{" "}
+                <span className="font-semibold text-slate-900">
+                  {confirmBox.itemName || "this item"}
+                </span>{" "}
+                from your cart?
+              </p>
+
+              <div className="mt-6 grid grid-cols-2 gap-3">
+                <button
+                  onClick={closeRemoveConfirm}
+                  className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={confirmRemoveItem}
+                  className="rounded-xl bg-red-500 px-4 py-3 text-sm font-semibold text-white hover:bg-red-600 transition"
+                >
+                  Yes, Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
-export default Cart;  
+export default Cart;
