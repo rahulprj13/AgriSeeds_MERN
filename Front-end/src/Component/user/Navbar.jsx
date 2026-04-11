@@ -2,7 +2,7 @@ import React, { useContext, useState, useRef, useEffect } from 'react'
 import { NavLink, Link, useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import axios from "axios";
-import { faCartShopping, faSearch, faUser, faBars, faXmark, faHeart } from '@fortawesome/free-solid-svg-icons'
+import { faCartShopping, faSearch, faUser, faBars, faXmark, faHeart, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { CategoryContext } from '../context/CategoryContext'
 import { AuthContext } from '../context/AuthContext'
 import { CartContext } from '../context/CartContext'
@@ -131,22 +131,41 @@ export const Navbar = () => {
                             </h1>
                         </Link>
                         <div className="flex items-center gap-4 lg:hidden">
-                            <NavLink to="/cart" className="relative text-gray-300 hover:text-white">
-                                <FontAwesomeIcon icon={faCartShopping} />
-                                {totalItems > 0 && (
-                                    <span className="absolute -top-2 -right-3 bg-red-500 text-white rounded-full text-[10px] px-1.5 py-0.5">
-                                        {totalItems}
-                                    </span>
-                                )}
-                            </NavLink>
-                            <NavLink to="/wishlist" className="relative text-gray-300 hover:text-white">
-                                <FontAwesomeIcon icon={faHeart} />
-                                {wishlistCount > 0 && (
-                                    <span className="absolute -top-2 -right-3 bg-red-500 text-white rounded-full text-[10px] px-1.5 py-0.5">
-                                        {wishlistCount}
-                                    </span>
-                                )}
-                            </NavLink>
+                            {/* CART */}
+                        <NavLink
+                            to="/cart"
+                            className={({ isActive }) =>
+                                `relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl border transition-all duration-300 ${isActive
+                                    ? "bg-green-500 border-green-500 text-white shadow-lg shadow-green-500/25"
+                                    : "bg-white/10 border-white/10 text-gray-200 hover:bg-white hover:text-green-600 hover:border-green-100"
+                                }`
+                            }
+                        >
+                            <FontAwesomeIcon icon={faCartShopping} className="text-sm sm:text-base" />
+                            {totalItems > 0 && (
+                                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] sm:min-w-[20px] sm:h-[20px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold shadow-md">
+                                    {totalItems > 99 ? "99+" : totalItems}
+                                </span>
+                            )}
+                        </NavLink>
+
+                        {/* WISHLIST */}
+                        <NavLink
+                            to="/wishlist"
+                            className={({ isActive }) =>
+                                `relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl border transition-all duration-300 ${isActive
+                                    ? "bg-green-500 border-green-500 text-white shadow-lg shadow-green-500/25"
+                                    : "bg-white/10 border-white/10 text-gray-200 hover:bg-white hover:text-green-600 hover:border-green-100"
+                                }`
+                            }
+                        >
+                            <FontAwesomeIcon icon={faHeart} className="text-sm sm:text-base" />
+                            {wishlistCount > 0 && (
+                                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] sm:min-w-[20px] sm:h-[20px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold shadow-md">
+                                    {wishlistCount > 99 ? "99+" : wishlistCount}
+                                </span>
+                            )}
+                        </NavLink>
                             <button onClick={() => setIsOpen(!isOpen)} className="text-white text-xl">
                                 <FontAwesomeIcon icon={isOpen ? faXmark : faBars} />
                             </button>
@@ -190,8 +209,12 @@ export const Navbar = () => {
 
                         {/* CATEGORY DROPDOWN */}
                         <div className="relative" ref={seedsRef}>
-                            <button onClick={() => setDropdown(!dropdown)} className="text-gray-300 hover:text-white">
-                                Seeds ▼
+                            <button onClick={() => setDropdown(!dropdown)} className="text-gray-300 hover:text-white flex items-center gap-1 cursor-pointer">
+                                Seeds
+                                <FontAwesomeIcon
+                                    icon={faChevronDown}
+                                    className={`text-xs transition-transform ${dropdown ? "rotate-180" : ""}`}
+                                />
                             </button>
                             {dropdown && (
                                 <div className="absolute bg-white text-black mt-2 rounded shadow-lg w-52 py-2">
@@ -200,7 +223,7 @@ export const Navbar = () => {
                                             key={cat._id || cat.name}
                                             to={`/category/${cat.name}`}
                                             onClick={closeAll}
-                                            className="block px-4 py-2 hover:bg-gray-100"
+                                            className="block px-4 py-2 hover:bg-green-50"
                                         >
                                             {cat.name} Seeds
                                         </NavLink>
@@ -210,21 +233,37 @@ export const Navbar = () => {
                         </div>
 
                         {/* CART */}
-                        <NavLink to="/cart" className="relative text-gray-300 hover:text-white">
-                            <FontAwesomeIcon icon={faCartShopping} />
+                        <NavLink
+                            to="/cart"
+                            className={({ isActive }) =>
+                                `relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl border transition-all duration-300 ${isActive
+                                    ? "bg-green-500 border-green-500 text-white shadow-lg shadow-green-500/25"
+                                    : "bg-white/10 border-white/10 text-gray-200 hover:bg-white hover:text-green-600 hover:border-green-100"
+                                }`
+                            }
+                        >
+                            <FontAwesomeIcon icon={faCartShopping} className="text-sm sm:text-base" />
                             {totalItems > 0 && (
-                                <span className="absolute -top-2 -right-3 bg-red-500 text-white rounded-full text-xs px-1.5 py-0.5">
-                                    {totalItems}
+                                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] sm:min-w-[20px] sm:h-[20px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold shadow-md">
+                                    {totalItems > 99 ? "99+" : totalItems}
                                 </span>
                             )}
                         </NavLink>
 
                         {/* WISHLIST */}
-                        <NavLink to="/wishlist" className="relative text-gray-300 hover:text-white">
-                            <FontAwesomeIcon icon={faHeart} />
+                        <NavLink
+                            to="/wishlist"
+                            className={({ isActive }) =>
+                                `relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl border transition-all duration-300 ${isActive
+                                    ? "bg-green-500 border-green-500 text-white shadow-lg shadow-green-500/25"
+                                    : "bg-white/10 border-white/10 text-gray-200 hover:bg-white hover:text-green-600 hover:border-green-100"
+                                }`
+                            }
+                        >
+                            <FontAwesomeIcon icon={faHeart} className="text-sm sm:text-base" />
                             {wishlistCount > 0 && (
-                                <span className="absolute -top-2 -right-3 bg-red-500 text-white rounded-full text-xs px-1.5 py-0.5">
-                                    {wishlistCount}
+                                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] sm:min-w-[20px] sm:h-[20px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold shadow-md">
+                                    {wishlistCount > 99 ? "99+" : wishlistCount}
                                 </span>
                             )}
                         </NavLink>
@@ -260,6 +299,7 @@ export const Navbar = () => {
                 {/* MOBILE MENU LINKS */}
                 {isOpen && (
                     <div className="lg:hidden bg-gray-900 border-t border-gray-700 px-2 py-4 space-y-4">
+                        
                         <NavLink to="/home" onClick={closeAll} className="block text-gray-300 hover:text-white text-lg px-2">Home</NavLink>
                         <NavLink to="/about" onClick={closeAll} className="block text-gray-300 hover:text-white text-lg px-2">About</NavLink>
                         <NavLink to="/contact" onClick={closeAll} className="block text-gray-300 hover:text-white text-lg px-2">Contact</NavLink>
@@ -267,7 +307,11 @@ export const Navbar = () => {
                         {/* MOBILE CATEGORY DROPDOWN */}
                         <div ref={seedsRef}>
                             <button onClick={() => setDropdown(!dropdown)} className="w-full text-left text-gray-300 hover:text-white text-lg px-2 flex justify-between">
-                                Seeds <span>{dropdown ? '▲' : '▼'}</span>
+                                <span>Seeds</span>
+                                <FontAwesomeIcon
+                                    icon={faChevronDown}
+                                    className={`text-xs transition-transform ${dropdown ? "rotate-180" : ""}`}
+                                />
                             </button>
                             {dropdown && (
                                 <div className="flex flex-col gap-2 mt-2 pl-6">
