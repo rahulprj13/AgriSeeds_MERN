@@ -71,8 +71,8 @@ const Cart = () => {
     return (
       <div className="min-h-screen bg-[#f1f3f6] px-4 flex items-center justify-center">
         <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-sm border border-slate-200">
-          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50">
-            <ShoppingBag className="text-blue-600" size={30} />
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-green-50">
+            <ShoppingBag className="text-green-600" size={30} />
           </div>
 
           <h1 className="text-2xl font-bold text-slate-900">Your cart is empty</h1>
@@ -82,7 +82,7 @@ const Cart = () => {
 
           <button
             onClick={() => navigate("/")}
-            className="mt-6 w-full rounded-xl bg-[#2874f0] px-6 py-3 font-semibold text-white hover:bg-[#1f63d3] transition"
+            className="mt-6 w-full rounded-xl bg-[#18ba30] px-6 py-3 font-semibold text-white hover:bg-[#1fd340] transition"
           >
             Shop Now
           </button>
