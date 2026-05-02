@@ -186,7 +186,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={togglePassword}
-                  className="px-4 bg-white text-black rounded-r-xl font-semibold"
+                  className="px-4 bg-white text-black rounded-r-xl font-semibold cursor-pointer"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -206,10 +206,10 @@ const Login = () => {
 
             <div className="flex justify-between text-sm">
 
-              <label className="flex items-center gap-2">
+              {/* <label className="flex items-center gap-2">
                 <input type="checkbox" className="accent-green-500" />
                 Remember me
-              </label>
+              </label> */}
 
               <Link
                 to="/forgotpassword"
@@ -227,7 +227,7 @@ const Login = () => {
               type="submit"
               disabled={loading}
               className="w-full py-3 rounded-xl bg-green-500 hover:bg-green-600
-            font-bold transition"
+            font-bold transition cursor-pointer"
             >
               {loading ? "Logging in..." : "Login"}
             </button>

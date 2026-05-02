@@ -29,7 +29,7 @@ const SignUp = () => {
     watch,
     getValues,
     setValue,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm();
 
   const passwordValue = watch("password");
@@ -351,7 +351,7 @@ const SignUp = () => {
                 type="button"
                 onClick={sendOtp}
                 disabled={sendingOtp || secondsLeft > 0}
-                className="w-full rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:from-green-600 hover:to-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:from-green-600 hover:to-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
               >
                 {sendingOtp
                   ? "Sending..."
@@ -406,7 +406,7 @@ const SignUp = () => {
                   <label className="mb-1 block text-sm font-semibold tracking-wide text-gray-100">
                     Password
                   </label>
-                  <div className="relative">
+                  <div className="relative ">
                     <FontAwesomeIcon
                       icon={faLock}
                       className="absolute left-3 top-1/2 -translate-y-1/2 text-green-300"
@@ -420,7 +420,7 @@ const SignUp = () => {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-200 transition hover:text-white"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-200 transition hover:text-white cursor-pointer"
                     >
                       <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                     </button>
@@ -448,7 +448,7 @@ const SignUp = () => {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-200 transition hover:text-white"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-200 transition hover:text-white cursor-pointer"
                     >
                       <FontAwesomeIcon
                         icon={showConfirmPassword ? faEyeSlash : faEye}
@@ -461,8 +461,12 @@ const SignUp = () => {
                 </div>
               </div>
 
-              <button className="w-full rounded-xl bg-white py-2.5 text-sm font-bold text-gray-900 shadow-lg transition hover:bg-green-50">
-                Register
+              <button 
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full rounded-xl bg-white py-2.5 text-sm font-bold text-gray-900 shadow-lg transition hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+              >
+                {isSubmitting ? "Registering..." : "Register"}
               </button>
 
               <p className="text-center text-sm sm:text-sm text-gray-200">
